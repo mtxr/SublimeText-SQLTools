@@ -1,7 +1,7 @@
 import sublime, os, subprocess, threading, signal
 
 from SQLTools import const
-from SQLTools.general import Log
+from SQLTools.lib.general import Log
 
 class Command(threading.Thread):
     def __init__(self, text, tempfile=None):

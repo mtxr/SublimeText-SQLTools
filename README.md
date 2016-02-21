@@ -1,4 +1,4 @@
-SQLTools
+![SQLTools](/icon.png?raw=true) SQLTools
 ===============
 
 A swiss knife for SQL in Sublime Text.
@@ -15,17 +15,41 @@ Inspired by [SQLExec Plugin](http://lubriciousdevelopers.github.io/projects/subl
 
 ## Settings
 
-| Option | Description | Default value |
-| --- | :--- | --- |
-| `unescape_quotes`| Escape chars like \" and \' for extension in array | `[ "php" ]` |
-| `commands` | Path to desired command | `{ "mysql"  : "mysql", "pgsql"  : "psql", "oracle" : "sqlplus", "vertica": "vsql" }` |
-| `debug` | Activate debug mode. This will print SQL queries and messages using Sublime Text console | `false` |
-| `thread_timeout` | Query execution time in miliseconds before kill. Prevents Sublime Text from lockup while running complex queries | 5000 |
-| `show_result_on_window` | Show query result using a window (true) or a panel (false) | `false` |
-| `show_records` | Resultset settings. you can check more on [Show records options](#show-records-options). | `{"limit": 50}` |
+| Option | Description | Type | Default value |
+| --- | :--- | --- | --- |
+| `unescape_quotes`| Escape chars like \" and \' for extension in array | `array` |`[ "php" ]` |
+| `commands` | Path to desired command. You can check more on [Path to Commands](#path-to-commands) | `object` |  |
+| `debug` | Activate debug mode. This will print SQL queries and messages using Sublime Text console | `boolean``|`false` |
+| `thread_timeout` | Query execution time in miliseconds before kill. Prevents Sublime Text from lockup while running complex queries | `int` | 5000 |
+| `show_result_on_window` | Show query result using a window (true) or a panel (false) | `boolean` | `false` |
+| `show_records` | Resultset settings. You can check more on [Show records options](#show-records-options) | `object` | `{"limit": 50}` |
+| `beautify` | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting) | `object` | `{"limit": 50}` |
 
 ### <a id="show-records-options"></a>Show records options
 
-| Option | Description | Default value |
-| --- | :--- | --- |
-| `limit`| number of rows to show whe using Show Table Records command | `50` |
+| Option | Description | Type | Default value |
+| --- | :--- | --- | --- |
+| `limit`| number of rows to show whe using Show Table Records command | `int` | 50 |
+
+
+### <a id="sql-formatting"></a>SQL Formatting
+
+| Option | Description | Type | Default value |
+| --- | :--- | --- | --- |
+| `keyword_case` | Changes how keywords are formatted. Allowed values are `"upper"`, `"lower"` and `"capitalize"` and `null` (leaves case intact) | `string` | `"upper"` |
+| `identifier_case` | Changes how identifiers are formatted. Allowed values are `"upper"` `"lower"` and `"capitalize"`and `null` (leaves case intact) | `string` | `null` |
+| `strip_comments` | Remove comments from file/selection | `boolean` | `false` |
+| `indent_tabs` | Use tabs instead of spaces | `boolean` | `false` |
+| `indent_width` | Indentation width | `int` | 4 |
+| `reindent` | Reindent code if `true` | `boolean` | `true` |
+
+### <a id="path-to-commands"></a>Path to Commands
+
+In case your database command is not in your `PATH` enviroment var, you can set the path here.
+
+| Option | Default value |
+| --- | --- |
+| `mysql`|  `"mysql"` |
+| `pgsql` | `"psql"` |
+| `oracle` | `"sqlplus"` |
+| `vertica` | `"vsql"` |

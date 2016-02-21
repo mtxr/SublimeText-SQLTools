@@ -1,17 +1,25 @@
 {
-    "unescape_quotes": [
+    "debug"                 : false,
+    "thread_timeout"        : 5000,
+    "show_result_on_window" : false,
+    "unescape_quotes" : [
         "php"
     ],
-    "commands": {
-        "mysql"  : "mysql",
-        "pgsql"  : "psql",
-        "oracle" : "sqlplus",
-        "vertica": "vsql",
+    "commands" : {
+        "mysql"   : "mysql",
+        "pgsql"   : "psql",
+        "oracle"  : "sqlplus",
+        "vertica" : "vsql",
     },
-    "debug": false,
-    "thread_timeout": 5000,
-    "show_result_on_window": false,
-    "show_records": {
-        "limit": 50
+    "show_records" : {
+        "limit" : 50
+    },
+    "beautify" : {
+        "keyword_case"    : "upper",
+        "identifier_case" : null,
+        "strip_comments"  : false,
+        "indent_tabs"     : false,
+        "indent_width"    : 4,
+        "reindent"        : true
     }
 }

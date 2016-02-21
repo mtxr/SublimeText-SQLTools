@@ -1,8 +1,8 @@
 import sublime, tempfile
 
 from SQLTools import const
-from SQLTools.command import Command
-from SQLTools.general import Log
+from SQLTools.lib.command import Command
+from SQLTools.lib.general import Log
 
 class Connection:
     def __init__(self, options):

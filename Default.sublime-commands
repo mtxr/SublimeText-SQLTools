@@ -22,5 +22,9 @@
   {
     "caption": "ST: Desc Table",
     "command": "sql_desc"
+  },
+  {
+    "caption": "ST: Format Current SQL File",
+    "command": "sql_beautify"
   }
 ]
