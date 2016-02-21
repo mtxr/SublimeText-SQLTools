@@ -1,0 +1,228 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>SQLTools by mtxr</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">SQLTools</h1>
+        <p class="header">The ultimate SQL swiss knife for Sublime Text 2/3</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/mtxr/SQLTools/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/mtxr/SQLTools/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/mtxr/SQLTools">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/mtxr">mtxr</a></p>
+
+
+      </header>
+      <section>
+        <h1>
+<a id="-sqltools" class="anchor" href="#-sqltools" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><img src="https://raw.githubusercontent.com/mtxr/SQLTools/master/icon.png" alt="SQLTools"> SQLTools</h1>
+
+<p>A swiss knife for SQL in Sublime Text.</p>
+
+<p>Inspired by <a href="http://lubriciousdevelopers.github.io/projects/sublime-sql-exec/">SQLExec Plugin</a> and <a href="https://github.com/zsong/SqlBeautifier">SqlBeautifier</a>.</p>
+
+<h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>View table schemas</li>
+<li>Show table records</li>
+<li>Run SQL Queries</li>
+<li>Threading Support (prevent ST lockups)</li>
+<li>Query timeout (Kill thread if query takes too long)</li>
+<li>Unescape chars for languages (PHP \" is replace by ")</li>
+</ul>
+
+<h2>
+<a id="settings" class="anchor" href="#settings" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Settings</h2>
+
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th align="left">Description</th>
+<th>Type</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unescape_quotes</code></td>
+<td align="left">Escape chars like \" and \' for extension in array</td>
+<td><code>array</code></td>
+<td><code>[ "php" ]</code></td>
+</tr>
+<tr>
+<td><code>commands</code></td>
+<td align="left">Path to desired command. You can check more on <a href="#path-to-commands">Path to Commands</a>
+</td>
+<td><code>object</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>debug</code></td>
+<td align="left">Activate debug mode. This will print SQL queries and messages using Sublime Text console</td>
+<td>
+<code>boolean</code><code>|</code>false`</td>
+<td></td>
+</tr>
+<tr>
+<td><code>thread_timeout</code></td>
+<td align="left">Query execution time in miliseconds before kill. Prevents Sublime Text from lockup while running complex queries</td>
+<td><code>int</code></td>
+<td>5000</td>
+</tr>
+<tr>
+<td><code>show_result_on_window</code></td>
+<td align="left">Show query result using a window (true) or a panel (false)</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>show_records</code></td>
+<td align="left">Resultset settings. You can check more on <a href="#show-records-options">Show records options</a>
+</td>
+<td><code>object</code></td>
+<td><code>{"limit": 50}</code></td>
+</tr>
+<tr>
+<td><code>beautify</code></td>
+<td align="left">SQL formatting settings. You can check more on <a href="#sql-formatting">SQL Formatting</a>
+</td>
+<td><code>object</code></td>
+<td><code>{"limit": 50}</code></td>
+</tr>
+</tbody>
+</table>
+
+<h3>
+<a id="show-records-options" class="anchor" href="#show-records-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="show-records-options"></a>Show records options</h3>
+
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th align="left">Description</th>
+<th>Type</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>limit</code></td>
+<td align="left">number of rows to show whe using Show Table Records command</td>
+<td><code>int</code></td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+
+<h3>
+<a id="sql-formatting" class="anchor" href="#sql-formatting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="sql-formatting"></a>SQL Formatting</h3>
+
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th align="left">Description</th>
+<th>Type</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>keyword_case</code></td>
+<td align="left">Changes how keywords are formatted. Allowed values are <code>"upper"</code>, <code>"lower"</code> and <code>"capitalize"</code> and <code>null</code> (leaves case intact)</td>
+<td><code>string</code></td>
+<td><code>"upper"</code></td>
+</tr>
+<tr>
+<td><code>identifier_case</code></td>
+<td align="left">Changes how identifiers are formatted. Allowed values are <code>"upper"</code> <code>"lower"</code> and <code>"capitalize"</code>and <code>null</code> (leaves case intact)</td>
+<td><code>string</code></td>
+<td><code>null</code></td>
+</tr>
+<tr>
+<td><code>strip_comments</code></td>
+<td align="left">Remove comments from file/selection</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>indent_tabs</code></td>
+<td align="left">Use tabs instead of spaces</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>indent_width</code></td>
+<td align="left">Indentation width</td>
+<td><code>int</code></td>
+<td>4</td>
+</tr>
+<tr>
+<td><code>reindent</code></td>
+<td align="left">Reindent code if <code>true</code>
+</td>
+<td><code>boolean</code></td>
+<td><code>true</code></td>
+</tr>
+</tbody>
+</table>
+
+<h3>
+<a id="path-to-commands" class="anchor" href="#path-to-commands" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="path-to-commands"></a>Path to Commands</h3>
+
+<p>In case your database command is not in your <code>PATH</code> enviroment var, you can set the path here.</p>
+
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mysql</code></td>
+<td><code>"mysql"</code></td>
+</tr>
+<tr>
+<td><code>pgsql</code></td>
+<td><code>"psql"</code></td>
+</tr>
+<tr>
+<td><code>oracle</code></td>
+<td><code>"sqlplus"</code></td>
+</tr>
+<tr>
+<td><code>vertica</code></td>
+<td><code>"vsql"</code></td>
+</tr>
+</tbody>
+</table>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
