@@ -1,0 +1,26 @@
+[
+  {
+    "caption": "ST: List connections",
+    "command": "sql_list_connection"
+  },
+  {
+    "caption": "ST: Execute",
+    "command": "sql_execute"
+  },
+  {
+    "caption": "ST: History",
+    "command": "sql_history"
+  },
+  {
+    "caption": "ST: Type Query",
+    "command": "sql_query"
+  },
+  {
+    "caption": "ST: Show Table Records",
+    "command": "sql_show_records"
+  },
+  {
+    "caption": "ST: Desc Table",
+    "command": "sql_desc"
+  }
+]

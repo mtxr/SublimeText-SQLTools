@@ -1,0 +1,27 @@
+{
+    "options": ["-S"],
+    "before": [
+        "set colsep '|'",
+        "set pagesize 100",
+        "set linesize 500",
+        "set tab off"
+    ],
+    "args": "{options.username}/{options.password}@\"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={options.host})(PORT={options.port})))(CONNECT_DATA=(SERVICE_NAME={options.service})))\"",
+    "queries": {
+        "desc" : {
+            "query": "select CONCAT(CONCAT('| ', table_name), ' |') as tables from user_tables;",
+            "options": ["-S"],
+            "format" : "|%s|"
+        },
+        "desc table": {
+            "query": "desc %s;",
+            "options": ["-S"],
+            "format" : "|%s|"
+        },
+        "show records": {
+            "query": "select * from {0} limit {1};",
+            "options": ["-S"],
+            "format" : "|%s|"
+        }
+    }
+}

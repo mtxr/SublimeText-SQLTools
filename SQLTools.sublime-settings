@@ -1,0 +1,17 @@
+{
+    "unescape_quotes": [
+        "php"
+    ],
+    "commands": {
+        "mysql"  : "mysql",
+        "pgsql"  : "psql",
+        "oracle" : "sqlplus",
+        "vertica": "vsql",
+    },
+    "debug": false,
+    "thread_timeout": 5000,
+    "show_result_on_window": false,
+    "show_records": {
+        "limit": 50
+    }
+}

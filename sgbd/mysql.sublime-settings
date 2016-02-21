@@ -1,0 +1,22 @@
+{
+    "options": ["-f", "--table"],
+    "before": [],
+    "args": "-h{options.host} -P{options.port} -u\"{options.username}\" -p\"{options.password}\" -D\"{options.database}\"",
+    "queries": {
+        "desc" : {
+            "query": "show tables",
+            "options": ["-f", "--table", "--skip-column-names"],
+            "format" : "|%s|"
+        },
+        "desc table": {
+            "query": "desc `%s`",
+            "options": ["-f", "--table"],
+            "format" : "|%s|"
+        },
+        "show records": {
+            "query": "select * from `{0}` limit {1}",
+            "options": ["-f", "--table"],
+            "format" : "|%s|"
+        }
+    }
+}

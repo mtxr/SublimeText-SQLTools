@@ -1,0 +1,8 @@
+[
+    { "keys": ["ctrl+alt+e"], "command": "sql_list_connection" },
+    { "keys": ["ctrl+e", "ctrl+e"], "command": "sql_execute" },
+    { "keys": ["ctrl+e", "ctrl+h"], "command": "sql_history" },
+    { "keys": ["ctrl+e", "ctrl+q"], "command": "sql_query" },
+    { "keys": ["ctrl+e", "ctrl+s"], "command": "sql_show_records" },
+    { "keys": ["ctrl+e", "ctrl+d"], "command": "sql_desc" }
+]
