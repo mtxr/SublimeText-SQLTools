@@ -217,6 +217,41 @@
 </tr>
 </tbody>
 </table>
+
+<h2>
+<a id="connections" class="anchor" href="#connections" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Connections</h2>
+
+<p>SQLToolConnections.sublime-settings example:</p>
+
+<div class="highlight highlight-source-json"><pre>{
+    <span class="pl-s"><span class="pl-pds">"</span>connections<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Connection 1<span class="pl-pds">"</span></span>: {
+            <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>mysql<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>host<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>port<span class="pl-pds">"</span></span>    : <span class="pl-c1">3306</span>,
+            <span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>user<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>database<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>dbname<span class="pl-pds">"</span></span>
+        },
+        <span class="pl-s"><span class="pl-pds">"</span>Connection 2<span class="pl-pds">"</span></span>: {
+            <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>pgsql<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>host<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>port<span class="pl-pds">"</span></span>    :  <span class="pl-c1">5432</span>,
+            <span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>anotheruser<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>database<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>dbname<span class="pl-pds">"</span></span>
+        },
+        <span class="pl-s"><span class="pl-pds">"</span>Connection 2<span class="pl-pds">"</span></span>: {
+            <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>oracle<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>host<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>port<span class="pl-pds">"</span></span>    :  <span class="pl-c1">1522</span>,
+            <span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>anotheruser<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>database<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>dbname<span class="pl-pds">"</span></span>,
+            <span class="pl-s"><span class="pl-pds">"</span>service<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>servicename<span class="pl-pds">"</span></span>
+        }
+    },
+    <span class="pl-s"><span class="pl-pds">"</span>default<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Connection 1<span class="pl-pds">"</span></span>
+}</pre></div>
       </section>
       <footer>
         <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
