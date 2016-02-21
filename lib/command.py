@@ -1,7 +1,10 @@
-import sublime, os, subprocess, threading, signal
+import sublime, os, subprocess, threading, signal, sys
 
-from SQLTools import const
-from SQLTools.lib.general import Log
+from os.path import dirname
+sys.path.append(dirname(dirname(__file__)))
+
+from lib import const
+from lib.general import Log
 
 class Command(threading.Thread):
     def __init__(self, text, tempfile=None):

@@ -1,5 +1,9 @@
-import sublime
-from SQLTools import const
+import sublime, sys
+
+from os.path import dirname
+sys.path.append(dirname(dirname(__file__)))
+
+from lib import const
 
 class Selection:
     def __init__(self, view):

@@ -53,3 +53,39 @@ In case your database command is not in your `PATH` enviroment var, you can set 
 | `pgsql` | `"psql"` |
 | `oracle` | `"sqlplus"` |
 | `vertica` | `"vsql"` |
+
+## Connections
+
+SQLToolConnections.sublime-settings example:
+
+```json
+{
+    "connections": {
+        "Connection 1": {
+            "type"    : "mysql",
+            "host"    : "127.0.0.1",
+            "port"    : 3306,
+            "username": "user",
+            "password": "password",
+            "database": "dbname"
+        },
+        "Connection 2": {
+            "type"    : "pgsql",
+            "host"    : "127.0.0.1",
+            "port"    :  5432,
+            "username": "anotheruser",
+            "database": "dbname"
+        },
+        "Connection 2": {
+            "type"    : "oracle",
+            "host"    : "127.0.0.1",
+            "port"    :  1522,
+            "username": "anotheruser",
+            "password": "password",
+            "database": "dbname",
+            "service" : "servicename"
+        }
+    },
+    "default": "Connection 1"
+}
+```

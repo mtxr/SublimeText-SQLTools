@@ -1,28 +1,34 @@
-
 import sublime, sublime_plugin, tempfile, os, subprocess, threading, signal, sys
 
-from SQLTools import const
-from SQLTools.lib.connection import Connection
-from SQLTools.lib.command import Command
-from SQLTools.lib.general import Selection, Options, Log
+from os.path import dirname
+sys.path.append(dirname(__file__))
+
+from lib import const
+from lib.connection import Connection
+from lib.command import Command
+from lib.general import Selection, Options, Log
 
 if sys.version_info >= (3, 0):
-    from SQLTools import sqlparse3 as sqlparse
+    import sqlparse3 as sqlparse
 else:
-    from SQLTools import sqlparse2 as sqlparse
+    import sqlparse2 as sqlparse
 
-connection          = None
-history             = ['']
+connection = None
+history    = ['']
+tableNames = []
 
 def sqlChangeConnection(index):
     global connection
-    names = Options.list()
-    options = Options(names[index])
+    global tableNames
+    names      = Options.list()
+    options    = Options(names[index])
     connection = Connection(options)
+    tableNames = connection.desc()
     sublime.status_message('ST: Connection switched to %s' % names[index])
 
 def showTableRecords(index):
     global connection
+    global tableNames
     if index > -1:
         if connection != None:
             tables = connection.desc()
@@ -143,3 +149,31 @@ class SqlBeautifyCommand(sublime_plugin.TextCommand):
                 self.replace_region_with_formatted_sql(edit, region)
 
 Log.debug("Package Loaded")
+
+
+# class SqlCompletePlugin(sublime_plugin.EventListener):
+#     def on_query_completions(self, view, prefix, locations):
+#         return self.get_autocomplete_list(prefix)
+
+#     def get_autocomplete_list(self, word):
+#         global tableNames
+#         completions = list(set(tableNames))
+#         completions.sort()
+#         # return the array
+#         print (word)
+#         autocomplete_list = []
+#         for w in tableNames:
+#             try:
+#                 if word.lower() in w.lower():
+#                     autocomplete_list.append((w, w))
+#             except UnicodeDecodeError:
+#                 continue
+
+#         return autocomplete_list
+
+if sublime.load_settings(const.connectionsFilename).get("default", False):
+    default = sublime.load_settings(const.connectionsFilename).get("default")
+    Log.debug("Default database set to " + default)
+    dbs = Options.list()
+    index = dbs.index(default)
+    sqlChangeConnection(index)

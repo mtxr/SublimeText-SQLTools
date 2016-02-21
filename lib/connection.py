@@ -1,8 +1,11 @@
-import sublime, tempfile
+import sublime, tempfile, sys
 
-from SQLTools import const
-from SQLTools.lib.command import Command
-from SQLTools.lib.general import Log
+from os.path import dirname
+sys.path.append(dirname(dirname(__file__)))
+
+from lib import const
+from lib.command import Command
+from lib.general import Log
 
 class Connection:
     def __init__(self, options):
