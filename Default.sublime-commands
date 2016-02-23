@@ -26,5 +26,20 @@
   {
     "caption": "ST: Format Current SQL File",
     "command": "sql_beautify"
+  },
+  {
+    "caption": "ST: Connections – User",
+    "command": "open_file",
+    "args": {"file": "${packages}/User/SQLToolsConnections.sublime-settings"}
+  },
+  {
+    "command": "open_file",
+    "args": {"file": "${packages}/SQLTools/SQLTools.sublime-settings"},
+    "caption": "ST: Settings – Default"
+  },
+  {
+    "command": "open_file",
+    "args": {"file": "${packages}/User/SQLTools.sublime-settings"},
+    "caption": "ST: Settings – User"
   }
 ]

@@ -1,12 +1,9 @@
 import sublime, sublime_plugin, tempfile, os, subprocess, threading, signal, sys
 
-from os.path import dirname
-sys.path.append(dirname(__file__))
-
-from lib import const
-from lib.connection import Connection
-from lib.command import Command
-from lib.general import Selection, Options, Log
+from . import const
+from .connection import Connection
+from .command import Command
+from .general import Selection, Options, Log
 
 if sys.version_info >= (3, 0):
     import sqlparse3 as sqlparse
@@ -149,27 +146,6 @@ class SqlBeautifyCommand(sublime_plugin.TextCommand):
                 self.replace_region_with_formatted_sql(edit, region)
 
 Log.debug("Package Loaded")
-
-
-# class SqlCompletePlugin(sublime_plugin.EventListener):
-#     def on_query_completions(self, view, prefix, locations):
-#         return self.get_autocomplete_list(prefix)
-
-#     def get_autocomplete_list(self, word):
-#         global tableNames
-#         completions = list(set(tableNames))
-#         completions.sort()
-#         # return the array
-#         print (word)
-#         autocomplete_list = []
-#         for w in tableNames:
-#             try:
-#                 if word.lower() in w.lower():
-#                     autocomplete_list.append((w, w))
-#             except UnicodeDecodeError:
-#                 continue
-
-#         return autocomplete_list
 
 if sublime.load_settings(const.connectionsFilename).get("default", False):
     default = sublime.load_settings(const.connectionsFilename).get("default")

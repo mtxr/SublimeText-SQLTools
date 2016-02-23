@@ -1,9 +1,8 @@
 import sublime, sys
-
 from os.path import dirname
-sys.path.append(dirname(dirname(__file__)))
+sys.path.append(dirname(__file__))
 
-from lib import const
+import const
 
 class Selection:
     def __init__(self, view):
