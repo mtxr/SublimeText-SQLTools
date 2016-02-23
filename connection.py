@@ -1,11 +1,8 @@
-import sublime, tempfile, sys, re
+import sublime, sys, re, shlex
 
-from os.path import dirname
-sys.path.append(dirname(dirname(__file__)))
-
-from lib import const
-from lib.command import Command
-from lib.general import Log
+from . import const
+from .command import Command
+from .general import Log
 
 class Connection:
     def __init__(self, options):
@@ -40,13 +37,7 @@ class Connection:
 
         Log.debug("Query: " + queryToRun)
 
-        self.tmp = tempfile.NamedTemporaryFile(mode = 'w', delete = False, suffix='.sql')
-        self.tmp.write(queryToRun)
-        self.tmp.close()
-
-        cmd = '%s < "%s"' % (self._buildCommand(options), self.tmp.name)
-
-        return Command(cmd, self.tmp.name)
+        return Command(self._buildCommand(options), queryToRun)
 
     def execute(self, queries):
         command = self._getCommand(self.settings.get('options'), queries)
