@@ -1,4 +1,4 @@
-import sublime, tempfile, sys
+import sublime, tempfile, sys, re
 
 from os.path import dirname
 sys.path.append(dirname(dirname(__file__)))
@@ -15,7 +15,7 @@ class Connection:
         self.options  = options
 
     def _buildCommand(self, options):
-        return self.command + ' ' + ' '.join(options) + ' ' + self.settings.get('args').format(options=self.options)
+        return re.sub('\s+', ' ', self.command + ' ' + ' '.join(options) + ' ' + self.settings.get('args').format(options=self.options)).strip()
 
     def _getCommand(self, options, queries, header = ''):
         queryToRun = ''

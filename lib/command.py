@@ -34,10 +34,17 @@ class Command(threading.Thread):
 
     def execute(self):
         sublime.status_message(' ST: running SQL command')
-        self.process = subprocess.Popen(self.text, stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+        # hot fix for windows
+        args = self.text.split(" ")
+        args.pop()
+        args.pop()
+        inputfile = open(self.tempfile, 'r')
+        self.process = subprocess.Popen(args, stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=inputfile)
+        # end hotfix
         results, errors = self.process.communicate()
 
         if errors:
+            Log.debug(errors.decode('utf-8', 'replace').replace('\r', ''))
             return self._errors(errors.decode('utf-8', 'replace').replace('\r', ''))
 
         return results.decode('utf-8', 'replace').replace('\r', '')
@@ -51,9 +58,10 @@ class Command(threading.Thread):
 
         if self.tempfile and os.path.exists(self.tempfile):
             os.unlink(self.tempfile)
+
     def stop(self):
         if self.process:
-            os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
+            self.process.kill()
             self.process = None
             if self.tempfile:
                 os.unlink(self.tempfile)
