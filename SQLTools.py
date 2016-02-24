@@ -4,7 +4,6 @@ from . import const
 from .connection import Connection
 from .command import Command
 from .general import Selection, Options, Log
-from .SQLToolsAutoComplete import SqlCompletePlugin
 
 if sys.version_info >= (3, 0):
     import sqlparse3 as sqlparse

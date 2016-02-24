@@ -6,7 +6,7 @@ from .general import Log
 
 class Connection:
     def __init__(self, options):
-        self.settings = sublime.load_settings('{0}.{1}'.format(options.type, const.settingsExtension))
+        self.settings = sublime.load_settings('{0}.settings'.format(options.type))
         self.command  = sublime.load_settings(const.settingsFilename).get('commands').get(options.type)
         self.limit    = sublime.load_settings(const.settingsFilename).get('show_records').get('limit', 50)
         self.options  = options
@@ -59,13 +59,13 @@ class Connection:
 
     def getSchemaColumns(self):
         query = self.settings.get('queries')['columns']['query']
-        command = self._getCommand(self.settings.get('queries')['desc']['options'], query)
+        command = self._getCommand(self.settings.get('queries')['columns']['options'], query)
 
         schemaColumns = []
         for result in command.execute().splitlines():
             try:
-                result = re.sub("\s+", " ", re.sub("[^0-9A-Za-z\-_]", " ", result.split('|')[0]))
-                schemaColumns.append(result.strip().replace(" ", "."))
+                result = result.split('|')
+                schemaColumns.append('{0}.{1}'.format(result[0].strip(), result[1].strip()))
             except IndexError as e:
                 pass
 
