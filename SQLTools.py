@@ -4,6 +4,7 @@ from . import const
 from .connection import Connection
 from .command import Command
 from .general import Selection, Options, Log
+from .SQLToolsAutoComplete import SqlCompletePlugin
 
 if sys.version_info >= (3, 0):
     import sqlparse3 as sqlparse
@@ -18,9 +19,15 @@ def sqlChangeConnection(index):
     global connection
     global tableNames
     names      = Options.list()
+    if index < 0:
+        Log.debug('Connection not selected')
+        return
+
     options    = Options(names[index])
     connection = Connection(options)
     tableNames = connection.desc()
+    SqlCompletePlugin.setTableNames(tableNames)
+    SqlCompletePlugin.setColumns(connection.getSchemaColumns())
     sublime.status_message('ST: Connection switched to %s' % names[index])
 
 def showTableRecords(index):

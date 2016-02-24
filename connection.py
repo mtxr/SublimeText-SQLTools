@@ -57,6 +57,20 @@ class Connection:
 
         return tables
 
+    def getSchemaColumns(self):
+        query = self.settings.get('queries')['columns']['query']
+        command = self._getCommand(self.settings.get('queries')['desc']['options'], query)
+
+        schemaColumns = []
+        for result in command.execute().splitlines():
+            try:
+                result = re.sub("\s+", " ", re.sub("[^0-9A-Za-z\-_]", " ", result.split('|')[0]))
+                schemaColumns.append(result.strip().replace(" ", "."))
+            except IndexError as e:
+                pass
+
+        return schemaColumns
+
     def descTable(self, tableName):
         query = self.settings.get('queries')['desc table']['query'] % tableName
         command = self._getCommand(self.settings.get('queries')['desc table']['options'], query)

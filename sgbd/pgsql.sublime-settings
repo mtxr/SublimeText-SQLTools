@@ -17,6 +17,11 @@
             "query": "select * from {0} limit {1}",
             "options": [],
             "format" : "|%s|"
+        },
+        "columns": {
+            "query": "SELECT DISTINCT table_name, column_name as table_name FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() GROUP BY table_name, column_name;",
+            "options": [],
+            "format" : "|%s|"
         }
     }
 }
