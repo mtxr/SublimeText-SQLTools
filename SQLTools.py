@@ -25,8 +25,7 @@ def sqlChangeConnection(index):
     options    = Options(names[index])
     connection = Connection(options)
     tableNames = connection.desc()
-    SqlCompletePlugin.setTableNames(tableNames)
-    SqlCompletePlugin.setColumns(connection.getSchemaColumns())
+    sublime.active_window().run_command('sql_tools_add_auto_complete_data', {"tables": tableNames, "columns": connection.getSchemaColumns()})
     sublime.status_message('ST: Connection switched to %s' % names[index])
 
 def showTableRecords(index):
