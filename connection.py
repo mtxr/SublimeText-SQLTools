@@ -58,18 +58,23 @@ class Connection:
         return tables
 
     def getSchemaColumns(self):
-        query = self.settings.get('queries')['columns']['query']
-        command = self._getCommand(self.settings.get('queries')['columns']['options'], query)
+        try:
+            query = self.settings.get('queries')['columns']['query']
+            command = self._getCommand(self.settings.get('queries')['columns']['options'], query)
 
-        schemaColumns = []
-        for result in command.execute().splitlines():
-            try:
-                result = result.split('|')
-                schemaColumns.append('{0}.{1}'.format(result[0].strip(), result[1].strip()))
-            except IndexError as e:
-                pass
+            schemaColumns = []
+            for result in command.execute().splitlines():
+                try:
+                    result = result.split('|')
+                    schemaColumns.append('{0}.{1}'.format(result[0].strip(), result[1].strip()))
+                except IndexError as e:
+                    pass
 
-        return schemaColumns
+            return schemaColumns
+        except Exception:
+            Log.debug("Support enabled just for postgresql and mysql")
+            return []
+
 
     def descTable(self, tableName):
         query = self.settings.get('queries')['desc table']['query'] % tableName
