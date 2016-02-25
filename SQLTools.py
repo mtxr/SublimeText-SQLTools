@@ -18,9 +18,14 @@ def sqlChangeConnection(index):
     global connection
     global tableNames
     names      = Options.list()
+    if index < 0:
+        Log.debug('Connection not selected')
+        return
+
     options    = Options(names[index])
     connection = Connection(options)
     tableNames = connection.desc()
+    sublime.active_window().run_command('sql_tools_add_auto_complete_data', {"tables": tableNames, "columns": connection.getSchemaColumns()})
     sublime.status_message('ST: Connection switched to %s' % names[index])
 
 def showTableRecords(index):

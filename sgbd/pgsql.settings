@@ -5,7 +5,7 @@
     "queries": {
         "desc" : {
             "query": "SELECT  '| ' || CASE WHEN n.nspname = current_schema() THEN quote_ident(c.relname) ELSE quote_ident(n.nspname)||'.'||quote_ident(c.relname) END ||' |' AS tblname FROM pg_catalog.pg_class AS c INNER JOIN pg_catalog.pg_namespace AS n ON n.oid = c.relnamespace WHERE relkind = 'r' AND n.nspname NOT IN ('pg_catalog', 'pg_toast', 'information_schema') ORDER BY n.nspname = current_schema() DESC, pg_catalog.pg_table_is_visible(c.oid) DESC, n.nspname, c.relname",
-            "options": ["-t"],
+            "options": ["-t", "--no-psqlrc"],
             "format" : "|%s|"
         },
         "desc table": {
@@ -16,6 +16,11 @@
         "show records": {
             "query": "select * from {0} limit {1}",
             "options": [],
+            "format" : "|%s|"
+        },
+        "columns": {
+            "query": "SELECT DISTINCT table_name, column_name as table_name FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() GROUP BY table_name, column_name;",
+            "options": ["-t", "--no-psqlrc"],
             "format" : "|%s|"
         }
     }

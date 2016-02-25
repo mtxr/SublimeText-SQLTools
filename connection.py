@@ -6,7 +6,7 @@ from .general import Log
 
 class Connection:
     def __init__(self, options):
-        self.settings = sublime.load_settings('{0}.{1}'.format(options.type, const.settingsExtension))
+        self.settings = sublime.load_settings('{0}.settings'.format(options.type))
         self.command  = sublime.load_settings(const.settingsFilename).get('commands').get(options.type)
         self.limit    = sublime.load_settings(const.settingsFilename).get('show_records').get('limit', 50)
         self.options  = options
@@ -56,6 +56,25 @@ class Connection:
                 pass
 
         return tables
+
+    def getSchemaColumns(self):
+        try:
+            query = self.settings.get('queries')['columns']['query']
+            command = self._getCommand(self.settings.get('queries')['columns']['options'], query)
+
+            schemaColumns = []
+            for result in command.execute().splitlines():
+                try:
+                    result = result.split('|')
+                    schemaColumns.append('{0}.{1}'.format(result[0].strip(), result[1].strip()))
+                except IndexError as e:
+                    pass
+
+            return schemaColumns
+        except Exception:
+            Log.debug("Support enabled just for postgresql and mysql")
+            return []
+
 
     def descTable(self, tableName):
         query = self.settings.get('queries')['desc table']['query'] % tableName
