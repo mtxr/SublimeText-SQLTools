@@ -37,12 +37,9 @@ class SqlCompletePlugin(sublime_plugin.EventListener):
         autocomplete_list.sort()
         return (list(set(autocomplete_list)), sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
-    @staticmethod
-    def setTableNames(tables):
-        global tableNames
-        tableNames = tables
-
-    @staticmethod
-    def setColumns(columns):
+class SqlToolsAddAutoCompleteData(sublime_plugin.WindowCommand):
+    def run(self, tables=[], columns=[]):
         global columnNames
+        global tableNames
         columnNames = columns
+        tableNames  = tables
