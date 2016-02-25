@@ -17,6 +17,11 @@
             "query": "select * from `{0}` limit {1}",
             "options": ["-f", "--table"],
             "format" : "|%s|"
+        },
+        "columns": {
+            "query": "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = DATABASE();",
+            "options": ["-f", "--table"],
+            "format" : "|%s|"
         }
     }
 }

@@ -61,5 +61,5 @@ class Command(threading.Thread):
             if self.tmp and os.path.exists(self.tmp.name):
                 os.unlink(self.tmp.name)
 
-            sublime.message_dialog("Query is taking too long to execute. Try to run outside of sublime.")
-            Log.debug("Query is taking too long to run. Killing process")
+            sublime.message_dialog("Your command is taking too long to execute. Try to run outside of sublime.")
+            Log.debug("Your command is taking too long to run. Killing process")
