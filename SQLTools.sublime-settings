@@ -5,7 +5,7 @@
     "unescape_quotes" : [
         "php"
     ],
-    "commands" : {
+    "cli" : {
         "mysql"   : "mysql",
         "pgsql"   : "psql",
         "oracle"  : "sqlplus",

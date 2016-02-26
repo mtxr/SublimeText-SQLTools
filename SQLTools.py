@@ -1,160 +1,138 @@
-import sublime, sublime_plugin, tempfile, os, subprocess, threading, signal, sys
+import sublime, sublime_plugin, sys
 
-from . import const
-from .connection import Connection
-from .command import Command
-from .general import Selection, Options, Log
+from .SQLToolsModels import Log, Settings, Connection, Selection, Window, View, Const
 
-if sys.version_info >= (3, 0):
-    import sqlparse3 as sqlparse
-else:
-    import sqlparse2 as sqlparse
+# if sys.version_info >= (3, 0):
+#     import sqlparse3 as sqlparse
+# else:
+#     import sqlparse2 as sqlparse
 
-connection = None
-history    = ['']
-tableNames = []
 
-def sqlChangeConnection(index):
-    global connection
-    global tableNames
-    names      = Options.list()
-    if index < 0:
-        Log.debug('Connection not selected')
-        return
+class ST(sublime_plugin.EventListener):
+    conn             = None
+    history          = []
+    tables           = []
+    columns          = []
+    connectionList   = {}
+    autoCompleteList = []
 
-    options    = Options(names[index])
-    connection = Connection(options)
-    tableNames = connection.desc()
-    sublime.active_window().run_command('sql_tools_add_auto_complete_data', {"tables": tableNames, "columns": connection.getSchemaColumns()})
-    sublime.status_message('ST: Connection switched to %s' % names[index])
+    def bootstrap():
+        ST.connectionList = Settings.getConnections()
+        ST.checkDefaultConnection()
 
-def showTableRecords(index):
-    global connection
-    global tableNames
-    if index > -1:
-        if connection != None:
-            tables = connection.desc()
-            connection.showTableRecords(tables[index])
-        else:
-            showConnectionMenu()
+    def loadConnectionData():
+        if not ST.conn:
+            return
 
-def descTable(index):
-    global connection
-    if index > -1:
-        if connection != None:
-            tables = connection.desc()
-            connection.descTable(tables[index])
-        else:
-            showConnectionMenu()
+        ST.conn.getTables(lambda tables: setattr(ST, 'tables', tables))
+        ST.conn.getColumns(lambda columns: setattr(ST, 'columns', columns))
 
-def executeHistoryQuery(index):
-    global history
-    if index > -1:
-        executeQuery(history[index])
+    def setConnection(index):
+        if index < 0 or index > (len(ST.connectionList) - 1) :
+            return
 
-def executeQuery(query):
-    global connection
-    global history
-    history.append(query)
-    history = list(set(history))
-    if connection != None:
-        connection.execute(query)
+        connListNames = list(ST.connectionList.keys())
+        ST.conn = ST.connectionList.get(connListNames[index])
+        ST.loadConnectionData()
 
-def showConnectionMenu():
-    options = Options.list()
-    if len(options) == 0:
-        sublime.message_dialog("You need to setup your connections first.")
-        return
-    sublime.active_window().show_quick_panel(options, sqlChangeConnection)
+        Log.debug('Connection {0} selected'.format(ST.conn))
 
-class sqlHistory(sublime_plugin.WindowCommand):
-    global history
-    def run(self):
-        sublime.active_window().show_quick_panel(history, executeHistoryQuery)
+    def showConnectionMenu():
+        if len(ST.connectionList) == 0:
+            sublime.message_dialog('You need to setup your connections first.')
+            return
 
-class sqlDesc(sublime_plugin.WindowCommand):
-    def run(self):
-        global connection
-        if connection != None:
-            tables = connection.desc()
-            sublime.active_window().show_quick_panel(tables, descTable)
-        else:
-            showConnectionMenu()
+        menu = []
+        for name, conn in ST.connectionList.items():
+            menu.append(conn._quickPanel())
+        Window().show_quick_panel(menu, ST.setConnection)
 
-class sqlShowRecords(sublime_plugin.WindowCommand):
-    def run(self):
-        global connection
-        if connection != None:
-            tables = connection.desc()
-            sublime.active_window().show_quick_panel(tables, showTableRecords)
-        else:
-            showConnectionMenu()
+    def on_query_completions(self, view, prefix, locations):
+        if prefix == "":
+            region = sublime.Region(locations[0], locations[0])
+            try:
+                prefix = view.substr(view.line(region)).split(" ").pop()
+            except Exception:
+                pass
 
-class sqlQuery(sublime_plugin.WindowCommand):
-    def run(self):
-        global connection
-        global history
-        if connection != None:
-            sublime.active_window().show_input_panel('Enter query', history[-1], executeQuery, None, None)
-        else:
-            showConnectionMenu()
+        return self.getAutoCompleteList(prefix)
 
-class sqlExecute(sublime_plugin.WindowCommand):
-    def run(self):
-        global connection
-        if connection != None:
-            selection = Selection(self.window.active_view())
-            connection.execute(selection.getQueries())
-        else:
-            showConnectionMenu()
+    def getAutoCompleteList(self, word):
+        ST.autoCompleteList = []
+        for w in ST.tables:
+            try:
+                if word.lower() in w.lower():
+                    ST.autoCompleteList.append(("{0}\t({1})".format(w, 'Table'), w))
+            except UnicodeDecodeError:
+                continue
 
-class sqlListConnection(sublime_plugin.WindowCommand):
-    def run(self):
-        showConnectionMenu()
+        for w in ST.columns:
+            try:
+                if word.lower() in w.lower():
+                    ST.autoCompleteList.append(("{0}\t({1})".format(w.split(".")[1], w.split(".")[0] + ' Col'), w.split(".")[1]))
+            except Exception:
+                continue
 
-class SqlBeautifyCommand(sublime_plugin.TextCommand):
-    def format_sql(self, raw_sql):
-        settings = sublime.load_settings(const.settingsFilename).get("beautify")
+        ST.autoCompleteList.sort()
+        return (ST.autoCompleteList, sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+
+    def checkDefaultConnection():
+        default = Connection.loadDefaultConnectionName()
+        if not default:
+            return
         try:
-            formatted_sql = sqlparse.format(raw_sql,
-                keyword_case    = settings.get("keyword_case"),
-                identifier_case = settings.get("identifier_case"),
-                strip_comments  = settings.get("strip_comments"),
-                indent_tabs     = settings.get("indent_tabs"),
-                indent_width    = settings.get("indent_width"),
-                reindent        = settings.get("reindent")
-            )
-
-            if self.view.settings().get('ensure_newline_at_eof_on_save'):
-                formatted_sql += "\n"
-
-            return formatted_sql
+            ST.conn = ST.connectionList.get(default)
+            ST.loadConnectionData()
         except Exception as e:
-            print(e)
-            return None
+            Log.debug("Invalid connection setted")
 
-    def replace_region_with_formatted_sql(self, edit, region):
-        selected_text  = self.view.substr(region)
-        foramtted_text = self.format_sql(selected_text)
-        self.view.replace(edit, region, foramtted_text)
+    def display(content, name="SQLTools Result"):
+        if not sublime.load_settings(Const.SETTINGS_FILENAME).get('show_result_on_window'):
+            resultContainer = Window().create_output_panel(name)
+            Window().run_command("show_panel", {"panel": "output." + name})
+        else:
+            resultContainer = Window().new_file()
+            resultContainer.set_name(name)
 
-    def run(self, edit):
-        window = self.view.window()
-        view   = window.active_view()
+        resultContainer.set_read_only(False)
+        resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
+        resultContainer.run_command('append', {'characters': content})
+        resultContainer.set_read_only(True)
 
-        for region in self.view.sel():
-            if region.empty():
-                selection = sublime.Region(0, self.view.size())
-                self.replace_region_with_formatted_sql(edit, selection)
-                self.view.set_syntax_file("Packages/SQL/SQL.tmLanguage")
-            else:
-                self.replace_region_with_formatted_sql(edit, region)
+#
+# Commands
+#
 
-Log.debug("Package Loaded")
+class StShowConnectionMenu(sublime_plugin.WindowCommand):
+    def run (self):
+        ST.showConnectionMenu()
 
-if sublime.load_settings(const.connectionsFilename).get("default", False):
-    default = sublime.load_settings(const.connectionsFilename).get("default")
-    Log.debug("Default database set to " + default)
-    dbs = Options.list()
-    index = dbs.index(default)
-    sqlChangeConnection(index)
+class StShowRecords(sublime_plugin.WindowCommand):
+    def run(self):
+        if not ST.conn:
+            showConnectionMenu()
+            return
+
+        Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableRecords(ST.tables[index], ST.display))
+
+class StDescTable(sublime_plugin.WindowCommand):
+    def run(self):
+        if not ST.conn:
+            showConnectionMenu()
+            return
+
+        Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableDescription(ST.tables[index], ST.display))
+
+class StExecute(sublime_plugin.WindowCommand):
+    def run(self):
+        if not ST.conn:
+            showConnectionMenu()
+            return
+
+        query = Selection.get()
+        ST.conn.execute(query, ST.display)
+
+def plugin_loaded():
+    Log.debug(__name__ + ' loaded successfully')
+
+    ST.bootstrap()

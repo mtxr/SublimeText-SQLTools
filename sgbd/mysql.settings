@@ -1,7 +1,7 @@
 {
     "options": ["-f", "--table"],
     "before": [],
-    "args": "-h{options.host} -P{options.port} -u\"{options.username}\" -p\"{options.password}\" -D\"{options.database}\"",
+    "args": "-h{host} -P{port} -u\"{username}\" -p\"{password}\" -D\"{database}\"",
     "queries": {
         "desc" : {
             "query": "show tables",
