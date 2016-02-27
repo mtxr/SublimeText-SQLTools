@@ -110,31 +110,22 @@ class Connection:
 
     def getTables(self, callback):
         query   = self.cliSettings.get('queries')['desc']['query']
-        args    = self.builArgs('desc')
-        command = Command(args, lambda result: Utils.getResultAsList(result, callback), query)
-        command.start()
-        Connection.killCommandAfterTimeout(command)
+        self.runCommand(self.builArgs('desc'), query, lambda result: Utils.getResultAsList(result, callback))
 
     def getColumns(self, callback):
-        query   = self.cliSettings.get('queries')['columns']['query']
-        args    = self.builArgs('columns')
-        command = Command(args, lambda result: Utils.getResultAsList(result, callback), query)
-        command.start()
-        Connection.killCommandAfterTimeout(command)
+        try:
+            query   = self.cliSettings.get('queries')['columns']['query']
+            self.runCommand(self.builArgs('columns'), query, lambda result: Utils.getResultAsList(result, callback))
+        except Exception:
+            pass
 
     def getTableRecords(self, tableName, callback):
         query   = self.cliSettings.get('queries')['show records']['query'].format(tableName, self.rowsLimit)
-        args    = self.builArgs('show records')
-        command = Command(args, lambda result: callback(result), query)
-        command.start()
-        Connection.killCommandAfterTimeout(command)
+        self.runCommand(self.builArgs('show records'), query, lambda result: callback(result))
 
     def getTableDescription(self, tableName, callback):
         query   = self.cliSettings.get('queries')['desc table']['query'] % tableName
-        args    = self.builArgs('desc table')
-        command = Command(args, lambda result: callback(result), query)
-        command.start()
-        Connection.killCommandAfterTimeout(command)
+        self.runCommand(self.builArgs('desc table'), query, lambda result: callback(result))
 
     def execute(self, queries, callback):
         queryToRun = ''
