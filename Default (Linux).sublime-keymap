@@ -1,9 +1,9 @@
 [
-    { "keys": ["ctrl+alt+e"], "command": "sql_list_connection" },
-    { "keys": ["ctrl+e", "ctrl+e"], "command": "sql_execute" },
-    { "keys": ["ctrl+e", "ctrl+h"], "command": "sql_history" },
-    { "keys": ["ctrl+e", "ctrl+q"], "command": "sql_query" },
-    { "keys": ["ctrl+e", "ctrl+s"], "command": "sql_show_records" },
-    { "keys": ["ctrl+e", "ctrl+d"], "command": "sql_desc" },
-    { "keys": ["ctrl+e", "ctrl+b"], "command": "sql_beautify" }
+    { "keys": ["ctrl+alt+e"], "command": "st_show_connection_menu" },
+    { "keys": ["ctrl+e", "ctrl+e"], "command": "st_execute" },
+    { "keys": ["ctrl+e", "ctrl+h"], "command": "st_history" },
+    { "keys": ["ctrl+e", "ctrl+q"], "command": "st_query" },
+    { "keys": ["ctrl+e", "ctrl+s"], "command": "st_show_records" },
+    { "keys": ["ctrl+e", "ctrl+d"], "command": "st_desc_table" },
+    { "keys": ["ctrl+e", "ctrl+b"], "command": "st_format" }
 ]

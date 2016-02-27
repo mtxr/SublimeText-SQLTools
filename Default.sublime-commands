@@ -1,31 +1,31 @@
 [
   {
-    "caption": "ST: List connections",
-    "command": "sql_list_connection"
+    "caption": "ST: Select Connection",
+    "command": "st_show_connection_menu"
   },
   {
     "caption": "ST: Execute",
-    "command": "sql_execute"
+    "command": "st_execute"
   },
   {
     "caption": "ST: History",
-    "command": "sql_history"
+    "command": "st_history"
   },
   {
     "caption": "ST: Type Query",
-    "command": "sql_query"
+    "command": "st_query"
   },
   {
     "caption": "ST: Show Table Records",
-    "command": "sql_show_records"
+    "command": "st_show_records"
   },
   {
-    "caption": "ST: Desc Table",
-    "command": "sql_desc"
+    "caption": "ST: Table Description",
+    "command": "st_desc_table"
   },
   {
     "caption": "ST: Format Current SQL File",
-    "command": "sql_beautify"
+    "command": "st_format"
   },
   {
     "caption": "ST: Connections – User",

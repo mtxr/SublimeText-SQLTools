@@ -3,27 +3,37 @@
 
 A swiss knife for SQL in Sublime Text.
 
-Inspired by [SQLExec Plugin](http://lubriciousdevelopers.github.io/projects/sublime-sql-exec/) and [SqlBeautifier](https://github.com/zsong/SqlBeautifier).
+Project website: [http://mtxr.github.io/SQLTools/](http://mtxr.github.io/SQLTools/)
 
 ## Features
 * View table schemas
+* View Queries history
 * Show table records
+* Auto complete (PostgreSQL & MySQL)
 * Run SQL Queries
 * Threading Support (prevent ST lockups)
 * Query timeout (Kill thread if query takes too long)
 * Unescape chars for languages (PHP \" is replace by ")
+
+## Todo
+
+Up coming features:
+
+- [ ] Save queries
+- [ ] Get saved queries
+- [ ] Run saved queries
+- [ ] Auto complete for Oracle and Vertica
 
 ## Settings
 
 | Option | Description | Type | Default value |
 | --- | :--- | --- | --- |
 | `unescape_quotes`| Escape chars like \" and \' for extension in array | `array` |`[ "php" ]` |
-| `commands` | Path to desired command. You can check more on [Path to Commands](#path-to-commands) | `object` |  |
-| `debug` | Activate debug mode. This will print SQL queries and messages using Sublime Text console | `boolean``|`false` |
+| `cli` | Path to desired command. You can check more on [Path to Cli](#path-to-commands) | `object` |  |
 | `thread_timeout` | Query execution time in miliseconds before kill. Prevents Sublime Text from lockup while running complex queries | `int` | 5000 |
 | `show_result_on_window` | Show query result using a window (true) or a panel (false) | `boolean` | `false` |
 | `show_records` | Resultset settings. You can check more on [Show records options](#show-records-options) | `object` | `{"limit": 50}` |
-| `beautify` | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting) | `object` | `{"limit": 50}` |
+| `format` | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting) | `object` | `{"limit": 50}` |
 
 ### <a id="show-records-options"></a>Show records options
 
@@ -43,7 +53,7 @@ Inspired by [SQLExec Plugin](http://lubriciousdevelopers.github.io/projects/subl
 | `indent_width` | Indentation width | `int` | 4 |
 | `reindent` | Reindent code if `true` | `boolean` | `true` |
 
-### <a id="path-to-commands"></a>Path to Commands
+### <a id="path-to-commands"></a>Path to Cli
 
 In case your database command is not in your `PATH` enviroment var, you can set the path here.
 
@@ -76,7 +86,7 @@ SQLToolConnections.sublime-settings example:
             "username": "anotheruser",
             "database": "dbname"
         },
-        "Connection 2": {
+        "Connection 3": {
             "type"    : "oracle",
             "host"    : "127.0.0.1",
             "port"    :  1522,
@@ -88,4 +98,19 @@ SQLToolConnections.sublime-settings example:
     },
     "default": "Connection 1"
 }
+```
+
+
+## Auto Complete
+
+After you select one connection, SQLTools prepare auto completions for you.
+
+PS: For a better experience, add this line to your sublime settings file
+
+1. `CTRL+SHIFT+P`, select "*Preferences: Settings - User*"
+2. add this option: 
+
+
+```
+"auto_complete_triggers": [ {"selector": "text.html", "characters": "<"}, {"selector": "source.sql", "characters": "."} ]
 ```
