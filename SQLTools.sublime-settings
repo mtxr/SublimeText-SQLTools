@@ -1,11 +1,12 @@
 {
     "debug"                 : false,
     "thread_timeout"        : 5000,
+    "history_size"          : 100,
     "show_result_on_window" : false,
     "unescape_quotes" : [
         "php"
     ],
-    "commands" : {
+    "cli" : {
         "mysql"   : "mysql",
         "pgsql"   : "psql",
         "oracle"  : "sqlplus",
@@ -14,7 +15,7 @@
     "show_records" : {
         "limit" : 50
     },
-    "beautify" : {
+    "format" : {
         "keyword_case"    : "upper",
         "identifier_case" : null,
         "strip_comments"  : false,

@@ -1,7 +1,7 @@
 {
     "options": [],
     "before" : [],
-    "args": "-h {options.host} -p {options.port} -U \"{options.username}\" -w \"{options.password}\" -d \"{options.database}\"",
+    "args": "-h {host} -p {port} -U \"{username}\" -w \"{password}\" -d \"{database}\"",
     "queries": {
         "desc" : {
             "query": "\\dt",
