@@ -1,4 +1,10 @@
-import sublime, os, tempfile, threading, signal, shlex, subprocess
+import sublime, os, tempfile, threading, signal, shlex, subprocess, sys
+
+sys.path.append(os.path.dirname(__file__))
+if sys.version_info >= (3, 0):
+    import sqlparse3 as sqlparse
+else:
+    import sqlparse2 as sqlparse
 
 class Const:
     SETTINGS_EXTENSION    = "sublime-settings"
@@ -149,6 +155,7 @@ class Connection:
 
 
         Log.debug("Query: " + queryToRun)
+        History.add(queryToRun)
         self.runCommand(self.builArgs(), queryToRun, lambda result: callback(result))
 
     def runCommand(self, args, query, callback):
@@ -175,6 +182,18 @@ class Selection:
                 else:
                     text.append(View().substr(region))
         return text
+
+    def formatSql(edit):
+        for region in View().sel():
+            if region.empty():
+                selectedRegion = sublime.Region(0, View().size())
+                selection = View().substr(selectedRegion)
+                print (Utils.formatSql(selection))
+                View().replace(edit, selectedRegion, Utils.formatSql(selection))
+                View().set_syntax_file("Packages/SQL/SQL.tmLanguage")
+            else:
+                text = View().substr(region)
+                View().replace(edit, region, Utils.formatSql(text))
 
 class Command(threading.Thread):
     def __init__(self, args, callback, query=None):
@@ -230,6 +249,34 @@ class Utils:
            callback(resultList)
 
         return resultList
+
+    def formatSql(raw):
+        settings = sublime.load_settings(Const.SETTINGS_FILENAME).get("format")
+        try:
+            result = sqlparse.format(raw,
+                keyword_case    = settings.get("keyword_case"),
+                identifier_case = settings.get("identifier_case"),
+                strip_comments  = settings.get("strip_comments"),
+                indent_tabs     = settings.get("indent_tabs"),
+                indent_width    = settings.get("indent_width"),
+                reindent        = settings.get("reindent")
+            )
+
+            if View().settings().get('ensure_newline_at_eof_on_save'):
+                result += "\n"
+
+            return result
+        except Exception as e:
+            return None
+
+class History:
+    queries = []
+
+    def add(query):
+        if len(History.queries) >= sublime.load_settings(Const.SETTINGS_FILENAME).get('history_size', 100):
+            History.queries.pop(0)
+        History.queries.append(query)
+        print (History.queries)
 
 def Window():
     return sublime.active_window()

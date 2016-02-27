@@ -1,6 +1,7 @@
 {
     "debug"                 : false,
     "thread_timeout"        : 5000,
+    "history_size"          : 100,
     "show_result_on_window" : false,
     "unescape_quotes" : [
         "php"
@@ -14,7 +15,7 @@
     "show_records" : {
         "limit" : 50
     },
-    "beautify" : {
+    "format" : {
         "keyword_case"    : "upper",
         "identifier_case" : null,
         "strip_comments"  : false,

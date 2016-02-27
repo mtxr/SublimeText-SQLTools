@@ -1,12 +1,6 @@
-import sublime, sublime_plugin, sys
+import sublime, sublime_plugin
 
-from .SQLToolsModels import Log, Settings, Connection, Selection, Window, View, Const
-
-# if sys.version_info >= (3, 0):
-#     import sqlparse3 as sqlparse
-# else:
-#     import sqlparse2 as sqlparse
-
+from .SQLToolsModels import Log, Settings, Connection, Selection, Window, View, Const, History
 
 class ST(sublime_plugin.EventListener):
     conn             = None
@@ -123,6 +117,14 @@ class StDescTable(sublime_plugin.WindowCommand):
 
         Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableDescription(ST.tables[index], ST.display))
 
+class StHistory(sublime_plugin.WindowCommand):
+    def run(self):
+        if not ST.conn:
+            showConnectionMenu()
+            return
+
+        Window().show_quick_panel(History.queries, lambda index: ST.conn.execute(History.queries[index], ST.display))
+
 class StExecute(sublime_plugin.WindowCommand):
     def run(self):
         if not ST.conn:
@@ -131,6 +133,10 @@ class StExecute(sublime_plugin.WindowCommand):
 
         query = Selection.get()
         ST.conn.execute(query, ST.display)
+
+class StFormat(sublime_plugin.TextCommand):
+    def run(self, edit):
+        Selection.formatSql(edit)
 
 def plugin_loaded():
     Log.debug(__name__ + ' loaded successfully')
