@@ -1,51 +1,47 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta charset="UTF-8">
     <title>SQLTools by mtxr</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1 class="header">SQLTools</h1>
-        <p class="header">The ultimate SQL swiss knife for Sublime Text 2/3</p>
+    <section class="page-header">
+      <h1 class="project-name">SQLTools</h1>
+      <h2 class="project-tagline">The ultimate SQL swiss knife for Sublime Text 2/3</h2>
+      <a href="https://github.com/mtxr/SQLTools" class="btn">View on GitHub</a>
+      <a href="https://github.com/mtxr/SQLTools/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/mtxr/SQLTools/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
 
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/mtxr/SQLTools/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/mtxr/SQLTools/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/mtxr/SQLTools">View On GitHub</a></li>
-        </ul>
-
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/mtxr">mtxr</a></p>
-
-
-      </header>
-      <section>
-        <h1>
-<a id="-sqltools" class="anchor" href="#-sqltools" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><img src="https://raw.githubusercontent.com/mtxr/SQLTools/master/icon.png" alt="SQLTools"> SQLTools</h1>
+    <section class="main-content">
+      <h1>
+<a id="-sqltools" class="anchor" href="#-sqltools" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><img src="https://github.com/mtxr/SQLTools/raw/images/icon.png?raw=true" alt="SQLTools"> SQLTools</h1>
 
 <p>A swiss knife for SQL in Sublime Text.</p>
-
-<p>Project website: <a href="http://mtxr.github.io/SQLTools/">http://mtxr.github.io/SQLTools/</a></p>
 
 <h2>
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
-<li>View table schemas</li>
-<li>View Queries history</li>
-<li>Show table records</li>
+<li>View table schemas (<code>CTRL+e, CTRL+d</code>)
+<img src="https://github.com/mtxr/SQLTools/raw/images/table_description.gif?raw=true" alt="View table schemas">
+</li>
+<li>View Queries history (<code>CTRL+e, CTRL+h</code>)</li>
+<li>Show table records (<code>CTRL+e, CTRL+s</code>)
+<img src="https://github.com/mtxr/SQLTools/raw/images/table_records.gif?raw=true" alt="Show table records">
+</li>
 <li>Auto complete (PostgreSQL &amp; MySQL)</li>
-<li>Run SQL Queries</li>
+<li>Run SQL Queries (<code>CTRL+e, CTRL+e</code>)
+<img src="https://github.com/mtxr/SQLTools/raw/images/execute_auto_complete.gif?raw=true" alt="Auto complete (PostgreSQL &amp; MySQL) &amp;&amp; Run SQL Queries">
+</li>
+<li>Formatting SQL Queries (<code>CTRL+e, CTRL+b</code>)
+<img src="https://github.com/mtxr/SQLTools/raw/images/format_sql.gif?raw=true" alt="Formatting SQL Queries">
+</li>
 <li>Threading Support (prevent ST lockups)</li>
 <li>Query timeout (Kill thread if query takes too long)</li>
 <li>Unescape chars for languages (PHP \" is replace by ")</li>
@@ -62,6 +58,25 @@
 <li>[ ] Run saved queries</li>
 <li>[ ] Auto complete for Oracle and Vertica</li>
 </ul>
+
+<h2>
+<a id="installing" class="anchor" href="#installing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing</h2>
+
+<p>As long SQLTools is not in the Package Control repository yet (pull request already sent! :D) you can install SQLTools using via sublime in X steps:</p>
+
+<ol>
+<li>Press <code>CTRL+SHIFT+p</code>
+</li>
+<li>Type <em>"Add repository"</em> </li>
+<li>Paste this url <a href="https://github.com/mtxr/SQLTools">https://github.com/mtxr/SQLTools</a>
+</li>
+<li>Press <code>CTRL+SHIFT+p</code> again</li>
+<li>Select <em>"Install package"</em>
+</li>
+<li>Select <em>"SQLTools"</em>
+</li>
+<li>Done!</li>
+</ol>
 
 <h2>
 <a id="settings" class="anchor" href="#settings" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Settings</h2>
@@ -269,19 +284,26 @@
 
 <ol>
 <li>
-<code>CTRL+SHIFT+P</code>, select "<em>Preferences: Settings - User</em>"</li>
+<code>CTRL+SHIFT+p</code>, select "<em>Preferences: Settings - User</em>"</li>
 <li>add this option: </li>
 </ol>
 
-<pre><code>"auto_complete_triggers": [ {"selector": "text.html", "characters": "&lt;"}, {"selector": "source.sql", "characters": "."} ]
-</code></pre>
-      </section>
-      <footer>
-        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+<div class="highlight highlight-source-json"><pre>{
+  <span class="pl-s"><span class="pl-pds">"</span>auto_complete_triggers<span class="pl-pds">"</span></span>: [
+    {<span class="pl-s"><span class="pl-pds">"</span>selector<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>text.html<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>characters<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;<span class="pl-pds">"</span></span> },
+    {<span class="pl-s"><span class="pl-pds">"</span>selector<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>source.sql<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>characters<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>.<span class="pl-pds">"</span></span>}
+  ]
+}</pre></div>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/mtxr/SQLTools">SQLTools</a> is maintained by <a href="https://github.com/mtxr">mtxr</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
       </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		          <script type="text/javascript">
+
+    </section>
+
+            <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
           </script>
