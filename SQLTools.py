@@ -34,6 +34,7 @@ class ST(sublime_plugin.EventListener):
         Log.debug('Connection {0} selected'.format(ST.conn))
 
     def showConnectionMenu():
+        ST.connectionList = Settings.getConnections()
         if len(ST.connectionList) == 0:
             sublime.message_dialog('You need to setup your connections first.')
             return
