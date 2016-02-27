@@ -25,7 +25,9 @@ class ST(sublime_plugin.EventListener):
         if index < 0 or index > (len(ST.connectionList) - 1) :
             return
 
+
         connListNames = list(ST.connectionList.keys())
+        connListNames.sort()
         ST.conn = ST.connectionList.get(connListNames[index])
         ST.loadConnectionData()
 
@@ -39,6 +41,7 @@ class ST(sublime_plugin.EventListener):
         menu = []
         for name, conn in ST.connectionList.items():
             menu.append(conn._quickPanel())
+        menu.sort()
         Window().show_quick_panel(menu, ST.setConnection)
 
     def on_query_completions(self, view, prefix, locations):
@@ -123,7 +126,13 @@ class StHistory(sublime_plugin.WindowCommand):
             showConnectionMenu()
             return
 
-        Window().show_quick_panel(History.queries, lambda index: ST.conn.execute(History.queries[index], ST.display))
+        if len(History.queries) == 0:
+            sublime.message_dialog('History is empty.')
+            return
+        try:
+            Window().show_quick_panel(History.queries, lambda index: ST.conn.execute(History.get(index), ST.display))
+        except Exception:
+            pass
 
 class StExecute(sublime_plugin.WindowCommand):
     def run(self):

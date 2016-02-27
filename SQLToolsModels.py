@@ -276,7 +276,12 @@ class History:
         if len(History.queries) >= sublime.load_settings(Const.SETTINGS_FILENAME).get('history_size', 100):
             History.queries.pop(0)
         History.queries.append(query)
-        print (History.queries)
+
+    def get(index):
+        if index < 0 or index > (len(History.queries) - 1):
+            raise "No query selected"
+
+        return History.queries[index]
 
 def Window():
     return sublime.active_window()
