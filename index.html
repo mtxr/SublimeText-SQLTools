@@ -35,18 +35,32 @@
 
 <p>A swiss knife for SQL in Sublime Text.</p>
 
-<p>Inspired by <a href="http://lubriciousdevelopers.github.io/projects/sublime-sql-exec/">SQLExec Plugin</a> and <a href="https://github.com/zsong/SqlBeautifier">SqlBeautifier</a>.</p>
+<p>Project website: <a href="http://mtxr.github.io/SQLTools/">http://mtxr.github.io/SQLTools/</a></p>
 
 <h2>
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
 <li>View table schemas</li>
+<li>View Queries history</li>
 <li>Show table records</li>
+<li>Auto complete (PostgreSQL &amp; MySQL)</li>
 <li>Run SQL Queries</li>
 <li>Threading Support (prevent ST lockups)</li>
 <li>Query timeout (Kill thread if query takes too long)</li>
 <li>Unescape chars for languages (PHP \" is replace by ")</li>
+</ul>
+
+<h2>
+<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Todo</h2>
+
+<p>Up coming features:</p>
+
+<ul>
+<li>[ ] Save queries</li>
+<li>[ ] Get saved queries</li>
+<li>[ ] Run saved queries</li>
+<li>[ ] Auto complete for Oracle and Vertica</li>
 </ul>
 
 <h2>
@@ -69,17 +83,10 @@
 <td><code>[ "php" ]</code></td>
 </tr>
 <tr>
-<td><code>commands</code></td>
-<td align="left">Path to desired command. You can check more on <a href="#path-to-commands">Path to Commands</a>
+<td><code>cli</code></td>
+<td align="left">Path to desired command. You can check more on <a href="#path-to-commands">Path to Cli</a>
 </td>
 <td><code>object</code></td>
-<td></td>
-</tr>
-<tr>
-<td><code>debug</code></td>
-<td align="left">Activate debug mode. This will print SQL queries and messages using Sublime Text console</td>
-<td>
-<code>boolean</code><code>|</code>false`</td>
 <td></td>
 </tr>
 <tr>
@@ -102,7 +109,7 @@
 <td><code>{"limit": 50}</code></td>
 </tr>
 <tr>
-<td><code>beautify</code></td>
+<td><code>format</code></td>
 <td align="left">SQL formatting settings. You can check more on <a href="#sql-formatting">SQL Formatting</a>
 </td>
 <td><code>object</code></td>
@@ -187,7 +194,7 @@
 </table>
 
 <h3>
-<a id="path-to-commands" class="anchor" href="#path-to-commands" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="path-to-commands"></a>Path to Commands</h3>
+<a id="path-to-cli" class="anchor" href="#path-to-cli" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="path-to-commands"></a>Path to Cli</h3>
 
 <p>In case your database command is not in your <code>PATH</code> enviroment var, you can set the path here.</p>
 
@@ -240,7 +247,7 @@
             <span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>anotheruser<span class="pl-pds">"</span></span>,
             <span class="pl-s"><span class="pl-pds">"</span>database<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>dbname<span class="pl-pds">"</span></span>
         },
-        <span class="pl-s"><span class="pl-pds">"</span>Connection 2<span class="pl-pds">"</span></span>: {
+        <span class="pl-s"><span class="pl-pds">"</span>Connection 3<span class="pl-pds">"</span></span>: {
             <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>oracle<span class="pl-pds">"</span></span>,
             <span class="pl-s"><span class="pl-pds">"</span>host<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>,
             <span class="pl-s"><span class="pl-pds">"</span>port<span class="pl-pds">"</span></span>    :  <span class="pl-c1">1522</span>,
@@ -252,6 +259,22 @@
     },
     <span class="pl-s"><span class="pl-pds">"</span>default<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Connection 1<span class="pl-pds">"</span></span>
 }</pre></div>
+
+<h2>
+<a id="auto-complete" class="anchor" href="#auto-complete" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Auto Complete</h2>
+
+<p>After you select one connection, SQLTools prepare auto completions for you.</p>
+
+<p>PS: For a better experience, add this line to your sublime settings file</p>
+
+<ol>
+<li>
+<code>CTRL+SHIFT+P</code>, select "<em>Preferences: Settings - User</em>"</li>
+<li>add this option: </li>
+</ol>
+
+<pre><code>"auto_complete_triggers": [ {"selector": "text.html", "characters": "&lt;"}, {"selector": "source.sql", "characters": "."} ]
+</code></pre>
       </section>
       <footer>
         <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
