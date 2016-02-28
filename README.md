@@ -32,6 +32,7 @@ Up coming features:
 ## Installing
 
 As long SQLTools is not in the Package Control repository yet (pull request already sent! :D) you can install SQLTools using via sublime in X steps:
+
 1. Press `CTRL+SHIFT+p`
 2. Type *"Add repository"* 
 3. Paste this url https://github.com/mtxr/SQLTools
