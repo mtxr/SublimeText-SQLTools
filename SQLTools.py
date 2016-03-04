@@ -108,37 +108,37 @@ class StShowConnectionMenu(sublime_plugin.WindowCommand):
 class StShowRecords(sublime_plugin.WindowCommand):
     def run(self):
         if not ST.conn:
-            showConnectionMenu()
+            ST.showConnectionMenu()
             return
 
-        Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableRecords(ST.tables[index], ST.display))
+        Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableRecords(ST.tables[index], ST.display) if index != -1 else None)
 
 class StDescTable(sublime_plugin.WindowCommand):
     def run(self):
         if not ST.conn:
-            showConnectionMenu()
+            ST.showConnectionMenu()
             return
 
-        Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableDescription(ST.tables[index], ST.display))
+        Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableDescription(ST.tables[index], ST.display) if index != -1 else None)
 
 class StHistory(sublime_plugin.WindowCommand):
     def run(self):
         if not ST.conn:
-            showConnectionMenu()
+            ST.showConnectionMenu()
             return
 
         if len(History.queries) == 0:
             sublime.message_dialog('History is empty.')
             return
         try:
-            Window().show_quick_panel(History.queries, lambda index: ST.conn.execute(History.get(index), ST.display))
+            Window().show_quick_panel(History.queries, lambda index: ST.conn.execute(History.get(index), ST.display) if index != -1 else None)
         except Exception:
             pass
 
 class StExecute(sublime_plugin.WindowCommand):
     def run(self):
         if not ST.conn:
-            showConnectionMenu()
+            ST.showConnectionMenu()
             return
 
         query = Selection.get()

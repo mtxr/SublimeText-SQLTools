@@ -196,7 +196,6 @@ class Selection:
             if region.empty():
                 selectedRegion = sublime.Region(0, View().size())
                 selection = View().substr(selectedRegion)
-                print (Utils.formatSql(selection))
                 View().replace(edit, selectedRegion, Utils.formatSql(selection))
                 View().set_syntax_file("Packages/SQL/SQL.tmLanguage")
             else:
