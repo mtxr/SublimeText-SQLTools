@@ -9,6 +9,7 @@ else:
 class Const:
     SETTINGS_EXTENSION    = "sublime-settings"
     SETTINGS_FILENAME     = "SQLTools.{0}".format(SETTINGS_EXTENSION)
+    SGDB_FILENAME         = "SQLToolsSGBD.{0}".format(SETTINGS_EXTENSION)
     CONNECTIONS_FILENAME  = "SQLToolsConnections.{0}".format(SETTINGS_EXTENSION)
     USER_QUERIES_FILENAME = "SQLToolsSavedQueries.{0}".format(SETTINGS_EXTENSION)
     pass
@@ -76,7 +77,6 @@ class Storage:
 class Connection:
 
     def __init__(self, name, options):
-        self.cliSettings = sublime.load_settings('{0}.settings'.format(options['type']))
         self.cli         = sublime.load_settings(Const.SETTINGS_FILENAME).get('cli')[options['type']]
         self.rowsLimit   = sublime.load_settings(Const.SETTINGS_FILENAME).get('show_records').get('limit', 50)
         self.options     = options
@@ -115,28 +115,28 @@ class Connection:
         return default
 
     def getTables(self, callback):
-        query   = self.cliSettings.get('queries')['desc']['query']
+        query   = self.getOptionsForSgdbCli()['queries']['desc']['query']
         self.runCommand(self.builArgs('desc'), query, lambda result: Utils.getResultAsList(result, callback))
 
     def getColumns(self, callback):
         try:
-            query   = self.cliSettings.get('queries')['columns']['query']
+            query   = self.getOptionsForSgdbCli()['queries']['columns']['query']
             self.runCommand(self.builArgs('columns'), query, lambda result: Utils.getResultAsList(result, callback))
         except Exception:
             pass
 
     def getTableRecords(self, tableName, callback):
-        query   = self.cliSettings.get('queries')['show records']['query'].format(tableName, self.rowsLimit)
+        query   = self.getOptionsForSgdbCli()['queries']['show records']['query'].format(tableName, self.rowsLimit)
         self.runCommand(self.builArgs('show records'), query, lambda result: callback(result))
 
     def getTableDescription(self, tableName, callback):
-        query   = self.cliSettings.get('queries')['desc table']['query'] % tableName
+        query   = self.getOptionsForSgdbCli()['queries']['desc table']['query'] % tableName
         self.runCommand(self.builArgs('desc table'), query, lambda result: callback(result))
 
     def execute(self, queries, callback):
         queryToRun = ''
 
-        for query in self.cliSettings.get('before'):
+        for query in self.getOptionsForSgdbCli()['before']:
             queryToRun += query + "\n"
 
         if type(queries) is str:
@@ -165,11 +165,19 @@ class Connection:
 
 
     def builArgs(self, queryName=None):
+        cliOptions = self.getOptionsForSgdbCli()
         args  = [self.cli]
-        if queryName and len(self.cliSettings.get('queries')[queryName]['options']) > 0:
-            args = args + self.cliSettings.get('queries')[queryName]['options']
 
-        return args + shlex.split(self.cliSettings.get('args').format(**self.options))
+        if len(cliOptions['options']) > 0:
+            args = args + ' '.join(cliOptions['options'])
+
+        if queryName and len(cliOptions['queries'][queryName]['options']) > 0:
+            args = args + cliOptions['queries'][queryName]['options']
+
+        return args + shlex.split(cliOptions['args'].format(**self.options))
+
+    def getOptionsForSgdbCli(self):
+        return sublime.load_settings(Const.SETTINGS_FILENAME).get('cli_options')[self.type]
 
 
 class Selection:

@@ -22,5 +22,119 @@
         "indent_tabs"     : false,
         "indent_width"    : 4,
         "reindent"        : true
+    },
+    /**
+     * Client options for you SGBD.
+     * In this file, the section cli has the names you can use here. Eg: "pgsql": "psql"
+     * So here, you must have "psql with the same sections listed bellow (options, before, args and queries)"
+     *
+     * Avoid changing the brackets content in "args"
+     */
+    "cli_options": {
+        "pgsql": {
+            "options": [],
+            "before": [],
+            "args": "-h {host} -p {port} -U {username} -d {database}",
+            "queries": {
+                "desc" : {
+                    "query": "SELECT  '|' || CASE WHEN n.nspname = current_schema() THEN quote_ident(c.relname) ELSE quote_ident(n.nspname)||'.'||quote_ident(c.relname) END ||'|' AS tblname FROM pg_catalog.pg_class AS c INNER JOIN pg_catalog.pg_namespace AS n ON n.oid = c.relnamespace WHERE relkind = 'r' AND n.nspname NOT IN ('pg_catalog', 'pg_toast', 'information_schema') ORDER BY n.nspname = current_schema() DESC, pg_catalog.pg_table_is_visible(c.oid) DESC, n.nspname, c.relname",
+                    "options": ["-t", "--no-psqlrc"],
+                    "format" : "|%s|"
+                },
+                "desc table": {
+                    "query": "\\d+ %s",
+                    "options": [],
+                    "format" : "|%s|"
+                },
+                "show records": {
+                    "query": "select * from {0} limit {1}",
+                    "options": [],
+                    "format" : "|%s|"
+                },
+                "columns": {
+                    "query": "SELECT DISTINCT '|' || table_name || '.' || column_name || '|' FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() GROUP BY table_name, column_name;",
+                    "options": ["-t", "--no-psqlrc"],
+                    "format" : "|%s|"
+                }
+            }
+        },
+        "oracle": {
+            "options": ["-S"],
+            "before": [
+                "set sqlprompt ''",
+                "set colsep '|'",
+                "set pagesize 100",
+                "set linesize 500",
+                "set tab off"
+            ],
+            "args": "{username}/{password}@\"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVICE_NAME={service})))\"",
+            "queries": {
+                "desc" : {
+                    "query": "select CONCAT(CONCAT('| ', table_name), ' |') as tables from user_tables;",
+                    "options": ["-S"],
+                    "format" : "|%s|"
+                },
+                "desc table": {
+                    "query": "desc %s;",
+                    "options": ["-S"],
+                    "format" : "|%s|"
+                },
+                "show records": {
+                    "query": "select * from {0} limit {1};",
+                    "options": ["-S"],
+                    "format" : "|%s|"
+                }
+            }
+        },
+        "mysql": {
+            "options": ["-f", "--table"],
+            "before": [],
+            "args": "-h{host} -P{port} -u\"{username}\" -p\"{password}\" -D\"{database}\"",
+            "queries": {
+                "desc" : {
+                    "query": "show tables",
+                    "options": ["-f", "--table", "--skip-column-names"],
+                    "format" : "|%s|"
+                },
+                "desc table": {
+                    "query": "desc `%s`",
+                    "options": ["-f", "--table"],
+                    "format" : "|%s|"
+                },
+                "show records": {
+                    "query": "select * from `{0}` limit {1}",
+                    "options": ["-f", "--table"],
+                    "format" : "|%s|"
+                },
+                "columns": {
+                    "query": "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = DATABASE();",
+                    "options": ["-f", "--table"],
+                    "format" : "|%s|"
+                }
+            }
+        },
+        "vertica": {
+            "options": [],
+            "before" : [],
+            "args": "-h {host} -p {port} -U \"{username}\" -w \"{password}\" -d \"{database}\"",
+            "queries": {
+                "desc" : {
+                    "query": "\\dt",
+                    "options": ["-t"],
+                    "format" : "|%s|"
+                },
+                "desc table": {
+                    "query": "\\d %s",
+                    "options": [],
+                    "format" : "|%s|"
+                },
+                "show records": {
+                    "query": "select * from {0} limit {1}",
+                    "options": [],
+                    "format" : "|%s|"
+                }
+            }
+        }
     }
+
 }
