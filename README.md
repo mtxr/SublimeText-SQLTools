@@ -5,6 +5,12 @@ A swiss knife for SQL in Sublime Text.
 
 Project website: [http://mtxr.github.io/SQLTools/](http://mtxr.github.io/SQLTools/)
 
+## Donate
+
+Donate and help SQLTools to become more awesome than ever.
+
+<span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RSMB6DGK238V8" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
+
 ## Features
 * View table schemas (`CTRL+e, CTRL+d`)
 ![View table schemas](https://github.com/mtxr/SQLTools/raw/images/table_description.gif?raw=true)
