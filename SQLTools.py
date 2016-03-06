@@ -1,6 +1,7 @@
-import sublime, sublime_plugin
+import sublime, sublime_plugin, sys, os
 
-from .SQLToolsModels import Log, Settings, Connection, Selection, Window, View, Const, History
+sys.path.append(os.path.dirname(__file__))
+from SQLToolsModels import Log, Settings, Connection, Selection, Window, View, Const, History
 
 class ST(sublime_plugin.EventListener):
     conn             = None
@@ -10,10 +11,12 @@ class ST(sublime_plugin.EventListener):
     connectionList   = {}
     autoCompleteList = []
 
+    @staticmethod
     def bootstrap():
         ST.connectionList = Settings.getConnections()
         ST.checkDefaultConnection()
 
+    @staticmethod
     def loadConnectionData():
         if not ST.conn:
             return
@@ -21,6 +24,7 @@ class ST(sublime_plugin.EventListener):
         ST.conn.getTables(lambda tables: setattr(ST, 'tables', tables))
         ST.conn.getColumns(lambda columns: setattr(ST, 'columns', columns))
 
+    @staticmethod
     def setConnection(index):
         if index < 0 or index > (len(ST.connectionList) - 1) :
             return
@@ -33,6 +37,7 @@ class ST(sublime_plugin.EventListener):
 
         Log.debug('Connection {0} selected'.format(ST.conn))
 
+    @staticmethod
     def showConnectionMenu():
         ST.connectionList = Settings.getConnections()
         if len(ST.connectionList) == 0:
@@ -74,6 +79,7 @@ class ST(sublime_plugin.EventListener):
         ST.autoCompleteList.sort()
         return (ST.autoCompleteList, sublime.INHIBIT_EXPLICIT_COMPLETIONS)
 
+    @staticmethod
     def checkDefaultConnection():
         default = Connection.loadDefaultConnectionName()
         if not default:
@@ -84,6 +90,7 @@ class ST(sublime_plugin.EventListener):
         except Exception as e:
             Log.debug("Invalid connection setted")
 
+    @staticmethod
     def display(content, name="SQLTools Result"):
         if not sublime.load_settings(Const.SETTINGS_FILENAME).get('show_result_on_window'):
             resultContainer = Window().create_output_panel(name)

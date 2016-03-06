@@ -10,7 +10,7 @@
         "mysql"   : "mysql",
         "pgsql"   : "psql",
         "oracle"  : "sqlplus",
-        "vertica" : "vsql",
+        "vertica" : "vsql"
     },
     "show_records" : {
         "limit" : 50

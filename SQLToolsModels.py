@@ -35,6 +35,7 @@ class Settings:
 
         return connections
 
+    @staticmethod
     def userFolder():
         return '{0}/User'.format(sublime.packages_path())
 
@@ -44,20 +45,24 @@ class Storage:
     savedQueries  = None
     selectedQuery = ''
 
+    @staticmethod
     def getSavedQueries():
         Storage.savedQueries = sublime.load_settings(Const.USER_QUERIES_FILENAME)
         return Storage.savedQueries
 
+    @staticmethod
     def flushSavedQueries():
         if not Storage.savedQueries:
             Storage.getSavedQueries()
 
         return sublime.save_settings(Const.USER_QUERIES_FILENAME)
 
+    @staticmethod
     def promptQueryAlias():
         Storage.selectedQuery = Selection.get()
         Window().show_input_panel('Query alias', '', Storage.saveQuery, None, None)
 
+    @staticmethod
     def saveQuery(alias):
         if len(alias) <= 0:
             return
@@ -67,6 +72,7 @@ class Storage:
         Storage.flushSavedQueries()
 
 
+    @staticmethod
     def getSavedQuery(alias):
         if len(alias) <= 0:
             return
@@ -102,6 +108,7 @@ class Connection:
     def _quickPanel(self):
         return [self.name, self._info()]
 
+    @staticmethod
     def killCommandAfterTimeout(command):
         timeout = sublime.load_settings(Const.SETTINGS_FILENAME).get('thread_timeout', 5000)
         sublime.set_timeout(command.stop, timeout)
@@ -181,6 +188,7 @@ class Connection:
 
 
 class Selection:
+    @staticmethod
     def get():
         text = []
         if View().sel():
@@ -191,6 +199,7 @@ class Selection:
                     text.append(View().substr(region))
         return text
 
+    @staticmethod
     def formatSql(edit):
         for region in View().sel():
             if region.empty():
@@ -219,9 +228,10 @@ class Command(threading.Thread):
         self.tmp.write(self.query)
         self.tmp.close()
 
+        self.args = map(str, self.args)
         self.process = subprocess.Popen(self.args, stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=open(self.tmp.name))
 
-        results, errors = self.process.communicate(input=self.query.encode('utf-8'))
+        results, errors = self.process.communicate()
 
         if errors:
             self.callback(errors.decode('utf-8', 'replace').replace('\r', ''))
@@ -244,6 +254,7 @@ class Command(threading.Thread):
             os.unlink(self.tmp.name)
 
 class Utils:
+    @staticmethod
     def getResultAsList(results, callback=None):
         resultList = []
         for result in results.splitlines():
@@ -257,6 +268,7 @@ class Utils:
 
         return resultList
 
+    @staticmethod
     def formatSql(raw):
         settings = sublime.load_settings(Const.SETTINGS_FILENAME).get("format")
         try:
@@ -279,11 +291,13 @@ class Utils:
 class History:
     queries = []
 
+    @staticmethod
     def add(query):
         if len(History.queries) >= sublime.load_settings(Const.SETTINGS_FILENAME).get('history_size', 100):
             History.queries.pop(0)
         History.queries.append(query)
 
+    @staticmethod
     def get(index):
         if index < 0 or index > (len(History.queries) - 1):
             raise "No query selected"
