@@ -11,7 +11,9 @@
         "pgsql"   : "psql",
         "oracle"  : "sqlplus",
         "vertica" : "vsql",
-        "sqsh"    : "sqsh"
+        "sqsh"    : "sqsh",
+        "firebird": "isql",
+        "sqlite"  : "sqlite3"
     },
     "show_records" : {
         "limit" : 50
@@ -172,6 +174,50 @@
                     "options": [],
                     "before": ["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""],
                     "format": "|%s|"
+                }
+            }
+        },
+        "sqlite": {
+            "options": ["-column", "-nullvalue null"],
+            "before": [".headers on"],
+            "args": "\"{options.database}\"",
+            "queries": {
+                "desc" : {
+                    "query": ".headers off\nSELECT '|' || name || '|' FROM sqlite_master WHERE type='table';",
+                    "options": [],
+                    "format" : "|%s|"
+                },
+                "desc table": {
+                    "query": ".schema \"%s\"",
+                    "options": ["-column"],
+                    "format" : "%s"
+                },
+                "show records": {
+                    "query": "select * from \"%s\" limit 100;",
+                    "options": ["-column"],
+                    "format" : "|%s|"
+                }
+            }
+        },
+        "firebird": {
+            "options": [],
+            "before": [],
+            "args": "-u \"{options.username}\" -p \"{options.password}\" \"{options.host}/{options.port}:{options.database}\"",
+            "queries": {
+                "desc" : {
+                    "query": "select '|' || rdb$relation_name || '|' from rdb$relations where rdb$view_blr is null and (rdb$system_flag is null or rdb$system_flag = 0);",
+                    "options": [],
+                    "format" : "|%s|"
+                },
+                "desc table": {
+                    "query": "show table \"%s\";",
+                    "options": [],
+                    "format" : "|%s|"
+                },
+                "show records": {
+                    "query": "select first 100 * from \"%s\";",
+                    "options": [],
+                    "format" : "|%s|"
                 }
             }
         }
