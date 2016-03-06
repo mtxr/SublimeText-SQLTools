@@ -42,12 +42,14 @@ class Settings:
 
 
 class Storage:
-    savedQueries  = None
-    selectedQuery = ''
+    savedQueries       = None
+    savedQueriesArray  = None
+    selectedQuery      = ''
 
     @staticmethod
     def getSavedQueries():
-        Storage.savedQueries = sublime.load_settings(Const.USER_QUERIES_FILENAME)
+        Storage.savedQueries      = sublime.load_settings(Const.USER_QUERIES_FILENAME)
+        Storage.savedQueriesArray = Storage.savedQueries.get('queries', {})
         return Storage.savedQueries
 
     @staticmethod
@@ -68,9 +70,19 @@ class Storage:
             return
 
         Storage.getSavedQueries()
-        Storage.savedQueries.set(alias, '\n'.join(Storage.selectedQuery))
+        Storage.savedQueriesArray[alias] = '\n'.join(Storage.selectedQuery)
+        Storage.savedQueries.set('queries', Storage.savedQueriesArray)
         Storage.flushSavedQueries()
 
+    @staticmethod
+    def removeQuery(alias):
+        if len(alias) <= 0:
+            return
+
+        Storage.getSavedQueries()
+        Storage.savedQueriesArray.pop(alias)
+        Storage.savedQueries.set('queries', Storage.savedQueriesArray)
+        Storage.flushSavedQueries()
 
     @staticmethod
     def getSavedQuery(alias):
@@ -78,7 +90,7 @@ class Storage:
             return
 
         Storage.getSavedQueries()
-        return Storage.savedQueries.get(alias)
+        return Storage.savedQueriesArray[alias]
 
 class Connection:
 

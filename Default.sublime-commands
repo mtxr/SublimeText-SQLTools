@@ -24,6 +24,18 @@
     "command": "st_desc_table"
   },
   {
+    "caption": "ST: Save Query",
+    "command": "st_save_query"
+  },
+  {
+    "caption": "ST: Remove Saved Query",
+    "command": "st_remove_saved_query"
+  },
+  {
+    "caption": "ST: List and Run Saved Queries",
+    "command": "st_list_queries"
+  },
+  {
     "caption": "ST: Format Current SQL File",
     "command": "st_format"
   },

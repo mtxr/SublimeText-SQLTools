@@ -1,7 +1,7 @@
 import sublime, sublime_plugin, sys, os
 
 sys.path.append(os.path.dirname(__file__))
-from SQLToolsModels import Log, Settings, Connection, Selection, Window, View, Const, History
+from SQLToolsModels import Log, Settings, Connection, Selection, Window, View, Const, History, Storage
 
 class ST(sublime_plugin.EventListener):
     conn             = None
@@ -152,6 +152,50 @@ class StExecute(sublime_plugin.WindowCommand):
 
         query = Selection.get()
         ST.conn.execute(query, ST.display)
+
+class StSaveQuery(sublime_plugin.WindowCommand):
+    def run(self):
+        Storage.promptQueryAlias()
+
+class StListQueries(sublime_plugin.WindowCommand):
+    def run(self):
+        if not ST.conn:
+            ST.showConnectionMenu()
+            return
+
+        queries = Storage.getSavedQueries().get('queries')
+
+        if len(queries) == 0:
+            sublime.message_dialog('No saved queries.')
+            return
+
+        queriesArray = []
+        for alias, query in queries.items():
+            print (alias, query)
+            queriesArray.append([alias, query])
+        queriesArray.sort()
+        try:
+            Window().show_quick_panel(queriesArray, lambda index: ST.conn.execute(queriesArray[index][1], ST.display) if index != -1 else None)
+        except Exception:
+            pass
+
+class StRemoveSavedQuery(sublime_plugin.WindowCommand):
+    def run(self):
+        queries = Storage.getSavedQueries().get('queries')
+
+        if len(queries) == 0:
+            sublime.message_dialog('No saved queries.')
+            return
+
+        queriesArray = []
+        for alias, query in queries.items():
+            print (alias, query)
+            queriesArray.append([alias, query])
+        queriesArray.sort()
+        try:
+            Window().show_quick_panel(queriesArray, lambda index: Storage.removeQuery(queriesArray[index][0]) if index != -1 else None)
+        except Exception:
+            pass
 
 class StFormat(sublime_plugin.TextCommand):
     def run(self, edit):
