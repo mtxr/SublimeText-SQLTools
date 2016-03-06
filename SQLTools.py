@@ -99,6 +99,7 @@ class ST(sublime_plugin.EventListener):
             resultContainer = Window().new_file()
             resultContainer.set_name(name)
 
+        resultContainer.settings().set("word_wrap", "false")
         resultContainer.set_read_only(False)
         resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
         resultContainer.run_command('append', {'characters': content})
