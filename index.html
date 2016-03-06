@@ -29,7 +29,7 @@
 
 <p>Donate and help SQLTools to become more awesome than ever.</p>
 
-<p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=RSMB6DGK238V8" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button"></a></p>
+<p><img alt='\"PayPal'></p>
 
 <h2>
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
@@ -51,7 +51,7 @@
 </li>
 <li>Threading Support (prevent ST lockups)</li>
 <li>Query timeout (Kill thread if query takes too long)</li>
-<li>Unescape chars for languages (PHP \" is replace by ")</li>
+<li>Unescape chars for languages (PHP \\" is replace by \")</li>
 </ul>
 
 <h2>
@@ -74,13 +74,13 @@
 <ol>
 <li>Press <code>CTRL+SHIFT+p</code>
 </li>
-<li>Type <em>"Add repository"</em> </li>
+<li>Type <em>\"Add repository\"</em> </li>
 <li>Paste this url <a href="https://github.com/mtxr/SQLTools">https://github.com/mtxr/SQLTools</a>
 </li>
 <li>Press <code>CTRL+SHIFT+p</code> again</li>
-<li>Select <em>"Install package"</em>
+<li>Select <em>\"Install package\"</em>
 </li>
-<li>Select <em>"SQLTools"</em>
+<li>Select <em>\"SQLTools\"</em>
 </li>
 <li>Done!</li>
 </ol>
@@ -100,9 +100,9 @@
 <tbody>
 <tr>
 <td><code>unescape_quotes</code></td>
-<td align="left">Escape chars like \" and \' for extension in array</td>
+<td align="left">Escape chars like \\" and \' for extension in array</td>
 <td><code>array</code></td>
-<td><code>[ "php" ]</code></td>
+<td><code>[ \"php\" ]</code></td>
 </tr>
 <tr>
 <td><code>cli</code></td>
@@ -128,20 +128,20 @@
 <td align="left">Resultset settings. You can check more on <a href="#show-records-options">Show records options</a>
 </td>
 <td><code>object</code></td>
-<td><code>{"limit": 50}</code></td>
+<td><code>{\"limit\": 50}</code></td>
 </tr>
 <tr>
 <td><code>format</code></td>
 <td align="left">SQL formatting settings. You can check more on <a href="#sql-formatting">SQL Formatting</a>
 </td>
 <td><code>object</code></td>
-<td><code>{"limit": 50}</code></td>
+<td><code>{\"limit\": 50}</code></td>
 </tr>
 </tbody>
 </table>
 
 <h3>
-<a id="show-records-options" class="anchor" href="#show-records-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="show-records-options"></a>Show records options</h3>
+<a id="show-records-options" class="anchor" href="#show-records-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id='\"show-records-options\"'></a>Show records options</h3>
 
 <table>
 <thead>
@@ -163,7 +163,7 @@
 </table>
 
 <h3>
-<a id="sql-formatting" class="anchor" href="#sql-formatting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="sql-formatting"></a>SQL Formatting</h3>
+<a id="sql-formatting" class="anchor" href="#sql-formatting" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id='\"sql-formatting\"'></a>SQL Formatting</h3>
 
 <table>
 <thead>
@@ -177,13 +177,13 @@
 <tbody>
 <tr>
 <td><code>keyword_case</code></td>
-<td align="left">Changes how keywords are formatted. Allowed values are <code>"upper"</code>, <code>"lower"</code> and <code>"capitalize"</code> and <code>null</code> (leaves case intact)</td>
+<td align="left">Changes how keywords are formatted. Allowed values are <code>\"upper\"</code>, <code>\"lower\"</code> and <code>\"capitalize\"</code> and <code>null</code> (leaves case intact)</td>
 <td><code>string</code></td>
-<td><code>"upper"</code></td>
+<td><code>\"upper\"</code></td>
 </tr>
 <tr>
 <td><code>identifier_case</code></td>
-<td align="left">Changes how identifiers are formatted. Allowed values are <code>"upper"</code> <code>"lower"</code> and <code>"capitalize"</code>and <code>null</code> (leaves case intact)</td>
+<td align="left">Changes how identifiers are formatted. Allowed values are <code>\"upper\"</code> <code>\"lower\"</code> and <code>\"capitalize\"</code>and <code>null</code> (leaves case intact)</td>
 <td><code>string</code></td>
 <td><code>null</code></td>
 </tr>
@@ -216,7 +216,7 @@
 </table>
 
 <h3>
-<a id="path-to-cli" class="anchor" href="#path-to-cli" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id="path-to-commands"></a>Path to Cli</h3>
+<a id="path-to-cli" class="anchor" href="#path-to-cli" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><a id='\"path-to-commands\"'></a>Path to Cli</h3>
 
 <p>In case your database command is not in your <code>PATH</code> enviroment var, you can set the path here.</p>
 
@@ -230,19 +230,19 @@
 <tbody>
 <tr>
 <td><code>mysql</code></td>
-<td><code>"mysql"</code></td>
+<td><code>\"mysql\"</code></td>
 </tr>
 <tr>
 <td><code>pgsql</code></td>
-<td><code>"psql"</code></td>
+<td><code>\"psql\"</code></td>
 </tr>
 <tr>
 <td><code>oracle</code></td>
-<td><code>"sqlplus"</code></td>
+<td><code>\"sqlplus\"</code></td>
 </tr>
 <tr>
 <td><code>vertica</code></td>
-<td><code>"vsql"</code></td>
+<td><code>\"vsql\"</code></td>
 </tr>
 </tbody>
 </table>
@@ -253,34 +253,34 @@
 <p>SQLToolConnections.sublime-settings example:</p>
 
 <div class="highlight highlight-source-json"><pre>{
-    <span class="pl-s"><span class="pl-pds">"</span>connections<span class="pl-pds">"</span></span>: {
-        <span class="pl-s"><span class="pl-pds">"</span>Connection 1<span class="pl-pds">"</span></span>: {
-            <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>mysql<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>host<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>port<span class="pl-pds">"</span></span>    : <span class="pl-c1">3306</span>,
-            <span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>user<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>database<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>dbname<span class="pl-pds">"</span></span>
-        },
-        <span class="pl-s"><span class="pl-pds">"</span>Connection 2<span class="pl-pds">"</span></span>: {
-            <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>pgsql<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>host<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>port<span class="pl-pds">"</span></span>    :  <span class="pl-c1">5432</span>,
-            <span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>anotheruser<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>database<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>dbname<span class="pl-pds">"</span></span>
-        },
-        <span class="pl-s"><span class="pl-pds">"</span>Connection 3<span class="pl-pds">"</span></span>: {
-            <span class="pl-s"><span class="pl-pds">"</span>type<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>oracle<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>host<span class="pl-pds">"</span></span>    : <span class="pl-s"><span class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>port<span class="pl-pds">"</span></span>    :  <span class="pl-c1">1522</span>,
-            <span class="pl-s"><span class="pl-pds">"</span>username<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>anotheruser<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>password<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>database<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>dbname<span class="pl-pds">"</span></span>,
-            <span class="pl-s"><span class="pl-pds">"</span>service<span class="pl-pds">"</span></span> : <span class="pl-s"><span class="pl-pds">"</span>servicename<span class="pl-pds">"</span></span>
-        }
-    },
-    <span class="pl-s"><span class="pl-pds">"</span>default<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>Connection 1<span class="pl-pds">"</span></span>
-}</pre></div>
+    <span class="pl-ii">\</span><span class="pl-s"><span class="pl-pds">"</span>connections<span class="pl-cce">\"</span>: {</span>
+<span class="pl-s">        <span class="pl-cce">\"</span>Connection 1<span class="pl-cce">\"</span>: {</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>type<span class="pl-cce">\"</span>    : <span class="pl-cce">\"</span>mysql<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>host<span class="pl-cce">\"</span>    : <span class="pl-cce">\"</span>127.0.0.1<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>port<span class="pl-cce">\"</span>    : 3306,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>username<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>user<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>password<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>password<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>database<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>dbname<span class="pl-cce">\"</span></span>
+<span class="pl-s">        },</span>
+<span class="pl-s">        <span class="pl-cce">\"</span>Connection 2<span class="pl-cce">\"</span>: {</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>type<span class="pl-cce">\"</span>    : <span class="pl-cce">\"</span>pgsql<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>host<span class="pl-cce">\"</span>    : <span class="pl-cce">\"</span>127.0.0.1<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>port<span class="pl-cce">\"</span>    :  5432,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>username<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>anotheruser<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>database<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>dbname<span class="pl-cce">\"</span></span>
+<span class="pl-s">        },</span>
+<span class="pl-s">        <span class="pl-cce">\"</span>Connection 3<span class="pl-cce">\"</span>: {</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>type<span class="pl-cce">\"</span>    : <span class="pl-cce">\"</span>oracle<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>host<span class="pl-cce">\"</span>    : <span class="pl-cce">\"</span>127.0.0.1<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>port<span class="pl-cce">\"</span>    :  1522,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>username<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>anotheruser<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>password<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>password<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>database<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>dbname<span class="pl-cce">\"</span>,</span>
+<span class="pl-s">            <span class="pl-cce">\"</span>service<span class="pl-cce">\"</span> : <span class="pl-cce">\"</span>servicename<span class="pl-cce">\"</span></span>
+<span class="pl-s">        }</span>
+<span class="pl-s">    },</span>
+<span class="pl-s">    <span class="pl-cce">\"</span>default<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>Connection 1<span class="pl-cce">\"</span></span>
+<span class="pl-s">}</span></pre></div>
 
 <h2>
 <a id="auto-complete" class="anchor" href="#auto-complete" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Auto Complete</h2>
@@ -291,16 +291,16 @@
 
 <ol>
 <li>
-<code>CTRL+SHIFT+p</code>, select "<em>Preferences: Settings - User</em>"</li>
+<code>CTRL+SHIFT+p</code>, select \"<em>Preferences: Settings - User</em>\"</li>
 <li>add this option: </li>
 </ol>
 
 <div class="highlight highlight-source-json"><pre>{
-  <span class="pl-s"><span class="pl-pds">"</span>auto_complete_triggers<span class="pl-pds">"</span></span>: [
-    {<span class="pl-s"><span class="pl-pds">"</span>selector<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>text.html<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>characters<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>&lt;<span class="pl-pds">"</span></span> },
-    {<span class="pl-s"><span class="pl-pds">"</span>selector<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>source.sql<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>characters<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>.<span class="pl-pds">"</span></span>}
-  ]
-}</pre></div>
+  <span class="pl-ii">\</span><span class="pl-s"><span class="pl-pds">"</span>auto_complete_triggers<span class="pl-cce">\"</span>: [</span>
+<span class="pl-s">    {<span class="pl-cce">\"</span>selector<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>text.html<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>characters<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>&lt;<span class="pl-cce">\"</span> },</span>
+<span class="pl-s">    {<span class="pl-cce">\"</span>selector<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>source.sql<span class="pl-cce">\"</span>, <span class="pl-cce">\"</span>characters<span class="pl-cce">\"</span>: <span class="pl-cce">\"</span>.<span class="pl-cce">\"</span>}</span>
+<span class="pl-s">  ]</span>
+<span class="pl-s">}</span></pre></div>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/mtxr/SQLTools">SQLTools</a> is maintained by <a href="https://github.com/mtxr">mtxr</a>.</span>
