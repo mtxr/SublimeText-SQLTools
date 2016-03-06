@@ -10,7 +10,8 @@
         "mysql"   : "mysql",
         "pgsql"   : "psql",
         "oracle"  : "sqlplus",
-        "vertica" : "vsql"
+        "vertica" : "vsql",
+        "sqsh"    : "sqsh"
     },
     "show_records" : {
         "limit" : 50
@@ -148,7 +149,31 @@
                     "format" : "|%s|"
                 }
             }
+        },
+        "sqsh": {
+            "options": [],
+            "before": ["\\set semicolon_cmd=\"\\go -mpretty -l\""],
+            "args": "-S {options.host}:{options.port} -U\"{options.username}\" -P\"{options.password}\" -D{options.database}",
+            "queries": {
+                "desc": {
+                    "query": "select table_name from information_schema.tables order by 1;",
+                    "before" :["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""],
+                    "options": [],
+                    "format": "|%s|"
+                },
+                "desc table": {
+                    "query": "exec sp_columns \"%s\";",
+                    "options": [],
+                    "before": ["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""],
+                    "format": "|%s|"
+                },
+                "show records": {
+                    "query": "select top 100 * from \"%s\";",
+                    "options": [],
+                    "before": ["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""],
+                    "format": "|%s|"
+                }
+            }
         }
     }
-
 }

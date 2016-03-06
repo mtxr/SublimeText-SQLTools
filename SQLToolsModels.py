@@ -233,7 +233,7 @@ class Command(threading.Thread):
         self.tmp.close()
 
         self.args = map(str, self.args)
-        self.process = subprocess.Popen(self.args, stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=open(self.tmp.name))
+        self.process = subprocess.Popen(self.args, stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=open(self.tmp.name), env=os.environ.copy())
 
         results, errors = self.process.communicate()
 
