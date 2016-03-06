@@ -99,14 +99,16 @@ SQLToolConnections.sublime-settings example:
             "port"    : 3306,
             "username": "user",
             "password": "password",
-            "database": "dbname"
+            "database": "dbname",
+            "encoding": "utf-8"
         },
         "Connection 2": {
             "type"    : "pgsql",
             "host"    : "127.0.0.1",
             "port"    :  5432,
             "username": "anotheruser",
-            "database": "dbname"
+            "database": "dbname",
+            "encoding": "utf-8"
         },
         "Connection 3": {
             "type"    : "oracle",
@@ -115,7 +117,8 @@ SQLToolConnections.sublime-settings example:
             "username": "anotheruser",
             "password": "password",
             "database": "dbname",
-            "service" : "servicename"
+            "service" : "servicename",
+            "encoding": "utf-8"
         }
     },
     "default": "Connection 1"
