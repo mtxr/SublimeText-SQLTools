@@ -93,6 +93,9 @@ class Connection:
         self.username    = options['username']
         self.database    = options['database']
 
+        if 'encoding' in options:
+            self.encoding    = options['encoding']
+
         if 'password' in options:
             self.password = options['password']
 
@@ -212,10 +215,11 @@ class Selection:
                 View().replace(edit, region, Utils.formatSql(text))
 
 class Command(threading.Thread):
-    def __init__(self, args, callback, query=None):
+    def __init__(self, args, callback, query=None, encoding='utf-8'):
         self.query    = query
         self.process  = None
         self.args     = args
+        self.encoding = encoding
         self.callback = callback
         threading.Thread.__init__(self)
 
@@ -234,10 +238,10 @@ class Command(threading.Thread):
         results, errors = self.process.communicate()
 
         if errors:
-            self.callback(errors.decode('utf-8', 'replace').replace('\r', ''))
+            self.callback(errors.decode(self.encoding, 'replace').replace('\r', ''))
             return
 
-        self.callback(results.decode('utf-8', 'replace').replace('\r', ''))
+        self.callback(results.decode(self.encoding, 'replace').replace('\r', ''))
 
     def stop(self):
         if not self.process:

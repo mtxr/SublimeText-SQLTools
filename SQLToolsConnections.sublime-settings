@@ -1,4 +1,16 @@
 {
-    "connections": {},
+    "connections": {
+        /**
+         * "Connection name": {         // Connection name, used in menu (Display name)
+         *     "database" : "DATABASE",
+         *     "host"     : "HOSTNAME",
+         *     "port"     : "PORT",
+         *     "type"     : "pgsql",    // SGDB to use: (mysql, pgsql, oracle, vertica)
+         *     "username" : "USERNAME",
+         *     "password" : null        // (if you are using postgresql, you must setup a pgpass file and set it to null)
+         *     "encoding" : null        // Your DB encodings. Default: utf-8
+         * },
+         */
+    },
     "default": null
 }
