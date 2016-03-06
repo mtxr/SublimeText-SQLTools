@@ -61,11 +61,25 @@
         "oracle": {
             "options": ["-S"],
             "before": [
-                "set sqlprompt ''",
-                "set colsep '|'",
-                "set pagesize 100",
-                "set linesize 500",
-                "set tab off"
+                "SET AUTO           OFF",
+                "SET COLSEP         '|'",
+                "SET FEED           ON",
+                "SET FEEDBACK       ON",
+                "SET HEADING        ON",
+                "SET LINESIZE       32767",
+                "SET LONG           100",
+                "SET NULL           @",
+                "SET PAGESIZE       0 EMBEDDED ON",
+                "SET SERVEROUTPUT   ON",
+                "SET SQLBLANKLINES  ON",
+                "SET SQLPROMPT      ''",
+                "SET TAB            OFF",
+                "SET TI             ON",
+                "SET TIMI           OFF",
+                "SET TRIMSPOOL      OFF",
+                "SET UND            '-'",
+                "SET VERIFY         OFF ",
+                "SET WRAP           OFF"
             ],
             "args": "{username}/{password}@\"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVICE_NAME={service})))\"",
             "queries": {
