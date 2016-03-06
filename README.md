@@ -25,14 +25,14 @@ Donate and help SQLTools to become more awesome than ever.
 * Threading Support (prevent ST lockups)
 * Query timeout (Kill thread if query takes too long)
 * Unescape chars for languages (PHP \" is replace by ")
+* Save queries (`CTRL+e, CTRL+q`)
+* List and Run saved queries (`CTRL+e, CTRL+a`)
+* Remove saved queries (`CTRL+e, CTRL+r`)
 
 ## Todo
 
 Up coming features:
 
-- [ ] Save queries
-- [ ] Get saved queries
-- [ ] Run saved queries
 - [ ] Auto complete for Oracle and Vertica
 
 ## Installing

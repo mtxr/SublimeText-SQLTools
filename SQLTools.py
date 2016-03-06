@@ -77,7 +77,7 @@ class ST(sublime_plugin.EventListener):
                 continue
 
         ST.autoCompleteList.sort()
-        return (ST.autoCompleteList, sublime.INHIBIT_EXPLICIT_COMPLETIONS)
+        return (ST.autoCompleteList)
 
     @staticmethod
     def checkDefaultConnection():
