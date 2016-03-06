@@ -98,6 +98,7 @@ class ST(sublime_plugin.EventListener):
         else:
             resultContainer = Window().new_file()
             resultContainer.set_name(name)
+            resultContainer.set_scratch(True) # avoids prompting to save
 
         resultContainer.settings().set("word_wrap", "false")
         resultContainer.set_read_only(False)
