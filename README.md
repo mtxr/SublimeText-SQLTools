@@ -103,7 +103,9 @@ In case your database command is not in your `PATH` enviroment var, you can set 
 
 ## Connections
 
-SQLToolConnections.sublime-settings example:
+You can setup your connecitons using the `Preferences` menu or `CTRL+SHIFT+P` and searching for `ST: Setup Connections`. 
+
+Below you can see an example of the `SQLToolsConnections.sublime-settings`:
 
 ```json
 {
