@@ -40,7 +40,7 @@
     "command": "st_format"
   },
   {
-    "caption": "ST: Connections – User",
+    "caption": "ST: Setup Connections",
     "command": "open_file",
     "args": {"file": "${packages}/User/SQLToolsConnections.sublime-settings"}
   },
