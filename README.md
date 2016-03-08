@@ -35,7 +35,8 @@ SQLTools will save you (for sure) a lot of time and help you to increase your pr
 ## Todo
 
 Up coming features:
-- [ ] Auto complete for Oracle, Vertica, Firebird and SQLite
+
+* Auto complete for Oracle, Vertica, Firebird and SQLite
 
 ## Installing
 
