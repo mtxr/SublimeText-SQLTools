@@ -315,7 +315,7 @@ class History:
     def add(query):
         if len(History.queries) >= sublime.load_settings(Const.SETTINGS_FILENAME).get('history_size', 100):
             History.queries.pop(0)
-        History.queries.append(query)
+        History.queries.insert(0, query)
 
     @staticmethod
     def get(index):
