@@ -225,5 +225,7 @@ class StFormat(sublime_plugin.TextCommand):
 
 def plugin_loaded():
     STM.Log.debug(__name__ + ' loaded successfully')
-
-    ST.bootstrap()
+    try:
+        ST.bootstrap()
+    except Exception as e:
+        pass
