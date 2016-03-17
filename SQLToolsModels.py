@@ -191,7 +191,7 @@ class Connection:
         args  = [self.cli]
 
         if len(cliOptions['options']) > 0:
-            args = args + ' '.join(cliOptions['options'])
+            args = args + cliOptions['options']
 
         if queryName and len(cliOptions['queries'][queryName]['options']) > 0:
             args = args + cliOptions['queries'][queryName]['options']

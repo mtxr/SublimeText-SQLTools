@@ -1,7 +1,22 @@
-import sublime, sublime_plugin, sys, os
+import sublime, sublime_plugin, sys, os, imp
 
 sys.path.append(os.path.dirname(__file__))
-from SQLToolsModels import Log, Settings, Connection, Selection, Window, View, Const, History, Storage
+import SQLToolsModels as STM
+
+#  force reloading models when update
+try:
+    # python 3.0 to 3.3
+    import imp
+    imp.reload(STM)
+except Exception as e:
+    pass
+
+try:
+    # python 3.4 and newer
+    import importlib
+    importlib.reload(STM)
+except Exception as e:
+    pass
 
 class ST(sublime_plugin.EventListener):
     conn             = None
@@ -13,7 +28,7 @@ class ST(sublime_plugin.EventListener):
 
     @staticmethod
     def bootstrap():
-        ST.connectionList = Settings.getConnections()
+        ST.connectionList = STM.Settings.getConnections()
         ST.checkDefaultConnection()
 
     @staticmethod
@@ -42,11 +57,11 @@ class ST(sublime_plugin.EventListener):
         ST.conn = ST.connectionList.get(connListNames[index])
         ST.loadConnectionData()
 
-        Log.debug('Connection {0} selected'.format(ST.conn))
+        STM.Log.debug('Connection {0} selected'.format(ST.conn))
 
     @staticmethod
     def showConnectionMenu():
-        ST.connectionList = Settings.getConnections()
+        ST.connectionList = STM.Settings.getConnections()
         if len(ST.connectionList) == 0:
             sublime.message_dialog('You need to setup your connections first.')
             return
@@ -88,18 +103,18 @@ class ST(sublime_plugin.EventListener):
 
     @staticmethod
     def checkDefaultConnection():
-        default = Connection.loadDefaultConnectionName()
+        default = STM.Connection.loadDefaultConnectionName()
         if not default:
             return
         try:
             ST.conn = ST.connectionList.get(default)
             ST.loadConnectionData()
         except Exception as e:
-            Log.debug("Invalid connection setted")
+            STM.Log.debug("Invalid connection setted")
 
     @staticmethod
     def display(content, name="SQLTools Result"):
-        if not sublime.load_settings(Const.SETTINGS_FILENAME).get('show_result_on_window'):
+        if not sublime.load_settings(STM.Const.SETTINGS_FILENAME).get('show_result_on_window'):
             resultContainer = Window().create_output_panel(name)
             Window().run_command("show_panel", {"panel": "output." + name})
         else:
@@ -143,11 +158,11 @@ class StHistory(sublime_plugin.WindowCommand):
             ST.showConnectionMenu()
             return
 
-        if len(History.queries) == 0:
+        if len(STM.History.queries) == 0:
             sublime.message_dialog('History is empty.')
             return
         try:
-            Window().show_quick_panel(History.queries, lambda index: ST.conn.execute(History.get(index), ST.display) if index != -1 else None)
+            Window().show_quick_panel(STM.History.queries, lambda index: ST.conn.execute(STM.History.get(index), ST.display) if index != -1 else None)
         except Exception:
             pass
 
@@ -157,12 +172,12 @@ class StExecute(sublime_plugin.WindowCommand):
             ST.showConnectionMenu()
             return
 
-        query = Selection.get()
+        query = STM.Selection.get()
         ST.conn.execute(query, ST.display)
 
 class StSaveQuery(sublime_plugin.WindowCommand):
     def run(self):
-        Storage.promptQueryAlias()
+        STM.Storage.promptQueryAlias()
 
 class StListQueries(sublime_plugin.WindowCommand):
     def run(self):
@@ -170,7 +185,7 @@ class StListQueries(sublime_plugin.WindowCommand):
             ST.showConnectionMenu()
             return
 
-        queries = Storage.getSavedQueries().get('queries')
+        queries = STM.Storage.getSavedQueries().get('queries')
 
         if len(queries) == 0:
             sublime.message_dialog('No saved queries.')
@@ -188,7 +203,7 @@ class StListQueries(sublime_plugin.WindowCommand):
 
 class StRemoveSavedQuery(sublime_plugin.WindowCommand):
     def run(self):
-        queries = Storage.getSavedQueries().get('queries')
+        queries = STM.Storage.getSavedQueries().get('queries')
 
         if len(queries) == 0:
             sublime.message_dialog('No saved queries.')
@@ -200,15 +215,15 @@ class StRemoveSavedQuery(sublime_plugin.WindowCommand):
             queriesArray.append([alias, query])
         queriesArray.sort()
         try:
-            Window().show_quick_panel(queriesArray, lambda index: Storage.removeQuery(queriesArray[index][0]) if index != -1 else None)
+            Window().show_quick_panel(queriesArray, lambda index: STM.Storage.removeQuery(queriesArray[index][0]) if index != -1 else None)
         except Exception:
             pass
 
 class StFormat(sublime_plugin.TextCommand):
     def run(self, edit):
-        Selection.formatSql(edit)
+        STM.Selection.formatSql(edit)
 
 def plugin_loaded():
-    Log.debug(__name__ + ' loaded successfully')
+    STM.Log.debug(__name__ + ' loaded successfully')
 
     ST.bootstrap()
