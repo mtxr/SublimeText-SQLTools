@@ -245,7 +245,11 @@ class Command(threading.Thread):
         self.tmp.close()
 
         self.args = map(str, self.args)
-        self.process = subprocess.Popen(self.args, stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=open(self.tmp.name), env=os.environ.copy())
+        si = None
+        if os.name == 'nt':
+            si = subprocess.STARTUPINFO()
+            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        self.process = subprocess.Popen(self.args, stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=open(self.tmp.name), env=os.environ.copy(), startupinfo=si)
 
         results, errors = self.process.communicate()
 
