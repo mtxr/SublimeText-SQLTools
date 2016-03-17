@@ -17,11 +17,18 @@ class ST(sublime_plugin.EventListener):
         ST.checkDefaultConnection()
 
     @staticmethod
+    def setTablesIfNotEmpty(tables):
+        if type(tables) is list and len(tables) == 0:
+            sublime.message_dialog('Connection failed. Check your settings and try again.')
+            return
+        ST.tables = tables
+
+    @staticmethod
     def loadConnectionData():
         if not ST.conn:
             return
 
-        ST.conn.getTables(lambda tables: setattr(ST, 'tables', tables))
+        ST.conn.getTables(lambda tables: ST.setTablesIfNotEmpty(tables))
         ST.conn.getColumns(lambda columns: setattr(ST, 'columns', columns))
 
     @staticmethod
