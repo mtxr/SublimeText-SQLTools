@@ -70,7 +70,7 @@ class ST(sublime_plugin.EventListener):
         for name, conn in ST.connectionList.items():
             menu.append(conn._quickPanel())
         menu.sort()
-        Window().show_quick_panel(menu, ST.setConnection)
+        STM.Window().show_quick_panel(menu, ST.setConnection)
 
     def on_query_completions(self, view, prefix, locations):
         if prefix == "":
@@ -115,10 +115,10 @@ class ST(sublime_plugin.EventListener):
     @staticmethod
     def display(content, name="SQLTools Result"):
         if not sublime.load_settings(STM.Const.SETTINGS_FILENAME).get('show_result_on_window'):
-            resultContainer = Window().create_output_panel(name)
-            Window().run_command("show_panel", {"panel": "output." + name})
+            resultContainer = STM.Window().create_output_panel(name)
+            STM.Window().run_command("show_panel", {"panel": "output." + name})
         else:
-            resultContainer = Window().new_file()
+            resultContainer = STM.Window().new_file()
             resultContainer.set_name(name)
             resultContainer.set_scratch(True) # avoids prompting to save
 
@@ -142,7 +142,7 @@ class StShowRecords(sublime_plugin.WindowCommand):
             ST.showConnectionMenu()
             return
 
-        Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableRecords(ST.tables[index], ST.display) if index != -1 else None)
+        STM.Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableRecords(ST.tables[index], ST.display) if index != -1 else None)
 
 class StDescTable(sublime_plugin.WindowCommand):
     def run(self):
@@ -150,7 +150,7 @@ class StDescTable(sublime_plugin.WindowCommand):
             ST.showConnectionMenu()
             return
 
-        Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableDescription(ST.tables[index], ST.display) if index != -1 else None)
+        STM.Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableDescription(ST.tables[index], ST.display) if index != -1 else None)
 
 class StHistory(sublime_plugin.WindowCommand):
     def run(self):
@@ -162,7 +162,7 @@ class StHistory(sublime_plugin.WindowCommand):
             sublime.message_dialog('History is empty.')
             return
         try:
-            Window().show_quick_panel(STM.History.queries, lambda index: ST.conn.execute(STM.History.get(index), ST.display) if index != -1 else None)
+            STM.Window().show_quick_panel(STM.History.queries, lambda index: ST.conn.execute(STM.History.get(index), ST.display) if index != -1 else None)
         except Exception:
             pass
 
@@ -197,7 +197,7 @@ class StListQueries(sublime_plugin.WindowCommand):
             queriesArray.append([alias, query])
         queriesArray.sort()
         try:
-            Window().show_quick_panel(queriesArray, lambda index: ST.conn.execute(queriesArray[index][1], ST.display) if index != -1 else None)
+            STM.Window().show_quick_panel(queriesArray, lambda index: ST.conn.execute(queriesArray[index][1], ST.display) if index != -1 else None)
         except Exception:
             pass
 
@@ -215,7 +215,7 @@ class StRemoveSavedQuery(sublime_plugin.WindowCommand):
             queriesArray.append([alias, query])
         queriesArray.sort()
         try:
-            Window().show_quick_panel(queriesArray, lambda index: STM.Storage.removeQuery(queriesArray[index][0]) if index != -1 else None)
+            STM.Window().show_quick_panel(queriesArray, lambda index: STM.Storage.removeQuery(queriesArray[index][0]) if index != -1 else None)
         except Exception:
             pass
 
