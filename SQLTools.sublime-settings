@@ -1,5 +1,5 @@
 {
-    "debug"                 : false,
+    "debug"                 : true,
     "thread_timeout"        : 5000,
     "history_size"          : 100,
     "show_result_on_window" : false,

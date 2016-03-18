@@ -223,8 +223,12 @@ class StFormat(sublime_plugin.TextCommand):
     def run(self, edit):
         STM.Selection.formatSql(edit)
 
+class StVersion(sublime_plugin.WindowCommand):
+    def run(self):
+        sublime.message_dialog('Using SQLTools ' + STM.Const.VERSION)
+
 def plugin_loaded():
-    STM.Log.debug(__name__ + ' loaded successfully')
+    STM.Log.debug('%s loaded successfully' % (__name__))
     try:
         ST.bootstrap()
     except Exception as e:
