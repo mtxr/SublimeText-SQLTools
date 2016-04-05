@@ -128,6 +128,13 @@ class ST(sublime_plugin.EventListener):
         resultContainer.run_command('append', {'characters': content})
         resultContainer.set_read_only(True)
 
+    @staticmethod
+    def toBuffer(content, name="", suffix="SQLTools Saved Query"):
+        resultContainer = STM.Window().new_file()
+        resultContainer.set_name(((name + " - ") if name != "" else "") + suffix)
+        resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
+        resultContainer.run_command('append', {'characters': content})
+
 #
 # Commands
 #
@@ -180,7 +187,8 @@ class StSaveQuery(sublime_plugin.WindowCommand):
         STM.Storage.promptQueryAlias()
 
 class StListQueries(sublime_plugin.WindowCommand):
-    def run(self):
+    def run(self, mode="run"):
+        print(mode)
         if not ST.conn:
             ST.showConnectionMenu()
             return
@@ -197,7 +205,10 @@ class StListQueries(sublime_plugin.WindowCommand):
             queriesArray.append([alias, query])
         queriesArray.sort()
         try:
-            STM.Window().show_quick_panel(queriesArray, lambda index: ST.conn.execute(queriesArray[index][1], ST.display) if index != -1 else None)
+            if mode == "run":
+                STM.Window().show_quick_panel(queriesArray, lambda index: ST.conn.execute(queriesArray[index][1], ST.display) if index != -1 else None)
+            else:
+                STM.Window().show_quick_panel(queriesArray, lambda index: ST.toBuffer(queriesArray[index][1], queriesArray[index][0]) if index != -1 else None)
         except Exception:
             pass
 
@@ -223,8 +234,12 @@ class StFormat(sublime_plugin.TextCommand):
     def run(self, edit):
         STM.Selection.formatSql(edit)
 
+class StVersion(sublime_plugin.WindowCommand):
+    def run(self):
+        sublime.message_dialog('Using SQLTools ' + STM.Const.VERSION)
+
 def plugin_loaded():
-    STM.Log.debug(__name__ + ' loaded successfully')
+    STM.Log.debug('%s loaded successfully' % (__name__))
     try:
         ST.bootstrap()
     except Exception as e:

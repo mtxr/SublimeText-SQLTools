@@ -33,11 +33,21 @@
   },
   {
     "caption": "ST: List and Run Saved Queries",
-    "command": "st_list_queries"
+    "command": "st_list_queries",
+    "args"   : {"mode": "run"}
+  },
+  {
+    "caption": "ST: List and Open Saved Queries",
+    "command": "st_list_queries",
+    "args"   :  {"mode": "open"}
   },
   {
     "caption": "ST: Format Current SQL File",
     "command": "st_format"
+  },
+  {
+    "caption": "ST: About",
+    "command": "st_version"
   },
   {
     "caption": "ST: Setup Connections",

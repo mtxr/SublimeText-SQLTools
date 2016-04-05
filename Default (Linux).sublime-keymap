@@ -7,5 +7,6 @@
     { "keys": ["ctrl+e", "ctrl+b"], "command": "st_format" },
     { "keys": ["ctrl+e", "ctrl+q"], "command": "st_save_query" },
     { "keys": ["ctrl+e", "ctrl+r"], "command": "st_remove_saved_query" },
-    { "keys": ["ctrl+e", "ctrl+a"], "command": "st_list_queries" }
+    { "keys": ["ctrl+e", "ctrl+a"], "command": "st_list_queries"},
+    { "keys": ["ctrl+e", "ctrl+o"], "command": "st_list_queries", "args": {"mode" : "open"}}
 ]

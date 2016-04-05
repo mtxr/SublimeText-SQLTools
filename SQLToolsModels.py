@@ -12,6 +12,7 @@ class Const:
     SGDB_FILENAME         = "SQLToolsSGBD.{0}".format(SETTINGS_EXTENSION)
     CONNECTIONS_FILENAME  = "SQLToolsConnections.{0}".format(SETTINGS_EXTENSION)
     USER_QUERIES_FILENAME = "SQLToolsSavedQueries.{0}".format(SETTINGS_EXTENSION)
+    VERSION               = "v1.0.8"
     pass
 
 class Log:
@@ -20,7 +21,7 @@ class Log:
     def debug(message):
         if not sublime.load_settings(Const.SETTINGS_FILENAME).get('debug', False):
             return
-        print ("SQLTools: " + message)
+        print ("SQLTools %s: %s" % (Const.VERSION, message))
 
 
 class Settings:
@@ -196,6 +197,12 @@ class Connection:
         if queryName and len(cliOptions['queries'][queryName]['options']) > 0:
             args = args + cliOptions['queries'][queryName]['options']
 
+        argsType = 'string'
+        if type(cliOptions['args']) is list:
+            argsType = 'list'
+            cliOptions['args'] = ' '.join(cliOptions['args'])
+
+        Log.debug('Usgin cli args (%s) "%s"' %(argsType, cliOptions['args']))
         return args + shlex.split(cliOptions['args'].format(**self.options))
 
     def getOptionsForSgdbCli(self):
