@@ -24,6 +24,10 @@
     "command": "st_desc_table"
   },
   {
+    "caption": "ST: Function Description",
+    "command": "st_desc_function"
+  },
+  {
     "caption": "ST: Save Query",
     "command": "st_save_query"
   },
