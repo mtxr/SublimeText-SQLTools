@@ -45,6 +45,7 @@ class ST(sublime_plugin.EventListener):
 
         ST.conn.getTables(lambda tables: ST.setTablesIfNotEmpty(tables))
         ST.conn.getColumns(lambda columns: setattr(ST, 'columns', columns))
+        ST.conn.getFunctions(lambda functions: setattr(ST, 'functions', functions))
 
     @staticmethod
     def setConnection(index):
@@ -95,6 +96,13 @@ class ST(sublime_plugin.EventListener):
             try:
                 if word.lower() in w.lower():
                     ST.autoCompleteList.append(("{0}\t({1})".format(w.split(".")[1], w.split(".")[0] + ' Col'), w.split(".")[1]))
+            except Exception:
+                continue
+
+        for w in ST.functions:
+            try:
+                if word.lower() in w.lower():
+                    ST.autoCompleteList.append(("{0}\t({1})".format(w, 'Func'), w))
             except Exception:
                 continue
 
@@ -158,6 +166,15 @@ class StDescTable(sublime_plugin.WindowCommand):
             return
 
         STM.Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableDescription(ST.tables[index], ST.display) if index != -1 else None)
+
+class StDescFunction(sublime_plugin.WindowCommand):
+    def run(self):
+        if not ST.conn:
+            ST.showConnectionMenu()
+            return
+
+        # get everything until first occurence of "(", e.g. get "function_name" from "function_name(int)"
+        STM.Window().show_quick_panel(ST.functions, lambda index: ST.conn.getFunctionDescription(ST.functions[index].split('(', 1)[0], ST.display) if index != -1 else None)
 
 class StHistory(sublime_plugin.WindowCommand):
     def run(self):

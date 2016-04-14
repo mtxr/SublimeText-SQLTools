@@ -4,6 +4,7 @@
     { "keys": ["ctrl+e", "ctrl+h"], "command": "st_history" },
     { "keys": ["ctrl+e", "ctrl+s"], "command": "st_show_records" },
     { "keys": ["ctrl+e", "ctrl+d"], "command": "st_desc_table" },
+    { "keys": ["ctrl+e", "ctrl+f"], "command": "st_desc_function" },
     { "keys": ["ctrl+e", "ctrl+b"], "command": "st_format" },
     { "keys": ["ctrl+e", "ctrl+q"], "command": "st_save_query" },
     { "keys": ["ctrl+e", "ctrl+r"], "command": "st_remove_saved_query" },

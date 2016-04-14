@@ -148,6 +148,11 @@ class Connection:
         except Exception:
             pass
 
+    def getFunctions(self, callback):
+        query   = self.getOptionsForSgdbCli()['queries']['functions']['query']
+        self.runCommand(self.builArgs('functions'), query, lambda result: Utils.getResultAsList(result, callback))
+
+
     def getTableRecords(self, tableName, callback):
         query   = self.getOptionsForSgdbCli()['queries']['show records']['query'].format(tableName, self.rowsLimit)
         self.runCommand(self.builArgs('show records'), query, lambda result: callback(result))
@@ -155,6 +160,11 @@ class Connection:
     def getTableDescription(self, tableName, callback):
         query   = self.getOptionsForSgdbCli()['queries']['desc table']['query'] % tableName
         self.runCommand(self.builArgs('desc table'), query, lambda result: callback(result))
+
+    def getFunctionDescription(self, functionName, callback):
+        query   = self.getOptionsForSgdbCli()['queries']['desc function']['query'] % functionName
+        self.runCommand(self.builArgs('desc function'), query, lambda result: callback(result))
+
 
     def execute(self, queries, callback):
         queryToRun = ''

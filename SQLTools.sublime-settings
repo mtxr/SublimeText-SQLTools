@@ -58,7 +58,17 @@
                     "query": "SELECT DISTINCT '|' || table_name || '.' || column_name || '|' FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() GROUP BY table_name, column_name;",
                     "options": ["-t", "--no-psqlrc"],
                     "format" : "|%s|"
-                }
+                },
+                "functions": {
+                    "query": "SELECT '|' || CASE WHEN n.nspname = current_schema() THEN quote_ident(f.proname) ELSE quote_ident(n.nspname)||'.'||quote_ident(f.proname) END || '(' || pg_get_function_identity_arguments(f.oid) || ')' || '|' AS funname FROM pg_catalog.pg_proc AS f INNER JOIN pg_catalog.pg_namespace AS n ON n.oid = f.pronamespace WHERE proisagg = false AND n.nspname NOT IN ('pg_catalog', 'information_schema')",
+                    "options": ["-t", "--no-psqlrc"],
+                    "format" : "|%s|"
+                },
+                "desc function": {
+                    "query": "\\sf %s",
+                    "options": [],
+                    "format" : "|%s|"
+                },
             }
         },
         "oracle": {
