@@ -126,13 +126,22 @@ class ST(sublime_plugin.EventListener):
             resultContainer = STM.Window().create_output_panel(name)
             STM.Window().run_command("show_panel", {"panel": "output." + name})
         else:
-            resultContainer = STM.Window().new_file()
-            resultContainer.set_name(name)
-            resultContainer.set_scratch(True) # avoids prompting to save
+            resultContainer = None
+            views = STM.Window().views()
+            for view in views:
+                if view.name() == name:
+                    resultContainer = view;
+                    break;
+            if not resultContainer:
+                resultContainer = STM.Window().new_file()
+                resultContainer.set_name(name)
 
+        resultContainer.set_scratch(True) # avoids prompting to save
         resultContainer.settings().set("word_wrap", "false")
         resultContainer.set_read_only(False)
         resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
+        resultContainer.run_command('select_all')
+        resultContainer.run_command('left_delete')
         resultContainer.run_command('append', {'characters': content})
         resultContainer.set_read_only(True)
 
