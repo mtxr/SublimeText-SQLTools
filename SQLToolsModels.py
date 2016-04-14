@@ -12,7 +12,7 @@ class Const:
     SGDB_FILENAME         = "SQLToolsSGBD.{0}".format(SETTINGS_EXTENSION)
     CONNECTIONS_FILENAME  = "SQLToolsConnections.{0}".format(SETTINGS_EXTENSION)
     USER_QUERIES_FILENAME = "SQLToolsSavedQueries.{0}".format(SETTINGS_EXTENSION)
-    VERSION               = "v0.2.2"
+    VERSION               = "v0.3.0"
     pass
 
 class Log:
