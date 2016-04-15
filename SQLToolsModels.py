@@ -12,7 +12,7 @@ class Const:
     SGDB_FILENAME         = "SQLToolsSGBD.{0}".format(SETTINGS_EXTENSION)
     CONNECTIONS_FILENAME  = "SQLToolsConnections.{0}".format(SETTINGS_EXTENSION)
     USER_QUERIES_FILENAME = "SQLToolsSavedQueries.{0}".format(SETTINGS_EXTENSION)
-    VERSION               = "v0.3.0"
+    VERSION               = "v0.3.1"
     pass
 
 class Log:
@@ -149,9 +149,11 @@ class Connection:
             pass
 
     def getFunctions(self, callback):
-        query   = self.getOptionsForSgdbCli()['queries']['functions']['query']
-        self.runCommand(self.builArgs('functions'), query, lambda result: Utils.getResultAsList(result, callback))
-
+        try:
+            query   = self.getOptionsForSgdbCli()['queries']['functions']['query']
+            self.runCommand(self.builArgs('functions'), query, lambda result: Utils.getResultAsList(result, callback))
+        except Exception:
+            pass
 
     def getTableRecords(self, tableName, callback):
         query   = self.getOptionsForSgdbCli()['queries']['show records']['query'].format(tableName, self.rowsLimit)
@@ -212,7 +214,7 @@ class Connection:
             argsType = 'list'
             cliOptions['args'] = ' '.join(cliOptions['args'])
 
-        Log.debug('Usgin cli args (%s) "%s"' %(argsType, cliOptions['args']))
+        Log.debug('Usgin cli args ' + ' '.join(args + shlex.split(cliOptions['args'].format(**self.options))))
         return args + shlex.split(cliOptions['args'].format(**self.options))
 
     def getOptionsForSgdbCli(self):

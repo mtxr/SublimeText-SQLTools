@@ -34,7 +34,7 @@ class ST(sublime_plugin.EventListener):
     @staticmethod
     def setTablesIfNotEmpty(tables):
         if type(tables) is list and len(tables) == 0:
-            sublime.message_dialog('Connection failed. Check your settings and try again.')
+            # sublime.message_dialog('Connection failed. Check your settings and try again.')
             return
         ST.tables = tables
 
@@ -130,7 +130,8 @@ class ST(sublime_plugin.EventListener):
             views = STM.Window().views()
             for view in views:
                 if view.name() == name:
-                    resultContainer = view;
+                    resultContainer = view
+                    STM.Window().focus_view(resultContainer)
                     break;
             if not resultContainer:
                 resultContainer = STM.Window().new_file()
