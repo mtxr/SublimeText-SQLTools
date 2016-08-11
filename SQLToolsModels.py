@@ -289,8 +289,12 @@ class Command(threading.Thread):
             Log.debug("Your command is taking too long to run. Process killed")
         except Exception:
             pass
-        if self.tmp and os.path.exists(self.tmp.name):
-            os.unlink(self.tmp.name)
+        try:
+            if self.tmp and os.path.exists(self.tmp.name):
+                os.unlink(self.tmp.name)
+        except Exception:
+            Log.debug("Failed to remove tmp file" + self.tmp.name)
+            pass
 
 class Utils:
     @staticmethod
