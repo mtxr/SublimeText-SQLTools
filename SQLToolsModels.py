@@ -276,11 +276,15 @@ class Command(threading.Thread):
 
         results, errors = self.process.communicate(input=self.query.encode())
 
-        if errors:
-            self.callback(errors.decode(self.encoding, 'replace').replace('\r', ''))
-            return
+        resultString = '';
 
-        self.callback(results.decode(self.encoding, 'replace').replace('\r', ''))
+        if results:
+            resultString += results.decode(self.encoding, 'replace').replace('\r', '')
+
+        if errors:
+            resultString += errors.decode(self.encoding, 'replace').replace('\r', '')
+
+        self.callback(resultString)
 
     def stop(self):
         if not self.process:
