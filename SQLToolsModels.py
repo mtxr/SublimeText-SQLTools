@@ -1,4 +1,4 @@
-import sublime, os, threading, signal, shlex, subprocess, sys
+import sublime, os, threading, signal, shlex, subprocess, sys, shutil
 
 sys.path.append(os.path.dirname(__file__))
 if sys.version_info >= (3, 0):
@@ -96,7 +96,14 @@ class Storage:
 class Connection:
 
     def __init__(self, name, options):
+
         self.cli         = sublime.load_settings(Const.SETTINGS_FILENAME).get('cli')[options['type']]
+        cli_path = shutil.which(self.cli)
+
+        if cli_path == None:
+            sublime.message_dialog("'{0}' could not be found by Sublime Text.\n\nPlease set the '{0}' path in your SQLTools settings before continue.".format(self.cli))
+            return
+
         self.rowsLimit   = sublime.load_settings(Const.SETTINGS_FILENAME).get('show_records').get('limit', 50)
         self.options     = options
         self.name        = name
