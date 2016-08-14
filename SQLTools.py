@@ -22,6 +22,7 @@ class ST(sublime_plugin.EventListener):
     conn             = None
     history          = []
     tables           = []
+    functions        = []
     columns          = []
     connectionList   = {}
     autoCompleteList = []
@@ -32,20 +33,20 @@ class ST(sublime_plugin.EventListener):
         ST.checkDefaultConnection()
 
     @staticmethod
-    def setTablesIfNotEmpty(tables):
-        if type(tables) is list and len(tables) == 0:
+    def setAttrIfNotEmpty(attr, value):
+        if type(value) is list and len(value) == 0:
             # sublime.message_dialog('Connection failed. Check your settings and try again.')
             return
-        ST.tables = tables
+        setattr(ST, attr, value)
 
     @staticmethod
     def loadConnectionData():
         if not ST.conn:
             return
 
-        ST.conn.getTables(lambda tables: ST.setTablesIfNotEmpty(tables))
-        ST.conn.getColumns(lambda columns: setattr(ST, 'columns', columns))
-        ST.conn.getFunctions(lambda functions: setattr(ST, 'functions', functions))
+        ST.conn.getTables(lambda tables: ST.setAttrIfNotEmpty('tables', tables))
+        ST.conn.getColumns(lambda columns: ST.setAttrIfNotEmpty('columns', columns))
+        ST.conn.getFunctions(lambda functions: ST.setAttrIfNotEmpty('functions', functions))
 
     @staticmethod
     def setConnection(index):
