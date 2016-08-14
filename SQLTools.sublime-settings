@@ -107,7 +107,7 @@
                     "format" : "|%s|"
                 },
                 "show records": {
-                    "query": "select * from {0} limit {1};",
+                    "query": "select * from {0} WHERE ROWNUM <= {1};",
                     "options": ["-S"],
                     "format" : "|%s|"
                 }
