@@ -1,4 +1,4 @@
-import sublime, os, tempfile, threading, signal, shlex, subprocess, sys
+import sublime, os, threading, signal, shlex, subprocess, sys
 
 sys.path.append(os.path.dirname(__file__))
 if sys.version_info >= (3, 0):
@@ -259,18 +259,15 @@ class Command(threading.Thread):
             return
 
         sublime.status_message(' ST: running SQL command')
-        self.tmp = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.sql')
-        self.tmp.write(self.query)
-        self.tmp.close()
-
         self.args = map(str, self.args)
         si = None
         if os.name == 'nt':
             si = subprocess.STARTUPINFO()
             si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        self.process = subprocess.Popen(self.args, stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=open(self.tmp.name), env=os.environ.copy(), startupinfo=si)
 
-        results, errors = self.process.communicate()
+        self.process = subprocess.Popen(self.args, stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=subprocess.PIPE, env=os.environ.copy(), startupinfo=si)
+
+        results, errors = self.process.communicate(input=self.query.encode())
 
         if errors:
             self.callback(errors.decode(self.encoding, 'replace').replace('\r', ''))
@@ -289,8 +286,6 @@ class Command(threading.Thread):
             Log.debug("Your command is taking too long to run. Process killed")
         except Exception:
             pass
-        if self.tmp and os.path.exists(self.tmp.name):
-            os.unlink(self.tmp.name)
 
 class Utils:
     @staticmethod

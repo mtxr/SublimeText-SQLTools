@@ -121,7 +121,7 @@ class ST(sublime_plugin.EventListener):
             STM.Log.debug("Invalid connection setted")
 
     @staticmethod
-    def display(content, name="SQLTools Result"):
+    def getOutputPlace(name="SQLTools Result"):
         if not sublime.load_settings(STM.Const.SETTINGS_FILENAME).get('show_result_on_window'):
             resultContainer = STM.Window().create_output_panel(name)
             STM.Window().run_command("show_panel", {"panel": "output." + name})
@@ -141,10 +141,16 @@ class ST(sublime_plugin.EventListener):
         resultContainer.settings().set("word_wrap", "false")
         resultContainer.set_read_only(False)
         resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
-        resultContainer.run_command('select_all')
-        resultContainer.run_command('left_delete')
-        resultContainer.run_command('append', {'characters': content})
-        resultContainer.set_read_only(True)
+        # resultContainer.run_command('select_all')
+        # resultContainer.run_command('left_delete')
+        return resultContainer
+
+    @staticmethod
+    def display(content, panel=None):
+        if not panel:
+            panel = ST.getOutputPlace()
+        panel.run_command('append', {'characters': content})
+        panel.set_read_only(True)
 
     @staticmethod
     def toBuffer(content, name="", suffix="SQLTools Saved Query"):
