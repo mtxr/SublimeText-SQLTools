@@ -75,6 +75,9 @@ class ST(sublime_plugin.EventListener):
         STM.Window().show_quick_panel(menu, ST.setConnection)
 
     def on_query_completions(self, view, prefix, locations):
+
+        completions = view.extract_completions(prefix)
+
         if prefix == "":
             region = sublime.Region(locations[0], locations[0])
             try:
@@ -82,7 +85,11 @@ class ST(sublime_plugin.EventListener):
             except Exception:
                 pass
 
-        return self.getAutoCompleteList(prefix)
+        # todo manage properly the scope name
+        # see https://github.com/Pleasurazy/Sublime-Better-Completion/blob/master/main.py
+        if view.match_selector(locations[0], 'source.sql'):
+            return completions + self.getAutoCompleteList(prefix)
+        return None
 
     def getAutoCompleteList(self, word):
         ST.autoCompleteList = []
