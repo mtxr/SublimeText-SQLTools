@@ -142,6 +142,7 @@ Below you can see an example of the `SQLToolsConnections.sublime-settings`:
 }
 ```
 
+You can also add connections to your `.sublime-project` files to use per-project connections.
 
 ## Auto Complete
 
