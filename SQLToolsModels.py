@@ -34,6 +34,14 @@ class Settings:
         for connection in options:
             connections[connection] = Connection(connection, options[connection])
 
+        # project settings
+        try:
+            options = Window().project_data().get('connections')
+            for connection in options:
+                connections[connection] = Connection(connection, options[connection])
+        except e:
+            pass
+
         return connections
 
     @staticmethod
