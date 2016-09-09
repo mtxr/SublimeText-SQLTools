@@ -1,10 +1,6 @@
 import sublime, os, threading, signal, shlex, subprocess, sys, shutil
 
-sys.path.append(os.path.dirname(__file__))
-if sys.version_info >= (3, 0):
-    import sqlparse3 as sqlparse
-else:
-    import sqlparse2 as sqlparse
+import sqlparse
 
 class Const:
     SETTINGS_EXTENSION    = "sublime-settings"
@@ -12,7 +8,7 @@ class Const:
     SGDB_FILENAME         = "SQLToolsSGBD.{0}".format(SETTINGS_EXTENSION)
     CONNECTIONS_FILENAME  = "SQLToolsConnections.{0}".format(SETTINGS_EXTENSION)
     USER_QUERIES_FILENAME = "SQLToolsSavedQueries.{0}".format(SETTINGS_EXTENSION)
-    VERSION               = "v0.3.1"
+    VERSION               = "v0.3.5"
     pass
 
 class Log:
@@ -39,7 +35,7 @@ class Settings:
             options = Window().project_data().get('connections')
             for connection in options:
                 connections[connection] = Connection(connection, options[connection])
-        except e:
+        except Exception:
             pass
 
         return connections
