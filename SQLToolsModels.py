@@ -1,6 +1,12 @@
-import sublime, os, threading, signal, shlex, subprocess, sys, shutil
+VERSION = "v0.4.3"
 
-import sqlparse
+import os, sys
+
+dirpath = os.path.dirname(__file__)
+if not dirpath in sys.path:
+    sys.path.append(dirpath)
+
+import sublime, threading, signal, shlex, subprocess, shutil, sqlparse
 
 class Const:
     SETTINGS_EXTENSION    = "sublime-settings"
@@ -8,8 +14,6 @@ class Const:
     SGDB_FILENAME         = "SQLToolsSGBD.{0}".format(SETTINGS_EXTENSION)
     CONNECTIONS_FILENAME  = "SQLToolsConnections.{0}".format(SETTINGS_EXTENSION)
     USER_QUERIES_FILENAME = "SQLToolsSavedQueries.{0}".format(SETTINGS_EXTENSION)
-    VERSION               = "v0.4.1"
-    pass
 
 class Log:
 
@@ -17,7 +21,7 @@ class Log:
     def debug(message):
         if not sublime.load_settings(Const.SETTINGS_FILENAME).get('debug', False):
             return
-        print ("SQLTools %s: %s" % (Const.VERSION, message))
+        print ("SQLTools %s: %s" % (VERSION, message))
 
 
 class Settings:

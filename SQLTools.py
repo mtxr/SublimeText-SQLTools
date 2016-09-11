@@ -1,9 +1,13 @@
-import sublime, sublime_plugin, sys, os, imp
+import sys, os
 
-sys.path.append(os.path.dirname(__file__))
+dirpath = os.path.dirname(__file__)
+if not dirpath in sys.path:
+    sys.path.append(dirpath)
+
+import sublime, sublime_plugin, imp
 import SQLToolsModels as STM
 
-#  force reloading models when update
+# force reloading models when update
 try:
     # python 3.0 to 3.3
     import imp
@@ -270,7 +274,7 @@ class StFormat(sublime_plugin.TextCommand):
 
 class StVersion(sublime_plugin.WindowCommand):
     def run(self):
-        sublime.message_dialog('Using SQLTools ' + STM.Const.VERSION)
+        sublime.message_dialog('Using SQLTools ' + STM.VERSION)
 
 def plugin_loaded():
     STM.Log.debug('%s loaded successfully' % (__name__))
