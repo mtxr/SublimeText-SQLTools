@@ -7,21 +7,6 @@ if not dirpath in sys.path:
 import sublime, sublime_plugin, imp
 import SQLToolsModels as STM
 
-# force reloading models when update
-try:
-    # python 3.0 to 3.3
-    import imp
-    imp.reload(STM)
-except Exception as e:
-    pass
-
-try:
-    # python 3.4 and newer
-    import importlib
-    importlib.reload(STM)
-except Exception as e:
-    pass
-
 class ST(sublime_plugin.EventListener):
     conn             = None
     history          = []
@@ -38,7 +23,7 @@ class ST(sublime_plugin.EventListener):
 
     @staticmethod
     def setAttrIfNotEmpty(attr, value):
-        if type(value) is list and len(value) == 0:
+        if isinstance(value, list) and len(value) == 0:
             # sublime.message_dialog('Connection failed. Check your settings and try again.')
             return
         setattr(ST, attr, value)
@@ -86,9 +71,10 @@ class ST(sublime_plugin.EventListener):
             except Exception:
                 pass
 
-        return self.getAutoCompleteList(prefix)
+        return ST.getAutoCompleteList(prefix)
 
-    def getAutoCompleteList(self, word):
+    @staticmethod
+    def getAutoCompleteList(word):
         ST.autoCompleteList = []
         for w in ST.tables:
             try:
@@ -169,11 +155,13 @@ class ST(sublime_plugin.EventListener):
 #
 
 class StShowConnectionMenu(sublime_plugin.WindowCommand):
-    def run (self):
+    @staticmethod
+    def run ():
         ST.showConnectionMenu()
 
 class StShowRecords(sublime_plugin.WindowCommand):
-    def run(self):
+    @staticmethod
+    def run():
         if not ST.conn:
             ST.showConnectionMenu()
             return
@@ -181,7 +169,8 @@ class StShowRecords(sublime_plugin.WindowCommand):
         STM.Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableRecords(ST.tables[index], ST.display) if index != -1 else None)
 
 class StDescTable(sublime_plugin.WindowCommand):
-    def run(self):
+    @staticmethod
+    def run():
         if not ST.conn:
             ST.showConnectionMenu()
             return
@@ -189,7 +178,8 @@ class StDescTable(sublime_plugin.WindowCommand):
         STM.Window().show_quick_panel(ST.tables, lambda index: ST.conn.getTableDescription(ST.tables[index], ST.display) if index != -1 else None)
 
 class StDescFunction(sublime_plugin.WindowCommand):
-    def run(self):
+    @staticmethod
+    def run():
         if not ST.conn:
             ST.showConnectionMenu()
             return
@@ -198,7 +188,8 @@ class StDescFunction(sublime_plugin.WindowCommand):
         STM.Window().show_quick_panel(ST.functions, lambda index: ST.conn.getFunctionDescription(ST.functions[index].split('(', 1)[0], ST.display) if index != -1 else None)
 
 class StHistory(sublime_plugin.WindowCommand):
-    def run(self):
+    @staticmethod
+    def run():
         if not ST.conn:
             ST.showConnectionMenu()
             return
@@ -212,7 +203,8 @@ class StHistory(sublime_plugin.WindowCommand):
             pass
 
 class StExecute(sublime_plugin.WindowCommand):
-    def run(self):
+    @staticmethod
+    def run():
         if not ST.conn:
             ST.showConnectionMenu()
             return
@@ -221,11 +213,13 @@ class StExecute(sublime_plugin.WindowCommand):
         ST.conn.execute(query, ST.display)
 
 class StSaveQuery(sublime_plugin.WindowCommand):
-    def run(self):
+    @staticmethod
+    def run():
         STM.Storage.promptQueryAlias()
 
 class StListQueries(sublime_plugin.WindowCommand):
-    def run(self, mode="run"):
+    @staticmethod
+    def run(mode="run"):
         print(mode)
         if not ST.conn:
             ST.showConnectionMenu()
@@ -251,7 +245,8 @@ class StListQueries(sublime_plugin.WindowCommand):
             pass
 
 class StRemoveSavedQuery(sublime_plugin.WindowCommand):
-    def run(self):
+    @staticmethod
+    def run():
         queries = STM.Storage.getSavedQueries().get('queries')
 
         if len(queries) == 0:
@@ -269,14 +264,24 @@ class StRemoveSavedQuery(sublime_plugin.WindowCommand):
             pass
 
 class StFormat(sublime_plugin.TextCommand):
-    def run(self, edit):
+    @staticmethod
+    def run(edit):
         STM.Selection.formatSql(edit)
 
 class StVersion(sublime_plugin.WindowCommand):
-    def run(self):
+    @staticmethod
+    def run():
         sublime.message_dialog('Using SQLTools ' + STM.VERSION)
 
 def plugin_loaded():
+    # force reloading models when update
+    try:
+        # python 3.0 to 3.3
+        import imp
+        imp.reload(STM)
+    except Exception as e:
+        pass
+
     STM.Log.debug('%s loaded successfully' % (__name__))
     try:
         ST.bootstrap()
