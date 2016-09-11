@@ -208,12 +208,6 @@ class Connection:
         History.add(queryToRun)
         Command.createAndRun(self.builArgs(), queryToRun, lambda result: callback(result))
 
-    def runCommand(self, args, query, callback):
-        command = Command(args, callback, query)
-        command.start()
-        Connection.killCommandAfterTimeout(command)
-
-
     def builArgs(self, queryName=None):
         cliOptions = self.getOptionsForSgdbCli()
         args  = [self.cli]
@@ -321,7 +315,7 @@ class Utils:
                 pass
 
         if callback:
-           callback(resultList)
+            callback(resultList)
 
         return resultList
 
