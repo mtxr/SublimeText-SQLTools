@@ -63,7 +63,8 @@ class ST(sublime_plugin.EventListener):
         menu.sort()
         STM.Window().show_quick_panel(menu, ST.setConnection)
 
-    def on_query_completions(self, view, prefix, locations):
+    @staticmethod
+    def on_query_completions(view, prefix, locations):
         if prefix == "":
             region = sublime.Region(locations[0], locations[0])
             try:
@@ -108,7 +109,7 @@ class ST(sublime_plugin.EventListener):
         try:
             ST.conn = ST.connectionList.get(default)
             ST.loadConnectionData()
-        except Exception as e:
+        except Exception:
             STM.Log.debug("Invalid connection setted")
 
     @staticmethod

@@ -154,33 +154,33 @@ class Connection:
 
     def getTables(self, callback):
         query   = self.getOptionsForSgdbCli()['queries']['desc']['query']
-        self.runCommand(self.builArgs('desc'), query, lambda result: Utils.getResultAsList(result, callback))
+        Command.createAndRun(self.builArgs('desc'), query, lambda result: Utils.getResultAsList(result, callback))
 
     def getColumns(self, callback):
         try:
             query   = self.getOptionsForSgdbCli()['queries']['columns']['query']
-            self.runCommand(self.builArgs('columns'), query, lambda result: Utils.getResultAsList(result, callback))
+            Command.createAndRun(self.builArgs('columns'), query, lambda result: Utils.getResultAsList(result, callback))
         except Exception:
             pass
 
     def getFunctions(self, callback):
         try:
             query   = self.getOptionsForSgdbCli()['queries']['functions']['query']
-            self.runCommand(self.builArgs('functions'), query, lambda result: Utils.getResultAsList(result, callback))
+            Command.createAndRun(self.builArgs('functions'), query, lambda result: Utils.getResultAsList(result, callback))
         except Exception:
             pass
 
     def getTableRecords(self, tableName, callback):
         query   = self.getOptionsForSgdbCli()['queries']['show records']['query'].format(tableName, self.rowsLimit)
-        self.runCommand(self.builArgs('show records'), query, lambda result: callback(result))
+        Command.createAndRun(self.builArgs('show records'), query, lambda result: callback(result))
 
     def getTableDescription(self, tableName, callback):
         query   = self.getOptionsForSgdbCli()['queries']['desc table']['query'] % tableName
-        self.runCommand(self.builArgs('desc table'), query, lambda result: callback(result))
+        Command.createAndRun(self.builArgs('desc table'), query, lambda result: callback(result))
 
     def getFunctionDescription(self, functionName, callback):
         query   = self.getOptionsForSgdbCli()['queries']['desc function']['query'] % functionName
-        self.runCommand(self.builArgs('desc function'), query, lambda result: callback(result))
+        Command.createAndRun(self.builArgs('desc function'), query, lambda result: callback(result))
 
 
     def execute(self, queries, callback):
@@ -206,7 +206,7 @@ class Connection:
 
         Log.debug("Query: " + queryToRun)
         History.add(queryToRun)
-        self.runCommand(self.builArgs(), queryToRun, lambda result: callback(result))
+        Command.createAndRun(self.builArgs(), queryToRun, lambda result: callback(result))
 
     def runCommand(self, args, query, callback):
         command = Command(args, callback, query)
@@ -303,6 +303,12 @@ class Command(threading.Thread):
             Log.debug("Your command is taking too long to run. Process killed")
         except Exception:
             pass
+
+    @staticmethod
+    def createAndRun(args, query, callback):
+        command = Command(args, callback, query)
+        command.start()
+        Connection.killCommandAfterTimeout(command)
 
 class Utils:
     @staticmethod
