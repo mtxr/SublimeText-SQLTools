@@ -136,7 +136,7 @@ class Connection:
     def _info(self):
         return 'DB: {0}, Connection: {1}@{2}:{3}'.format(self.database, self.username, self.host, self.port)
 
-    def _quickPanel(self):
+    def toQuickPanel(self):
         return [self.name, self._info()]
 
     @staticmethod

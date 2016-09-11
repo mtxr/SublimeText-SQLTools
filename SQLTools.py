@@ -59,7 +59,7 @@ class ST(sublime_plugin.EventListener):
 
         menu = []
         for conn in ST.connectionList.values():
-            menu.append(conn._quickPanel())
+            menu.append(conn.toQuickPanel())
         menu.sort()
         STM.Window().show_quick_panel(menu, ST.setConnection)
 
