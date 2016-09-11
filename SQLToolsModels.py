@@ -189,7 +189,7 @@ class Connection:
         for query in self.getOptionsForSgdbCli()['before']:
             queryToRun += query + "\n"
 
-        if type(queries) is str:
+        if isinstance(queries, str):
             queries = [queries];
 
         for query in queries:
@@ -197,7 +197,7 @@ class Connection:
 
         queryToRun = queryToRun.rstrip('\n')
         windowVars = sublime.active_window().extract_variables()
-        if type(windowVars) is dict and 'file_extension' in windowVars:
+        if isinstance(windowVars, dict) and 'file_extension' in windowVars:
             windowVars = windowVars['file_extension'].lstrip()
             unescapeExtension = sublime.load_settings(Const.SETTINGS_FILENAME).get('unescape_quotes')
             if windowVars in unescapeExtension:
@@ -224,9 +224,7 @@ class Connection:
         if queryName and len(cliOptions['queries'][queryName]['options']) > 0:
             args = args + cliOptions['queries'][queryName]['options']
 
-        argsType = 'string'
-        if type(cliOptions['args']) is list:
-            argsType = 'list'
+        if isinstance(cliOptions['args'], list):
             cliOptions['args'] = ' '.join(cliOptions['args'])
 
         Log.debug('Usgin cli args ' + ' '.join(args + shlex.split(cliOptions['args'].format(**self.options))))
@@ -338,7 +336,7 @@ class Utils:
                 result += "\n"
 
             return result
-        except Exception as e:
+        except Exception:
             return None
 
 class History:

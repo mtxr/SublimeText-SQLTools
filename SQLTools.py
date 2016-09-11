@@ -276,11 +276,11 @@ def plugin_loaded():
         # python 3.0 to 3.3
         import imp
         imp.reload(STM)
-    except Exception as e:
+    except Exception:
         pass
 
     STM.Log.debug('%s loaded successfully' % (__name__))
     try:
         ST.bootstrap()
-    except Exception as e:
+    except Exception:
         pass
