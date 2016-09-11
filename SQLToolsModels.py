@@ -203,7 +203,6 @@ class Connection:
             if windowVars in unescapeExtension:
                 queryToRun = queryToRun.replace("\\\"", "\"").replace("\\\'", "\'")
 
-
         Log.debug("Query: " + queryToRun)
         History.add(queryToRun)
         Command.createAndRun(self.builArgs(), queryToRun, lambda result: callback(result))
