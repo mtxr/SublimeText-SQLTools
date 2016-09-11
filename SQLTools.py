@@ -4,7 +4,7 @@ dirpath = os.path.dirname(__file__)
 if not dirpath in sys.path:
     sys.path.append(dirpath)
 
-import sublime, sublime_plugin, imp
+import sublime, sublime_plugin
 import SQLToolsModels as STM
 
 class ST(sublime_plugin.EventListener):
@@ -58,7 +58,7 @@ class ST(sublime_plugin.EventListener):
             return
 
         menu = []
-        for name, conn in ST.connectionList.items():
+        for conn in ST.connectionList.values():
             menu.append(conn._quickPanel())
         menu.sort()
         STM.Window().show_quick_panel(menu, ST.setConnection)
@@ -220,7 +220,6 @@ class StSaveQuery(sublime_plugin.WindowCommand):
 class StListQueries(sublime_plugin.WindowCommand):
     @staticmethod
     def run(mode="run"):
-        print(mode)
         if not ST.conn:
             ST.showConnectionMenu()
             return
@@ -233,7 +232,6 @@ class StListQueries(sublime_plugin.WindowCommand):
 
         queriesArray = []
         for alias, query in queries.items():
-            print (alias, query)
             queriesArray.append([alias, query])
         queriesArray.sort()
         try:
@@ -255,7 +253,6 @@ class StRemoveSavedQuery(sublime_plugin.WindowCommand):
 
         queriesArray = []
         for alias, query in queries.items():
-            print (alias, query)
             queriesArray.append([alias, query])
         queriesArray.sort()
         try:
