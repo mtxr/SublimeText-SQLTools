@@ -135,10 +135,10 @@ class Connection:
         cli_path = shutil.which(self.cli)
 
         if cli_path is None:
-            sublime.message_dialog(
+            sublime.message_dialog((
                 "'{0}' could not be found by Sublime Text.\n\n" +
                 "Please set the '{0}' path in your SQLTools settings " +
-                "before continue.".format(self.cli))
+                "before continue.").format(self.cli))
             return
 
         self.rowsLimit = sublime.load_settings(
