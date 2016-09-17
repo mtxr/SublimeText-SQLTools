@@ -326,8 +326,7 @@ class StVersion(sublime_plugin.WindowCommand):
         sublime.message_dialog('Using SQLTools ' + STM.VERSION)
 
 
-def plugin_loaded():
-    # force reloading models when update
+def reload():
     try:
         # python 3.0 to 3.3
         import imp
@@ -340,3 +339,23 @@ def plugin_loaded():
         ST.bootstrap()
     except Exception:
         pass
+
+
+def plugin_loaded():
+    try:
+        from package_control import events
+
+        if events.install(__name__):
+            print('Installed %s!' % events.install(__name__))
+        elif events.post_upgrade(__name__):
+            print('Upgraded to %s!' % events.post_upgrade(__name__))
+            sublime.message_dialog(('{0} was upgraded.' +
+                                    'If you have any problem,' +
+                                    'just restart your Sublime Text.'
+                                    ).format(__name__)
+                                   )
+
+    except Exception:
+        pass
+
+    reload()
