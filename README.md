@@ -15,6 +15,13 @@ SQLTools will save you (for sure) a lot of time and help you to increase your pr
 
 <span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RSMB6DGK238V8" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
 
+## Contributors
+
+These fellows helped SQLTools become better than ever. Thank you so much!
+
+* [@tkopets](https://github.com/tkopets)
+* [@gabrielebarbieri](https://github.com/gabrielebarbieri)
+
 ## Features
 
 * View table schemas (`CTRL+e, CTRL+d`)
