@@ -69,6 +69,8 @@ class ST(sublime_plugin.EventListener):
 
     @staticmethod
     def on_query_completions(view, prefix, locations):
+        completions = view.extract_completions(prefix)
+
         if prefix == "":
             region = sublime.Region(locations[0], locations[0])
             try:
@@ -76,7 +78,13 @@ class ST(sublime_plugin.EventListener):
             except Exception:
                 pass
 
-        return ST.getAutoCompleteList(prefix)
+        selectors = sublime.load_settings(STM.Const.SETTINGS_FILENAME).get('selectors', [])
+        if not selectors:
+            return completions + ST.getAutoCompleteList(prefix)
+        for selector in selectors:
+            if view.match_selector(locations[0], selector):
+                return completions + ST.getAutoCompleteList(prefix)
+        return None
 
     @staticmethod
     def getAutoCompleteList(word):
