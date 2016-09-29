@@ -85,10 +85,12 @@ class ST(sublime_plugin.EventListener):
             except Exception:
                 pass
 
-        # todo manage properly the scope name
-        # see https://github.com/Pleasurazy/Sublime-Better-Completion/blob/master/main.py
-        if view.match_selector(locations[0], 'source.sql'):
+        selectors = sublime.load_settings(STM.Const.SETTINGS_FILENAME).get('selectors', [])
+        if not selectors:
             return completions + self.getAutoCompleteList(prefix)
+        for selector in selectors:
+            if view.match_selector(locations[0], selector):
+                return completions + self.getAutoCompleteList(prefix)
         return None
 
     def getAutoCompleteList(self, word):

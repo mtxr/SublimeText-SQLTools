@@ -3,6 +3,11 @@
     "thread_timeout"        : 5000,
     "history_size"          : 100,
     "show_result_on_window" : false,
+    /**
+     * The list of syntax selector for which the plugin autocompletion will be active.
+     * An empty list means autocompletion always active.
+     */
+    "selectors": ["source.sql"],
     "unescape_quotes" : [
         "php"
     ],
