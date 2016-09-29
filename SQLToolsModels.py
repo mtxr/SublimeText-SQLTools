@@ -1,38 +1,69 @@
-import sublime, os, threading, signal, shlex, subprocess, sys, shutil
+VERSION = "v0.5.3"
 
-sys.path.append(os.path.dirname(__file__))
-if sys.version_info >= (3, 0):
-    import sqlparse3 as sqlparse
-else:
-    import sqlparse2 as sqlparse
+import os
+import sys
+
+dirpath = os.path.dirname(__file__)
+if dirpath not in sys.path:
+    sys.path.append(dirpath)
+
+import sublime
+import threading
+import signal
+import shlex
+import subprocess
+import shutil
+import sqlparse
+
 
 class Const:
-    SETTINGS_EXTENSION    = "sublime-settings"
-    SETTINGS_FILENAME     = "SQLTools.{0}".format(SETTINGS_EXTENSION)
-    SGDB_FILENAME         = "SQLToolsSGBD.{0}".format(SETTINGS_EXTENSION)
-    CONNECTIONS_FILENAME  = "SQLToolsConnections.{0}".format(SETTINGS_EXTENSION)
-    USER_QUERIES_FILENAME = "SQLToolsSavedQueries.{0}".format(SETTINGS_EXTENSION)
-    VERSION               = "v0.3.1"
-    pass
+    SETTINGS_EXTENSION = "sublime-settings"
+    SETTINGS_FILENAME = "SQLTools.{0}".format(SETTINGS_EXTENSION)
+    SGDB_FILENAME = "SQLToolsSGBD.{0}".format(SETTINGS_EXTENSION)
+    CONNECTIONS_FILENAME = "SQLToolsConnections.{0}".format(SETTINGS_EXTENSION)
+    USER_QUERIES_FILENAME = "SQLToolsSavedQueries.{0}".format(
+        SETTINGS_EXTENSION)
+
 
 class Log:
 
     @staticmethod
     def debug(message):
-        if not sublime.load_settings(Const.SETTINGS_FILENAME).get('debug', False):
+        if not Settings.get('debug', False):
             return
-        print ("SQLTools %s: %s" % (Const.VERSION, message))
+        print ("SQLTools %s: %s" % (VERSION, message))
 
 
 class Settings:
 
     @staticmethod
+    def get(key, default=None):
+        keys = key.split('.')
+        settings = sublime.load_settings(Const.SETTINGS_FILENAME)
+        value = settings
+        for key in keys:
+            value = value.get(key, None)
+
+        return value
+
+    @staticmethod
     def getConnections():
         connections = {}
-        options = sublime.load_settings(Const.CONNECTIONS_FILENAME).get('connections')
+        options = sublime.load_settings(Const.CONNECTIONS_FILENAME)
+        options = options.get('connections')
 
         for connection in options:
-            connections[connection] = Connection(connection, options[connection])
+            connections[connection] = Connection(
+                connection, options[connection])
+
+        # project settings
+        try:
+            options = Window().project_data().get('connections')
+            for connection in options:
+                connections[connection] = Connection(
+                    connection, options[connection])
+        except Exception:
+            pass
 
         return connections
 
@@ -41,15 +72,15 @@ class Settings:
         return '{0}/User'.format(sublime.packages_path())
 
 
-
 class Storage:
-    savedQueries       = None
-    savedQueriesArray  = None
-    selectedQuery      = ''
+    savedQueries = None
+    savedQueriesArray = None
+    selectedQuery = ''
 
     @staticmethod
     def getSavedQueries():
-        Storage.savedQueries      = sublime.load_settings(Const.USER_QUERIES_FILENAME)
+        Storage.savedQueries = sublime.load_settings(
+            Const.USER_QUERIES_FILENAME)
         Storage.savedQueriesArray = Storage.savedQueries.get('queries', {})
         return Storage.savedQueries
 
@@ -63,7 +94,8 @@ class Storage:
     @staticmethod
     def promptQueryAlias():
         Storage.selectedQuery = Selection.get()
-        Window().show_input_panel('Query alias', '', Storage.saveQuery, None, None)
+        cb = Storage.saveQuery
+        Window().show_input_panel('Query alias', '', cb, None, None)
 
     @staticmethod
     def saveQuery(alias):
@@ -93,87 +125,113 @@ class Storage:
         Storage.getSavedQueries()
         return Storage.savedQueriesArray[alias]
 
+
 class Connection:
 
     def __init__(self, name, options):
 
-        self.cli         = sublime.load_settings(Const.SETTINGS_FILENAME).get('cli')[options['type']]
+        self.cli = Settings.get('cli')[
+            options['type']]
         cli_path = shutil.which(self.cli)
 
-        if cli_path == None:
-            sublime.message_dialog("'{0}' could not be found by Sublime Text.\n\nPlease set the '{0}' path in your SQLTools settings before continue.".format(self.cli))
+        if cli_path is None:
+            sublime.message_dialog((
+                "'{0}' could not be found by Sublime Text.\n\n" +
+                "Please set the '{0}' path in your SQLTools settings " +
+                "before continue.").format(self.cli))
             return
 
-        self.rowsLimit   = sublime.load_settings(Const.SETTINGS_FILENAME).get('show_records').get('limit', 50)
-        self.options     = options
-        self.name        = name
-        self.type        = options['type']
-        self.host        = options['host']
-        self.port        = options['port']
-        self.username    = options['username']
-        self.database    = options['database']
+        self.rowsLimit = sublime.load_settings(
+            Const.SETTINGS_FILENAME).get('show_records').get('limit', 50)
+        self.options = options
+        self.name = name
+        self.type = options['type']
+        self.host = options['host']
+        self.port = options['port']
+        self.username = options['username']
+        self.database = options['database']
 
         if 'encoding' in options:
-            self.encoding    = options['encoding']
+            self.encoding = options['encoding']
 
         if 'password' in options:
             self.password = options['password']
 
         if 'service' in options:
-            self.service  = options['service']
+            self.service = options['service']
 
     def __str__(self):
         return self.name
 
     def _info(self):
-        return 'DB: {0}, Connection: {1}@{2}:{3}'.format(self.database, self.username, self.host, self.port)
+        return 'DB: {0}, Connection: {1}@{2}:{3}'.format(
+            self.database, self.username, self.host, self.port)
 
-    def _quickPanel(self):
+    def toQuickPanel(self):
         return [self.name, self._info()]
 
     @staticmethod
     def killCommandAfterTimeout(command):
-        timeout = sublime.load_settings(Const.SETTINGS_FILENAME).get('thread_timeout', 5000)
+        timeout = sublime.load_settings(
+            Const.SETTINGS_FILENAME).get('thread_timeout', 5000)
         sublime.set_timeout(command.stop, timeout)
 
     @staticmethod
     def loadDefaultConnectionName():
-        default = sublime.load_settings(Const.CONNECTIONS_FILENAME).get('default', False)
+        default = sublime.load_settings(
+            Const.CONNECTIONS_FILENAME).get('default', False)
         if not default:
             return
-        Log.debug('Default database set to ' + default + '. Loading options and auto complete.')
+        Log.debug('Default database set to ' + default +
+                  '. Loading options and auto complete.')
         return default
 
     def getTables(self, callback):
-        query   = self.getOptionsForSgdbCli()['queries']['desc']['query']
-        self.runCommand(self.builArgs('desc'), query, lambda result: Utils.getResultAsList(result, callback))
+        query = self.getOptionsForSgdbCli()['queries']['desc']['query']
+
+        def cb(result):
+            return Utils.getResultAsList(result, callback)
+
+        Command.createAndRun(self.builArgs('desc'), query, cb)
 
     def getColumns(self, callback):
+
+        def cb(result):
+            return Utils.getResultAsList(result, callback)
+
         try:
-            query   = self.getOptionsForSgdbCli()['queries']['columns']['query']
-            self.runCommand(self.builArgs('columns'), query, lambda result: Utils.getResultAsList(result, callback))
+            query = self.getOptionsForSgdbCli()['queries']['columns']['query']
+            Command.createAndRun(self.builArgs('columns'), query, cb)
         except Exception:
             pass
 
     def getFunctions(self, callback):
+
+        def cb(result):
+            return Utils.getResultAsList(result, callback)
+
         try:
-            query   = self.getOptionsForSgdbCli()['queries']['functions']['query']
-            self.runCommand(self.builArgs('functions'), query, lambda result: Utils.getResultAsList(result, callback))
+            query = self.getOptionsForSgdbCli()['queries'][
+                'functions']['query']
+            Command.createAndRun(self.builArgs(
+                'functions'), query, cb)
         except Exception:
             pass
 
     def getTableRecords(self, tableName, callback):
-        query   = self.getOptionsForSgdbCli()['queries']['show records']['query'].format(tableName, self.rowsLimit)
-        self.runCommand(self.builArgs('show records'), query, lambda result: callback(result))
+        query = self.getOptionsForSgdbCli()['queries']['show records'][
+            'query'].format(tableName, self.rowsLimit)
+        Command.createAndRun(self.builArgs('show records'), query, callback)
 
     def getTableDescription(self, tableName, callback):
-        query   = self.getOptionsForSgdbCli()['queries']['desc table']['query'] % tableName
-        self.runCommand(self.builArgs('desc table'), query, lambda result: callback(result))
+        query = self.getOptionsForSgdbCli()['queries']['desc table'][
+            'query'] % tableName
+        Command.createAndRun(self.builArgs('desc table'), query, callback)
 
     def getFunctionDescription(self, functionName, callback):
-        query   = self.getOptionsForSgdbCli()['queries']['desc function']['query'] % functionName
-        self.runCommand(self.builArgs('desc function'), query, lambda result: callback(result))
-
+        query = self.getOptionsForSgdbCli()['queries']['desc function'][
+            'query'] % functionName
+        Command.createAndRun(self.builArgs('desc function'), query, callback)
 
     def execute(self, queries, callback):
         queryToRun = ''
@@ -181,34 +239,29 @@ class Connection:
         for query in self.getOptionsForSgdbCli()['before']:
             queryToRun += query + "\n"
 
-        if type(queries) is str:
-            queries = [queries];
+        if isinstance(queries, str):
+            queries = [queries]
 
         for query in queries:
             queryToRun += query + "\n"
 
         queryToRun = queryToRun.rstrip('\n')
         windowVars = sublime.active_window().extract_variables()
-        if type(windowVars) is dict and 'file_extension' in windowVars:
+        if isinstance(windowVars, dict) and 'file_extension' in windowVars:
             windowVars = windowVars['file_extension'].lstrip()
-            unescapeExtension = sublime.load_settings(Const.SETTINGS_FILENAME).get('unescape_quotes')
+            unescapeExtension = sublime.load_settings(
+                Const.SETTINGS_FILENAME).get('unescape_quotes')
             if windowVars in unescapeExtension:
-                queryToRun = queryToRun.replace("\\\"", "\"").replace("\\\'", "\'")
-
+                queryToRun = queryToRun.replace(
+                    "\\\"", "\"").replace("\\\'", "\'")
 
         Log.debug("Query: " + queryToRun)
         History.add(queryToRun)
-        self.runCommand(self.builArgs(), queryToRun, lambda result: callback(result))
-
-    def runCommand(self, args, query, callback):
-        command = Command(args, callback, query)
-        command.start()
-        Connection.killCommandAfterTimeout(command)
-
+        Command.createAndRun(self.builArgs(), queryToRun, callback)
 
     def builArgs(self, queryName=None):
         cliOptions = self.getOptionsForSgdbCli()
-        args  = [self.cli]
+        args = [self.cli]
 
         if len(cliOptions['options']) > 0:
             args = args + cliOptions['options']
@@ -216,16 +269,17 @@ class Connection:
         if queryName and len(cliOptions['queries'][queryName]['options']) > 0:
             args = args + cliOptions['queries'][queryName]['options']
 
-        argsType = 'string'
-        if type(cliOptions['args']) is list:
-            argsType = 'list'
+        if isinstance(cliOptions['args'], list):
             cliOptions['args'] = ' '.join(cliOptions['args'])
 
-        Log.debug('Usgin cli args ' + ' '.join(args + shlex.split(cliOptions['args'].format(**self.options))))
-        return args + shlex.split(cliOptions['args'].format(**self.options))
+        cliOptions = cliOptions['args'].format(**self.options)
+        args = args + shlex.split(cliOptions)
+
+        Log.debug('Usgin cli args ' + ' '.join(args))
+        return args
 
     def getOptionsForSgdbCli(self):
-        return sublime.load_settings(Const.SETTINGS_FILENAME).get('cli_options')[self.type]
+        return Settings.get('cli_options')[self.type]
 
 
 class Selection:
@@ -244,19 +298,20 @@ class Selection:
     def formatSql(edit):
         for region in View().sel():
             if region.empty():
-                selectedRegion = sublime.Region(0, View().size())
-                selection = View().substr(selectedRegion)
-                View().replace(edit, selectedRegion, Utils.formatSql(selection))
+                region = sublime.Region(0, View().size())
+                selection = View().substr(region)
+                View().replace(edit, region, Utils.formatSql(selection))
                 View().set_syntax_file("Packages/SQL/SQL.tmLanguage")
             else:
                 text = View().substr(region)
                 View().replace(edit, region, Utils.formatSql(text))
 
+
 class Command(threading.Thread):
     def __init__(self, args, callback, query=None, encoding='utf-8'):
-        self.query    = query
-        self.process  = None
-        self.args     = args
+        self.query = query
+        self.process = None
+        self.args = args
         self.encoding = encoding
         self.callback = callback
         threading.Thread.__init__(self)
@@ -272,17 +327,24 @@ class Command(threading.Thread):
             si = subprocess.STARTUPINFO()
             si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
-        self.process = subprocess.Popen(self.args, stdout=subprocess.PIPE,stderr=subprocess.PIPE, stdin=subprocess.PIPE, env=os.environ.copy(), startupinfo=si)
+        self.process = subprocess.Popen(self.args,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE,
+                                        stdin=subprocess.PIPE,
+                                        env=os.environ.copy(),
+                                        startupinfo=si)
 
         results, errors = self.process.communicate(input=self.query.encode())
 
-        resultString = '';
+        resultString = ''
 
         if results:
-            resultString += results.decode(self.encoding, 'replace').replace('\r', '')
+            resultString += results.decode(self.encoding,
+                                           'replace').replace('\r', '')
 
         if errors:
-            resultString += errors.decode(self.encoding, 'replace').replace('\r', '')
+            resultString += errors.decode(self.encoding,
+                                          'replace').replace('\r', '')
 
         self.callback(resultString)
 
@@ -293,10 +355,20 @@ class Command(threading.Thread):
         try:
             os.kill(self.process.pid, signal.SIGKILL)
             self.process = None
-            sublime.message_dialog("Your command is taking too long to run. Try to run outside using your database cli.")
+            sublime.message_dialog(
+                "Your command is taking too long to run." +
+                "Try to run outside using your database cli.")
+
             Log.debug("Your command is taking too long to run. Process killed")
         except Exception:
             pass
+
+    @staticmethod
+    def createAndRun(args, query, callback):
+        command = Command(args, callback, query)
+        command.start()
+        Connection.killCommandAfterTimeout(command)
+
 
 class Utils:
     @staticmethod
@@ -309,36 +381,39 @@ class Utils:
                 pass
 
         if callback:
-           callback(resultList)
+            callback(resultList)
 
         return resultList
 
     @staticmethod
     def formatSql(raw):
-        settings = sublime.load_settings(Const.SETTINGS_FILENAME).get("format")
+        settings = Settings.get("format")
         try:
             result = sqlparse.format(raw,
-                keyword_case    = settings.get("keyword_case"),
-                identifier_case = settings.get("identifier_case"),
-                strip_comments  = settings.get("strip_comments"),
-                indent_tabs     = settings.get("indent_tabs"),
-                indent_width    = settings.get("indent_width"),
-                reindent        = settings.get("reindent")
-            )
+                                     keyword_case=settings.get("keyword_case"),
+                                     identifier_case=settings.get(
+                                         "identifier_case"),
+                                     strip_comments=settings.get(
+                                         "strip_comments"),
+                                     indent_tabs=settings.get("indent_tabs"),
+                                     indent_width=settings.get("indent_width"),
+                                     reindent=settings.get("reindent")
+                                     )
 
             if View().settings().get('ensure_newline_at_eof_on_save'):
                 result += "\n"
 
             return result
-        except Exception as e:
+        except Exception:
             return None
+
 
 class History:
     queries = []
 
     @staticmethod
     def add(query):
-        if len(History.queries) >= sublime.load_settings(Const.SETTINGS_FILENAME).get('history_size', 100):
+        if len(History.queries) >= Settings.get('history_size', 100):
             History.queries.pop(0)
         History.queries.insert(0, query)
 
@@ -349,8 +424,10 @@ class History:
 
         return History.queries[index]
 
+
 def Window():
     return sublime.active_window()
+
 
 def View():
     return Window().active_view()
