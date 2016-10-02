@@ -19,7 +19,6 @@ import sqlparse
 class Const:
     SETTINGS_EXTENSION = "sublime-settings"
     SETTINGS_FILENAME = "SQLTools.{0}".format(SETTINGS_EXTENSION)
-    SGDB_FILENAME = "SQLToolsSGBD.{0}".format(SETTINGS_EXTENSION)
     CONNECTIONS_FILENAME = "SQLToolsConnections.{0}".format(SETTINGS_EXTENSION)
     USER_QUERIES_FILENAME = "SQLToolsSavedQueries.{0}".format(
         SETTINGS_EXTENSION)
@@ -275,7 +274,7 @@ class Connection:
         cliOptions = cliOptions['args'].format(**self.options)
         args = args + shlex.split(cliOptions)
 
-        Log.debug('Usgin cli args ' + ' '.join(args))
+        Log.debug('Using cli args ' + ' '.join(args))
         return args
 
     def getOptionsForSgdbCli(self):
