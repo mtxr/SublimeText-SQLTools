@@ -1,3 +1,5 @@
+__version__ = "v0.5.4"
+
 import sys
 import os
 
@@ -6,66 +8,224 @@ if dirpath not in sys.path:
     sys.path.append(dirpath)
 
 import sublime
-import sublime_plugin
-import SQLToolsModels as STM
+from sublime_plugin import WindowCommand, EventListener, TextCommand
+
+from SQLToolsAPI import Utils
+from SQLToolsAPI.Log import Log, Logger
+from SQLToolsAPI.Storage import Storage, Settings
+from SQLToolsAPI.Connection import Connection
+from SQLToolsAPI.History import History
+
+USER_FOLDER                  = None
+DEFAULT_FOLDER               = None
+SETTINGS_FILENAME            = None
+SETTINGS_FILENAME_DEFAULT    = None
+CONNECTIONS_FILENAME         = None
+CONNECTIONS_FILENAME_DEFAULT = None
+QUERIES_FILENAME             = None
+QUERIES_FILENAME_DEFAULT     = None
+settings                     = None
+queries                      = None
+connections                  = None
+history                      = None
 
 
-class ST(sublime_plugin.EventListener):
+def startPlugin():
+    global USER_FOLDER, DEFAULT_FOLDER, SETTINGS_FILENAME, SETTINGS_FILENAME_DEFAULT, CONNECTIONS_FILENAME, CONNECTIONS_FILENAME_DEFAULT, QUERIES_FILENAME, QUERIES_FILENAME_DEFAULT, settings, queries, connections, history
+
+    USER_FOLDER = os.path.join(sublime.packages_path(), 'User')
+    DEFAULT_FOLDER = os.path.dirname(__file__)
+
+    SETTINGS_FILENAME            = os.path.join(USER_FOLDER, "SQLTools.sublime-settings")
+    SETTINGS_FILENAME_DEFAULT    = os.path.join(DEFAULT_FOLDER, "SQLTools.sublime-settings")
+    CONNECTIONS_FILENAME         = os.path.join(USER_FOLDER, "SQLToolsConnections.sublime-settings")
+    CONNECTIONS_FILENAME_DEFAULT = os.path.join(DEFAULT_FOLDER, "SQLToolsConnections.sublime-settings")
+    QUERIES_FILENAME             = os.path.join(USER_FOLDER, "SQLToolsSavedQueries.sublime-settings")
+    QUERIES_FILENAME_DEFAULT     = os.path.join(DEFAULT_FOLDER, "SQLToolsSavedQueries.sublime-settings")
+
+    settings    = Settings(SETTINGS_FILENAME, default=SETTINGS_FILENAME_DEFAULT)
+    queries     = Storage(QUERIES_FILENAME, default=QUERIES_FILENAME_DEFAULT)
+    connections = Settings(CONNECTIONS_FILENAME, default=CONNECTIONS_FILENAME_DEFAULT)
+    history     = History(settings.get('history_size', 100))
+
+    Logger.setPackageVersion(__version__)
+    Logger.setPackageName(__package__)
+    Logger.setLogging(settings.get('debug', True))
+    Connection.setTimeout(settings.get('thread_timeout', 5000))
+    Connection.setHistoryManager(history)
+
+    Log(__package__ + " Loaded!")
+
+
+def getConnections():
+    connectionsObj = {}
+
+    options = connections.get('connections', {})
+    for name, config in options.items():
+        connectionsObj[name] = Connection(name, config, settings=settings.all())
+
+    # project settings
+    try:
+        options = Window().project_data().get('connections', {})
+        for name, config in options.items():
+            connectionsObj[name] = Connection(name, config, settings=settings.all())
+    except Exception:
+        pass
+
+    return connectionsObj
+
+
+def loadDefaultConnection():
+    default = settings.get('default', False)
+    if not default:
+        return
+    Log('Default database set to ' + default + '. Loading options and auto complete.')
+    return default
+
+
+def output(content, panel=None):
+    if not panel:
+        panel = getOutputPlace()
+    panel.run_command('append', {'characters': content})
+    panel.set_read_only(True)
+
+
+def toNewTab(content, name="", suffix="SQLTools Saved Query"):
+    resultContainer = Window().new_file()
+    resultContainer.set_name(
+        ((name + " - ") if name != "" else "") + suffix)
+    resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
+    resultContainer.run_command('append', {'characters': content})
+
+
+def getOutputPlace(name="SQLTools Result"):
+        if not settings.get('show_result_on_window', True):
+            resultContainer = Window().create_output_panel(name)
+            Window().run_command("show_panel", {"panel": "output." + name})
+        else:
+            resultContainer = None
+            views = Window().views()
+            for view in views:
+                if view.name() == name:
+                    resultContainer = view
+                    Window().focus_view(resultContainer)
+                    break
+            if not resultContainer:
+                resultContainer = Window().new_file()
+                resultContainer.set_name(name)
+
+        resultContainer.set_scratch(True)  # avoids prompting to save
+        resultContainer.settings().set("word_wrap", "false")
+        resultContainer.set_read_only(False)
+        resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
+
+        if settings.get('clear_output', False):
+            resultContainer.run_command('select_all')
+            resultContainer.run_command('left_delete')
+
+        return resultContainer
+
+
+def getSelection():
+    text = []
+    if View().sel():
+        for region in View().sel():
+            if region.empty():
+                text.append(View().substr(View().line(region)))
+            else:
+                text.append(View().substr(region))
+    return text
+
+
+class ST(EventListener):
     conn = None
-    history = []
-    tables = []
-    functions = []
-    columns = []
-    connectionList = {}
+    tables = None
+    functions = None
+    columns = None
+    connectionList = None
     autoCompleteList = []
 
     @staticmethod
     def bootstrap():
-        ST.connectionList = STM.Settings.getConnections()
+        ST.connectionList = getConnections()
         ST.checkDefaultConnection()
 
     @staticmethod
-    def setAttrIfNotEmpty(attr, value):
-        if isinstance(value, list) and len(value) == 0:
+    def checkDefaultConnection():
+        default = loadDefaultConnection()
+        if not default:
             return
-        setattr(ST, attr, value)
+        try:
+            ST.conn = ST.connectionList.get(default)
+            ST.loadConnectionData()
+        except Exception:
+            Log("Invalid connection setted")
 
     @staticmethod
-    def loadConnectionData():
+    def loadConnectionData(tablesCallback=None, columnsCallback=None, functionsCallback=None):
         if not ST.conn:
             return
 
-        ST.conn.getTables(
-            lambda tables: ST.setAttrIfNotEmpty('tables', tables))
-        ST.conn.getColumns(
-            lambda columns: ST.setAttrIfNotEmpty('columns', columns))
-        ST.conn.getFunctions(
-            lambda functions: ST.setAttrIfNotEmpty('functions', functions))
+        def tbCallback(tables):
+            setattr(ST, 'tables', tables)
+            if tablesCallback:
+                tablesCallback()
+
+        def colCallback(columns):
+            setattr(ST, 'columns', columns)
+            if columnsCallback:
+                columnsCallback()
+
+        def funcCallback(functions):
+            setattr(ST, 'functions', functions)
+            if functionsCallback:
+                functionsCallback()
+
+        ST.conn.getTables(tbCallback)
+        ST.conn.getColumns(colCallback)
+        ST.conn.getFunctions(funcCallback)
 
     @staticmethod
-    def setConnection(index):
+    def setConnection(index, tablesCallback=None, columnsCallback=None, functionsCallback=None):
         if index < 0 or index > (len(ST.connectionList) - 1):
             return
 
         connListNames = list(ST.connectionList.keys())
         connListNames.sort()
         ST.conn = ST.connectionList.get(connListNames[index])
-        ST.loadConnectionData()
 
-        STM.Log.debug('Connection {0} selected'.format(ST.conn))
+        ST.loadConnectionData(tablesCallback, columnsCallback, functionsCallback)
+
+        Log('Connection {0} selected'.format(ST.conn))
 
     @staticmethod
-    def showConnectionMenu():
-        ST.connectionList = STM.Settings.getConnections()
+    def selectConnection(tablesCallback=None, columnsCallback=None, functionsCallback=None):
+        ST.connectionList = getConnections()
         if len(ST.connectionList) == 0:
             sublime.message_dialog('You need to setup your connections first.')
             return
 
         menu = []
         for conn in ST.connectionList.values():
-            menu.append(conn.toQuickPanel())
+            menu.append([conn.name, conn._info()])
         menu.sort()
-        STM.Window().show_quick_panel(menu, ST.setConnection)
+        Window().show_quick_panel(menu, lambda index: ST.setConnection(index, tablesCallback, columnsCallback, functionsCallback))
+
+    @staticmethod
+    def selectTable(callback):
+        if len(ST.tables) == 0:
+            sublime.message_dialog('Your database has no tables.')
+            return
+
+        Window().show_quick_panel(ST.tables, callback)
+
+    @staticmethod
+    def selectFunction(callback):
+        if len(ST.functions) == 0:
+            sublime.message_dialog('Your database has no functions.')
+            return
+
+        Window().show_quick_panel(ST.functions, callback)
 
     @staticmethod
     def on_query_completions(view, prefix, locations):
@@ -78,7 +238,7 @@ class ST(sublime_plugin.EventListener):
             except Exception:
                 pass
 
-        selectors = sublime.load_settings(STM.Const.SETTINGS_FILENAME).get('selectors', [])
+        selectors = settings.get('selectors', [])
         if not selectors:
             return completions + ST.getAutoCompleteList(prefix)
         for selector in selectors:
@@ -117,232 +277,206 @@ class ST(sublime_plugin.EventListener):
         ST.autoCompleteList.sort()
         return (ST.autoCompleteList)
 
-    @staticmethod
-    def checkDefaultConnection():
-        default = STM.Connection.loadDefaultConnectionName()
-        if not default:
-            return
-        try:
-            ST.conn = ST.connectionList.get(default)
-            ST.loadConnectionData()
-        except Exception:
-            STM.Log.debug("Invalid connection setted")
-
-    @staticmethod
-    def getOutputPlace(name="SQLTools Result"):
-        if not STM.Settings.get('show_result_on_window'):
-            resultContainer = STM.Window().create_output_panel(name)
-            STM.Window().run_command("show_panel", {"panel": "output." + name})
-        else:
-            resultContainer = None
-            views = STM.Window().views()
-            for view in views:
-                if view.name() == name:
-                    resultContainer = view
-                    STM.Window().focus_view(resultContainer)
-                    break
-            if not resultContainer:
-                resultContainer = STM.Window().new_file()
-                resultContainer.set_name(name)
-
-        resultContainer.set_scratch(True)  # avoids prompting to save
-        resultContainer.settings().set("word_wrap", "false")
-        resultContainer.set_read_only(False)
-        resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
-        # resultContainer.run_command('select_all')
-        # resultContainer.run_command('left_delete')
-        return resultContainer
-
-    @staticmethod
-    def display(content, panel=None):
-        if not panel:
-            panel = ST.getOutputPlace()
-        panel.run_command('append', {'characters': content})
-        panel.set_read_only(True)
-
-    @staticmethod
-    def toBuffer(content, name="", suffix="SQLTools Saved Query"):
-        resultContainer = STM.Window().new_file()
-        resultContainer.set_name(
-            ((name + " - ") if name != "" else "") + suffix)
-        resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
-        resultContainer.run_command('append', {'characters': content})
-
-#
-# Commands
-#
+# #
+# # Commands
+# #
 
 
-class StShowConnectionMenu(sublime_plugin.WindowCommand):
+# Usage for old keybindings defined by users
+class StShowConnectionMenu(WindowCommand):
     @staticmethod
     def run():
-        ST.showConnectionMenu()
+        Window().run_command('st_select_connection')
 
 
-class StShowRecords(sublime_plugin.WindowCommand):
+class StSelectConnection(WindowCommand):
+    @staticmethod
+    def run():
+        ST.selectConnection()
+
+
+class StShowRecords(WindowCommand):
     @staticmethod
     def run():
         if not ST.conn:
-            ST.showConnectionMenu()
+            ST.selectConnection(tablesCallback=lambda: Window().run_command('st_show_records'))
             return
 
         def cb(index):
             if index < 0:
                 return None
-            return ST.conn.getTableRecords(ST.tables[index], ST.display)
+            return ST.conn.getTableRecords(ST.tables[index], output)
 
-        STM.Window().show_quick_panel(ST.tables, cb)
+        ST.selectTable(cb)
 
 
-class StDescTable(sublime_plugin.WindowCommand):
+class StDescTable(WindowCommand):
     @staticmethod
     def run():
         if not ST.conn:
-            ST.showConnectionMenu()
+            ST.selectConnection(tablesCallback=lambda: Window().run_command('st_desc_table'))
             return
 
         def cb(index):
             if index < 0:
                 return None
-            return ST.conn.getTableDescription(ST.tables[index], ST.display)
+            return ST.conn.getTableDescription(ST.tables[index], output)
 
-        STM.Window().show_quick_panel(ST.tables, cb)
+        ST.selectTable(cb)
 
 
-class StDescFunction(sublime_plugin.WindowCommand):
+class StDescFunction(WindowCommand):
     @staticmethod
     def run():
         if not ST.conn:
-            ST.showConnectionMenu()
+            ST.selectConnection(functionsCallback=lambda: Window().run_command('st_desc_function'))
             return
 
         def cb(index):
             if index < 0:
                 return None
             functionName = ST.functions[index].split('(', 1)[0]
-            return ST.conn.getFunctionDescription(functionName, ST.display)
+            return ST.conn.getFunctionDescription(functionName, output)
 
         # get everything until first occurence of "(", e.g. get "function_name"
         # from "function_name(int)"
-        STM.Window().show_quick_panel(ST.functions, cb)
+        ST.selectFunction(cb)
 
 
-class StHistory(sublime_plugin.WindowCommand):
+class StExecute(WindowCommand):
     @staticmethod
     def run():
         if not ST.conn:
-            ST.showConnectionMenu()
+            ST.selectConnection(tablesCallback=lambda: ST.conn.execute(getSelection(), output))
             return
 
-        if len(STM.History.queries) == 0:
+        ST.conn.execute(getSelection(), output)
+
+
+class StFormat(TextCommand):
+    @staticmethod
+    def run(edit):
+        for region in View().sel():
+            if region.empty():
+                region = sublime.Region(0, View().size())
+                selection = View().substr(region)
+                View().replace(edit, region, Utils.formatSql(selection, settings.get('format', {})))
+                View().set_syntax_file("Packages/SQL/SQL.tmLanguage")
+            else:
+                text = View().substr(region)
+                View().replace(edit, region, Utils.formatSql(text, settings.get('format', {})))
+
+
+class StVersion(WindowCommand):
+    @staticmethod
+    def run():
+        sublime.message_dialog('Using {0} {1}'.format(__package__, __version__))
+
+
+class StHistory(WindowCommand):
+    @staticmethod
+    def run():
+        if not ST.conn:
+            ST.selectConnection(functionsCallback=lambda: Window().run_command('st_history'))
+            return
+
+        if len(history.all()) == 0:
             sublime.message_dialog('History is empty.')
             return
 
         def cb(index):
             if index < 0:
                 return None
-            return ST.conn.execute(STM.History.get(index), ST.display)
+            return ST.conn.execute(history.get(index), output)
 
-        try:
-            STM.Window().show_quick_panel(STM.History.queries, cb)
-        except Exception:
-            pass
+        Window().show_quick_panel(history.all(), cb)
 
 
-class StExecute(sublime_plugin.WindowCommand):
-    @staticmethod
-    def run():
-        if not ST.conn:
-            ST.showConnectionMenu()
-            return
-
-        query = STM.Selection.get()
-        ST.conn.execute(query, ST.display)
+# class StSaveQuery(WindowCommand):
+#     @staticmethod
+#     def run():
+#         STM.Storage.promptQueryAlias()
 
 
-class StSaveQuery(sublime_plugin.WindowCommand):
-    @staticmethod
-    def run():
-        STM.Storage.promptQueryAlias()
+# class StListQueries(WindowCommand):
+#     @staticmethod
+#     def run(mode="run"):
+#         if not ST.conn:
+#             ST.selectConnection()
+#             return
+
+#         queries = STM.Storage.getSavedQueries().get('queries')
+
+#         if len(queries) == 0:
+#             sublime.message_dialog('No saved queries.')
+#             return
+
+#         options = []
+#         for alias, query in queries.items():
+#             options.append([alias, query])
+#         options.sort()
+
+#         def cb(index):
+#             if index < 0:
+#                 return None
+
+#             param2 = output if mode == "run" else options[index][0]
+#             func = ST.conn.execute if mode == "run" else ST.toNewTab
+#             return func(options[index][1], param2)
+
+#         try:
+#             Window().show_quick_panel(options, cb)
+#         except Exception:
+#             pass
 
 
-class StListQueries(sublime_plugin.WindowCommand):
-    @staticmethod
-    def run(mode="run"):
-        if not ST.conn:
-            ST.showConnectionMenu()
-            return
+# class StRemoveSavedQuery(WindowCommand):
+#     @staticmethod
+#     def run():
+#         queries = STM.Storage.getSavedQueries().get('queries')
 
-        queries = STM.Storage.getSavedQueries().get('queries')
+#         if len(queries) == 0:
+#             sublime.message_dialog('No saved queries.')
+#             return
 
-        if len(queries) == 0:
-            sublime.message_dialog('No saved queries.')
-            return
+#         queriesArray = []
+#         for alias, query in queries.items():
+#             queriesArray.append([alias, query])
+#         queriesArray.sort()
 
-        options = []
-        for alias, query in queries.items():
-            options.append([alias, query])
-        options.sort()
-
-        def cb(index):
-            if index < 0:
-                return None
-
-            param2 = ST.display if mode == "run" else options[index][0]
-            func = ST.conn.execute if mode == "run" else ST.toBuffer
-            return func(options[index][1], param2)
-
-        try:
-            STM.Window().show_quick_panel(options, cb)
-        except Exception:
-            pass
+#         def cb(index):
+#             if index < 0:
+#                 return None
+#             return STM.Storage.removeQuery(queriesArray[index][0])
+#         try:
+#             Window().show_quick_panel(queriesArray, cb)
+#         except Exception:
+#             pass
 
 
-class StRemoveSavedQuery(sublime_plugin.WindowCommand):
-    @staticmethod
-    def run():
-        queries = STM.Storage.getSavedQueries().get('queries')
-
-        if len(queries) == 0:
-            sublime.message_dialog('No saved queries.')
-            return
-
-        queriesArray = []
-        for alias, query in queries.items():
-            queriesArray.append([alias, query])
-        queriesArray.sort()
-
-        def cb(index):
-            if index < 0:
-                return None
-            return STM.Storage.removeQuery(queriesArray[index][0])
-        try:
-            STM.Window().show_quick_panel(queriesArray, cb)
-        except Exception:
-            pass
+def Window():
+    return sublime.active_window()
 
 
-class StFormat(sublime_plugin.TextCommand):
-    @staticmethod
-    def run(edit):
-        STM.Selection.formatSql(edit)
-
-
-class StVersion(sublime_plugin.WindowCommand):
-    @staticmethod
-    def run():
-        sublime.message_dialog('Using SQLTools ' + STM.VERSION)
+def View():
+    return Window().active_view()
 
 
 def reload():
     try:
         # python 3.0 to 3.3
         import imp
-        imp.reload(STM)
-    except Exception:
+        imp.reload(sys.modules["SQLToolsAPI"])
+        imp.reload(sys.modules["SQLToolsAPI.Utils"])
+        imp.reload(sys.modules["SQLToolsAPI.Storage"])
+        imp.reload(sys.modules["SQLToolsAPI.History"])
+        imp.reload(sys.modules["SQLToolsAPI.Log"])
+        imp.reload(sys.modules["SQLToolsAPI.Command"])
+        imp.reload(sys.modules["SQLToolsAPI.Connection"])
+    except Exception as e:
+        raise (e)
         pass
 
-    STM.Log.debug('%s loaded successfully' % (__name__))
     try:
         ST.bootstrap()
     except Exception:
@@ -354,9 +488,9 @@ def plugin_loaded():
         from package_control import events
 
         if events.install(__name__):
-            print('Installed %s!' % events.install(__name__))
+            Log('Installed %s!' % events.install(__name__))
         elif events.post_upgrade(__name__):
-            print('Upgraded to %s!' % events.post_upgrade(__name__))
+            Log('Upgraded to %s!' % events.post_upgrade(__name__))
             sublime.message_dialog(('{0} was upgraded.' +
                                     'If you have any problem,' +
                                     'just restart your Sublime Text.'
@@ -367,3 +501,4 @@ def plugin_loaded():
         pass
 
     reload()
+    startPlugin()

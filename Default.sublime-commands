@@ -1,7 +1,7 @@
 [
   {
     "caption": "ST: Select Connection",
-    "command": "st_show_connection_menu"
+    "command": "st_select_connection"
   },
   {
     "caption": "ST: Execute",

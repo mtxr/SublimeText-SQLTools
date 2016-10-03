@@ -1,5 +1,5 @@
 [
-    { "keys": ["ctrl+alt+e"], "command": "st_show_connection_menu" },
+    { "keys": ["ctrl+alt+e"], "command": "st_select_connection" },
     { "keys": ["ctrl+e", "ctrl+e"], "command": "st_execute" },
     { "keys": ["ctrl+e", "ctrl+h"], "command": "st_history" },
     { "keys": ["ctrl+e", "ctrl+s"], "command": "st_show_records" },
