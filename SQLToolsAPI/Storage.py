@@ -21,10 +21,7 @@ class Storage:
         return U.merge(self.items, self.defaults())
 
     def write(self):
-        if not self.items:
-            self.all()
-
-        return U.saveJson(self.items, self.getFilename())
+        return U.saveJson(self.items if isinstance(self.items, dict) else {}, self.getFilename())
 
     def add(self, key, value):
         if len(key) <= 0:
@@ -51,7 +48,7 @@ class Storage:
             return
 
         items = self.all()
-        return items[key] if items[key] else default
+        return items[key] if key in items else default
 
     def getFilename(self):
         return self.storageFile

@@ -46,7 +46,7 @@ def parseJson(filename):
 def saveJson(content, filename):
     with open(filename, mode='w', encoding='utf-8') as outfile:
         json.dump(content, outfile,
-                  sort_keys=True, indent=2, separators=(',', ': '), encoding="utf-8")
+                  sort_keys=True, indent=2, separators=(',', ': '))
 
 
 def getResultAsList(results):

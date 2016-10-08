@@ -3,13 +3,14 @@ import shlex
 
 from .Log import Log
 from . import Utils as U
-from .Command import ThreadCommand as Command
+from . import Command as C
 
 
 class Connection:
-    history=None
+    history = None
 
-    def __init__(self, name, options, settings={}):
+    def __init__(self, name, options, settings={}, commandClass='ThreadCommand'):
+        self.Command = getattr(C, commandClass)
 
         self.cli = settings.get('cli')[options['type']]
         cli_path = shutil.which(self.cli)
@@ -53,7 +54,7 @@ class Connection:
         def cb(result):
             callback(U.getResultAsList(result))
 
-        Command.createAndRun(self.builArgs('desc'), query, cb)
+        self.Command.createAndRun(self.builArgs('desc'), query, cb)
 
     def getColumns(self, callback):
 
@@ -62,7 +63,7 @@ class Connection:
 
         try:
             query = self.getOptionsForSgdbCli()['queries']['columns']['query']
-            Command.createAndRun(self.builArgs('columns'), query, cb)
+            self.Command.createAndRun(self.builArgs('columns'), query, cb)
         except Exception:
             pass
 
@@ -74,7 +75,7 @@ class Connection:
         try:
             query = self.getOptionsForSgdbCli()['queries'][
                 'functions']['query']
-            Command.createAndRun(self.builArgs(
+            self.Command.createAndRun(self.builArgs(
                 'functions'), query, cb)
         except Exception:
             pass
@@ -82,17 +83,17 @@ class Connection:
     def getTableRecords(self, tableName, callback):
         query = self.getOptionsForSgdbCli()['queries']['show records'][
             'query'].format(tableName, self.rowsLimit)
-        Command.createAndRun(self.builArgs('show records'), query, callback)
+        self.Command.createAndRun(self.builArgs('show records'), query, callback)
 
     def getTableDescription(self, tableName, callback):
         query = self.getOptionsForSgdbCli()['queries']['desc table'][
             'query'] % tableName
-        Command.createAndRun(self.builArgs('desc table'), query, callback)
+        self.Command.createAndRun(self.builArgs('desc table'), query, callback)
 
     def getFunctionDescription(self, functionName, callback):
         query = self.getOptionsForSgdbCli()['queries']['desc function'][
             'query'] % functionName
-        Command.createAndRun(self.builArgs('desc function'), query, callback)
+        self.Command.createAndRun(self.builArgs('desc function'), query, callback)
 
     def execute(self, queries, callback):
         queryToRun = ''
@@ -113,7 +114,7 @@ class Connection:
         if Connection.history:
             Connection.history.add(queryToRun)
 
-        Command.createAndRun(self.builArgs(), queryToRun, callback)
+        self.Command.createAndRun(self.builArgs(), queryToRun, callback)
 
     def builArgs(self, queryName=None):
         cliOptions = self.getOptionsForSgdbCli()
@@ -131,7 +132,7 @@ class Connection:
         cliOptions = cliOptions['args'].format(**self.options)
         args = args + shlex.split(cliOptions)
 
-        # Log('Using cli args ' + ' '.join(args))
+        Log('Using cli args ' + ' '.join(args))
         return args
 
     def getOptionsForSgdbCli(self):

@@ -57,6 +57,7 @@ def getConnections():
     connectionsObj = {}
 
     options = connections.get('connections', {})
+
     for name, config in options.items():
         connectionsObj[name] = Connection(name, config, settings=settings.all())
 
@@ -420,7 +421,7 @@ class StListQueries(WindowCommand):
                 return None
 
             param2 = output if mode == "run" else options[index][0]
-            func = ST.conn.execute if mode == "run" else ST.toNewTab
+            func = ST.conn.execute if mode == "run" else toNewTab
             return func(options[index][1], param2)
 
         try:
@@ -469,7 +470,6 @@ def reload():
     try:
         # python 3.0 to 3.3
         import imp
-        print (__package__, sys.modules.keys())
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI"])
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Utils"])
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Storage"])
@@ -504,5 +504,5 @@ def plugin_loaded():
     except Exception:
         pass
 
-    reload()
     startPlugin()
+    reload()
