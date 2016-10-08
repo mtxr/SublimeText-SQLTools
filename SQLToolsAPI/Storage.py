@@ -1,5 +1,5 @@
 import os
-from SQLToolsAPI import Utils as U
+from . import Utils as U
 
 __version__ = "v0.1.0"
 

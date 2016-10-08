@@ -1,14 +1,12 @@
-__version__ = "v0.0.2"
+__version__ = "v0.1.0"
 
-from SQLToolsAPI.Log import Log
 
 __all__ = [
+    'Log',
+    'Utils',
     'Command',
     'Connection',
     'History',
-    'Log',
-    'Log',
     'Settings',
     'Storage',
-    'Utils'
 ]

@@ -3,18 +3,14 @@ __version__ = "v0.5.4"
 import sys
 import os
 
-dirpath = os.path.dirname(__file__)
-if dirpath not in sys.path:
-    sys.path.append(dirpath)
-
 import sublime
 from sublime_plugin import WindowCommand, EventListener, TextCommand
 
-from SQLToolsAPI import Utils
-from SQLToolsAPI.Log import Log, Logger
-from SQLToolsAPI.Storage import Storage, Settings
-from SQLToolsAPI.Connection import Connection
-from SQLToolsAPI.History import History
+from .SQLToolsAPI import Utils
+from .SQLToolsAPI.Log import Log, Logger
+from .SQLToolsAPI.Storage import Storage, Settings
+from .SQLToolsAPI.Connection import Connection
+from .SQLToolsAPI.History import History
 
 USER_FOLDER                  = None
 DEFAULT_FOLDER               = None
@@ -466,13 +462,14 @@ def reload():
     try:
         # python 3.0 to 3.3
         import imp
-        imp.reload(sys.modules["SQLToolsAPI"])
-        imp.reload(sys.modules["SQLToolsAPI.Utils"])
-        imp.reload(sys.modules["SQLToolsAPI.Storage"])
-        imp.reload(sys.modules["SQLToolsAPI.History"])
-        imp.reload(sys.modules["SQLToolsAPI.Log"])
-        imp.reload(sys.modules["SQLToolsAPI.Command"])
-        imp.reload(sys.modules["SQLToolsAPI.Connection"])
+        print (__package__, sys.modules.keys())
+        imp.reload(sys.modules[__package__ + ".SQLToolsAPI"])
+        imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Utils"])
+        imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Storage"])
+        imp.reload(sys.modules[__package__ + ".SQLToolsAPI.History"])
+        imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Log"])
+        imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Command"])
+        imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Connection"])
     except Exception as e:
         raise (e)
         pass

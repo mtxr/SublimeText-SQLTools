@@ -1,10 +1,14 @@
-import re
-import json
-import sqlparse
-
 __version__ = "v0.1.0"
 
-from .Log import Log
+import json
+import os
+import re
+import sys
+
+if os.path.dirname(__file__) not in sys.path:
+    sys.path.append(os.path.dirname(__file__))
+
+from .sqlparse import format
 
 # Regular expression for comments
 comment_re = re.compile(
@@ -57,7 +61,7 @@ def getResultAsList(results):
 
 def formatSql(raw, settings):
     try:
-        result = sqlparse.format(raw, **settings)
+        result = format(raw, **settings)
 
         return result
     except Exception:
