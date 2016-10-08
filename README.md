@@ -1,4 +1,4 @@
-![SQLTools](https://github.com/mtxr/SQLTools/raw/images/icon.png?raw=true) SQLTools
+![SQLTools v0.5.4](https://github.com/mtxr/SQLTools/raw/images/icon.png?raw=true) SQLTools
 ===============
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/9f52b6f590af41c0bce2897d68a60fb6)](https://www.codacy.com/app/matheus-mtxr/SQLTools?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mtxr/SQLTools&amp;utm_campaign=Badge_Grade)

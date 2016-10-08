@@ -388,66 +388,73 @@ class StHistory(WindowCommand):
         Window().show_quick_panel(history.all(), cb)
 
 
-# class StSaveQuery(WindowCommand):
-#     @staticmethod
-#     def run():
-#         STM.Storage.promptQueryAlias()
+class StSaveQuery(WindowCommand):
+    @staticmethod
+    def run():
+        query = getSelection()
+
+        def cb(alias):
+            queries.add(alias, query)
+        Window().show_input_panel('Query alias', '', cb, None, None)
 
 
-# class StListQueries(WindowCommand):
-#     @staticmethod
-#     def run(mode="run"):
-#         if not ST.conn:
-#             ST.selectConnection()
-#             return
+class StListQueries(WindowCommand):
+    @staticmethod
+    def run(mode="run"):
+        if not ST.conn:
+            ST.selectConnection(functionsCallback=lambda: Window().run_command('st_list_queries'))
+            return
 
-#         queries = STM.Storage.getSavedQueries().get('queries')
+        queriesList = queries.all()
+        if len(queriesList) == 0:
+            sublime.message_dialog('No saved queries.')
+            return
 
-#         if len(queries) == 0:
-#             sublime.message_dialog('No saved queries.')
-#             return
+        options = []
+        for alias, query in queriesList.items():
+            options.append([str(alias), str(query)])
+        options.sort()
 
-#         options = []
-#         for alias, query in queries.items():
-#             options.append([alias, query])
-#         options.sort()
+        def cb(index):
+            if index < 0:
+                return None
 
-#         def cb(index):
-#             if index < 0:
-#                 return None
+            param2 = output if mode == "run" else options[index][0]
+            func = ST.conn.execute if mode == "run" else ST.toNewTab
+            return func(options[index][1], param2)
 
-#             param2 = output if mode == "run" else options[index][0]
-#             func = ST.conn.execute if mode == "run" else ST.toNewTab
-#             return func(options[index][1], param2)
-
-#         try:
-#             Window().show_quick_panel(options, cb)
-#         except Exception:
-#             pass
+        try:
+            Window().show_quick_panel(options, cb)
+        except Exception:
+            pass
 
 
-# class StRemoveSavedQuery(WindowCommand):
-#     @staticmethod
-#     def run():
-#         queries = STM.Storage.getSavedQueries().get('queries')
+class StRemoveSavedQuery(WindowCommand):
+    @staticmethod
+    def run():
+        if not ST.conn:
+            ST.selectConnection(functionsCallback=lambda: Window().run_command('st_remove_saved_query'))
+            return
 
-#         if len(queries) == 0:
-#             sublime.message_dialog('No saved queries.')
-#             return
+        queriesList = queries.all()
+        if len(queriesList) == 0:
+            sublime.message_dialog('No saved queries.')
+            return
 
-#         queriesArray = []
-#         for alias, query in queries.items():
-#             queriesArray.append([alias, query])
-#         queriesArray.sort()
+        options = []
+        for alias, query in queriesList.items():
+            options.append([str(alias), str(query)])
+        options.sort()
 
-#         def cb(index):
-#             if index < 0:
-#                 return None
-#             return STM.Storage.removeQuery(queriesArray[index][0])
-#         try:
-#             Window().show_quick_panel(queriesArray, cb)
-#         except Exception:
-#             pass
+        def cb(index):
+            if index < 0:
+                return None
+
+            return queries.delete(options[index][0])
+        try:
+            Window().show_quick_panel(options, cb)
+        except Exception:
+            pass
 
 
 def Window():
