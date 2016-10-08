@@ -5,8 +5,9 @@ import os
 import re
 import sys
 
-if os.path.join(os.path.dirname(__file__), 'lib') not in sys.path:
-    sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
+dirpath = os.path.join(os.path.dirname(__file__), 'lib')
+if dirpath not in sys.path:
+    sys.path.append(dirpath)
 
 from sqlparse import format
 
@@ -28,7 +29,7 @@ def parseJson(filename):
             */
     """
 
-    with open(filename) as f:
+    with open(filename, mode='r', encoding='utf-8') as f:
         content = ''.join(f.readlines())
 
         # Looking for comments
@@ -39,13 +40,13 @@ def parseJson(filename):
             match = comment_re.search(content)
 
         # Return json file
-        return json.loads(content)
+        return json.loads(content, encoding='utf-8')
 
 
 def saveJson(content, filename):
-    with open(filename, 'w') as outfile:
+    with open(filename, mode='w', encoding='utf-8') as outfile:
         json.dump(content, outfile,
-                  sort_keys=True, indent=2, separators=(',', ': '))
+                  sort_keys=True, indent=2, separators=(',', ': '), encoding="utf-8")
 
 
 def getResultAsList(results):
