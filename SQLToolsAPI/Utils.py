@@ -5,10 +5,10 @@ import os
 import re
 import sys
 
-if os.path.dirname(__file__) not in sys.path:
-    sys.path.append(os.path.dirname(__file__))
+if os.path.join(os.path.dirname(__file__), 'lib') not in sys.path:
+    sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
 
-from .sqlparse import format
+from sqlparse import format
 
 # Regular expression for comments
 comment_re = re.compile(
