@@ -78,8 +78,7 @@ class Connection:
         self.Command.createAndRun(self.builArgs('show records'), query, callback)
 
     def getTableDescription(self, tableName, callback):
-        query = self.getOptionsForSgdbCli()['queries']['desc table'][
-            'query'] % tableName
+        query = self.getOptionsForSgdbCli()['queries']['desc table']['query'] % tableName
         self.Command.createAndRun(self.builArgs('desc table'), query, callback)
 
     def getFunctionDescription(self, functionName, callback):

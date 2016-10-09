@@ -180,7 +180,7 @@
                     "format": "|%s|"
                 },
                 "desc table": {
-                    "query": "exec sp_columns \"{0}\";",
+                    "query": "exec sp_columns \"%s\";",
                     "options": [],
                     "before": ["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""],
                     "format": "|%s|"
@@ -204,7 +204,7 @@
                     "format" : "|%s|"
                 },
                 "desc table": {
-                    "query": ".schema \"{0}\"",
+                    "query": ".schema \"%s\"",
                     "options": ["-column"],
                     "format" : "%s"
                 },
