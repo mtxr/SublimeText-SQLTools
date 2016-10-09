@@ -22,24 +22,18 @@ class Connection:
                 "before continue.").format(self.cli))
             return
 
-        self.settings = settings
+        self.settings  = settings
         self.rowsLimit = settings.get('show_records', {}).get('limit', 50)
-        self.options = options
-        self.name = name
-        self.type = options['type']
-        self.host = options['host']
-        self.port = options['port']
-        self.username = options['username']
-        self.database = options['database']
-
-        if 'encoding' in options:
-            self.encoding = options['encoding']
-
-        if 'password' in options:
-            self.password = options['password']
-
-        if 'service' in options:
-            self.service = options['service']
+        self.options   = options
+        self.name      = name
+        self.type      = options['type']
+        self.database  = options['database']
+        self.host      = options['host'] if 'host' in options else None
+        self.port      = options['port'] if 'port' in options else None
+        self.username  = options['username'] if 'username' in options else None
+        self.encoding  = options['encoding'] if 'encoding' in options else None
+        self.password  = options['password'] if 'password' in options else None
+        self.service   = options['service'] if 'service' in options else None
 
     def __str__(self):
         return self.name
@@ -73,16 +67,14 @@ class Connection:
             callback(U.getResultAsList(result))
 
         try:
-            query = self.getOptionsForSgdbCli()['queries'][
-                'functions']['query']
+            query = self.getOptionsForSgdbCli()['queries']['functions']['query']
             self.Command.createAndRun(self.builArgs(
                 'functions'), query, cb)
         except Exception:
             pass
 
     def getTableRecords(self, tableName, callback):
-        query = self.getOptionsForSgdbCli()['queries']['show records'][
-            'query'].format(tableName, self.rowsLimit)
+        query = self.getOptionsForSgdbCli()['queries']['show records']['query'].format(tableName, self.rowsLimit)
         self.Command.createAndRun(self.builArgs('show records'), query, callback)
 
     def getTableDescription(self, tableName, callback):

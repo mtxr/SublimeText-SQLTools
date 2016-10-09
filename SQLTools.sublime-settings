@@ -171,7 +171,7 @@
         "sqsh": {
             "options": [],
             "before": ["\\set semicolon_cmd=\"\\go -mpretty -l\""],
-            "args": "-S {options.host}:{options.port} -U\"{options.username}\" -P\"{options.password}\" -D{options.database}",
+            "args": "-S {host}:{port} -U\"{username}\" -P\"{password}\" -D{database}",
             "queries": {
                 "desc": {
                     "query": "select table_name from information_schema.tables order by 1;",
@@ -180,13 +180,13 @@
                     "format": "|%s|"
                 },
                 "desc table": {
-                    "query": "exec sp_columns \"%s\";",
+                    "query": "exec sp_columns \"{0}\";",
                     "options": [],
                     "before": ["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""],
                     "format": "|%s|"
                 },
                 "show records": {
-                    "query": "select top 100 * from \"%s\";",
+                    "query": "select top {1} * from \"{0}\";",
                     "options": [],
                     "before": ["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""],
                     "format": "|%s|"
@@ -194,9 +194,9 @@
             }
         },
         "sqlite": {
-            "options": ["-column", "-nullvalue null"],
+            "options": ["-column", "-noheader"],
             "before": [".headers on"],
-            "args": "\"{options.database}\"",
+            "args": "\"{database}\"",
             "queries": {
                 "desc" : {
                     "query": ".headers off\nSELECT '|' || name || '|' FROM sqlite_master WHERE type='table';",
@@ -204,12 +204,12 @@
                     "format" : "|%s|"
                 },
                 "desc table": {
-                    "query": ".schema \"%s\"",
+                    "query": ".schema \"{0}\"",
                     "options": ["-column"],
                     "format" : "%s"
                 },
                 "show records": {
-                    "query": "select * from \"%s\" limit 100;",
+                    "query": "select * from \"{0}\" limit {1};",
                     "options": ["-column"],
                     "format" : "|%s|"
                 }
@@ -218,7 +218,7 @@
         "firebird": {
             "options": [],
             "before": [],
-            "args": "-u \"{options.username}\" -p \"{options.password}\" \"{options.host}/{options.port}:{options.database}\"",
+            "args": "-u \"{username}\" -p \"{password}\" \"{host}/{port}:{database}\"",
             "queries": {
                 "desc" : {
                     "query": "select '|' || rdb$relation_name || '|' from rdb$relations where rdb$view_blr is null and (rdb$system_flag is null or rdb$system_flag = 0);",
