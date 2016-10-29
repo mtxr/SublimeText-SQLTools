@@ -39,6 +39,10 @@ def parseJson(filename):
             content = content[:match.start()] + content[match.end():]
             match = comment_re.search(content)
 
+        # remove trailing commas
+        content = re.sub(r',([ \t\r\n]+)}', r'\1}', content)
+        content = re.sub(r',([ \t\r\n]+)\]', r'\1]', content)
+
         # Return json file
         return json.loads(content, encoding='utf-8')
 
