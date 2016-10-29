@@ -29,7 +29,7 @@ class Connection:
 
         if cli_path is None:
             Log((
-                "'{0}' could not be found by Sublime Text.\n\n" +
+                "'{0}' could not be found.\n\n" +
                 "Please set the '{0}' path in your SQLTools settings " +
                 "before continue.").format(self.cli))
             return
@@ -38,14 +38,14 @@ class Connection:
         self.rowsLimit = settings.get('show_records', {}).get('limit', 50)
         self.options   = options
         self.name      = name
-        self.type      = options['type']
-        self.database  = options['database']
-        self.host      = options['host'] if 'host' in options else None
-        self.port      = options['port'] if 'port' in options else None
-        self.username  = options['username'] if 'username' in options else None
-        self.encoding  = options['encoding'] if 'encoding' in options else None
-        self.password  = options['password'] if 'password' in options else None
-        self.service   = options['service'] if 'service' in options else None
+        self.type      = options.get('type', None)
+        self.database  = options.get('database', None)
+        self.host      = options.get('host', None)
+        self.port      = options.get('port', None)
+        self.username  = options.get('username', None)
+        self.encoding  = options.get('encoding', None)
+        self.password  = options.get('password', None)
+        self.service   = options.get('service', None)
 
     def __str__(self):
         return self.name

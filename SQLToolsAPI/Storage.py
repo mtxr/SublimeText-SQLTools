@@ -1,4 +1,5 @@
 import os
+import shutil
 from . import Utils as U
 
 __version__ = "v0.1.0"
@@ -10,8 +11,9 @@ class Storage:
         self.defaultFile = default
         self.items = {}
 
-        if not os.path.isfile(filename):
-            U.saveJson(self.defaults(), filename)
+        #copy entire file, to keep comments
+        if not os.path.isfile(filename) and default and os.path.isfile(default):
+            shutil.copyfile(default, filename)
 
         self.all()
 
