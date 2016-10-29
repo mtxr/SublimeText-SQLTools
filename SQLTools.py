@@ -140,9 +140,9 @@ def getSelection():
 
 class ST(EventListener):
     conn             = None
-    tables           = None
-    functions        = None
-    columns          = None
+    tables           = []
+    functions        = []
+    columns          = []
     connectionList   = None
     autoCompleteList = []
 
