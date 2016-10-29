@@ -56,6 +56,10 @@ def startPlugin():
 def getConnections():
     connectionsObj = {}
 
+    # fixes #39 and #45
+    if not connections:
+        startPlugin()
+
     options = connections.get('connections', {})
 
     for name, config in options.items():
@@ -203,8 +207,8 @@ class ST(EventListener):
             return
 
         menu = []
-        for conn in ST.connectionList.values():
-            menu.append([conn.name, conn._info()])
+        for name, conn in ST.connectionList.items():
+            menu.append([name, conn._info()])
         menu.sort()
         Window().show_quick_panel(menu, lambda index: ST.setConnection(index, tablesCallback, columnsCallback, functionsCallback))
 

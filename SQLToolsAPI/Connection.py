@@ -8,6 +8,18 @@ from . import Command as C
 
 class Connection:
     history = None
+    settings = None
+    rowsLimit = None
+    options = None
+    name = None
+    type = None
+    database = None
+    host = None
+    port = None
+    username = None
+    encoding = None
+    password = None
+    service = None
 
     def __init__(self, name, options, settings={}, commandClass='ThreadCommand'):
         self.Command = getattr(C, commandClass)
