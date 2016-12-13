@@ -20,6 +20,7 @@ class Connection:
     encoding = None
     password = None
     service = None
+    safe_limit = None
 
     def __init__(self, name, options, settings={}, commandClass='ThreadCommand'):
         self.Command = getattr(C, commandClass)
@@ -46,6 +47,7 @@ class Connection:
         self.encoding  = options.get('encoding', None)
         self.password  = options.get('password', None)
         self.service   = options.get('service', None)
+        self.safe_limit = settings.get('safe_limit', None)
 
     def __str__(self):
         return self.name
@@ -108,6 +110,10 @@ class Connection:
             queries = [queries]
 
         for query in queries:
+            if query.lower().startswith('select'):
+                if not " limit " in query.lower()[-15:]:
+                    if self.safe_limit:
+                        query += " LIMIT {0}".format(self.safe_limit)
             queryToRun += query + "\n"
 
         queryToRun = queryToRun.rstrip('\n')
