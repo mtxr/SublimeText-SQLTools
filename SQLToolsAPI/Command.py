@@ -10,13 +10,16 @@ from .Log import Log
 class Command:
     timeout = 5000
 
-    def __init__(self, args, callback, query=None, encoding='utf-8', options={}):
+    def __init__(self, args, callback, query=None, encoding='utf-8', options=None):
         self.query = query
         self.process = None
         self.args = args
         self.encoding = encoding
         self.callback = callback
         self.options = options
+        # Don't allow empty dicts or lists as defaults in method signature, cfr http://nedbatchelder.com/blog/200806/pylint.html
+        if self.options is None:
+            self.options = {}
         Thread.__init__(self)
 
     def run(self):
@@ -64,14 +67,17 @@ class Command:
         self.callback(resultString)
 
     @staticmethod
-    def createAndRun(args, query, callback, options={}):
+    def createAndRun(args, query, callback, options=None):
+        # Don't allow empty dicts or lists as defaults in method signature, cfr http://nedbatchelder.com/blog/200806/pylint.html
+        if options is None:
+            options = {}
         command = Command(args, callback, query, options=options)
         command.run()
 
 
 class ThreadCommand(Command, Thread):
     def __init__(self, args, callback, query=None, encoding='utf-8',
-                 options={}, timeout=Command.timeout):
+                 options=None, timeout=Command.timeout):
         self.query = query
         self.process = None
         self.args = args
@@ -79,6 +85,9 @@ class ThreadCommand(Command, Thread):
         self.callback = callback
         self.options = options
         self.timeout = timeout
+        # Don't allow empty dicts or lists as defaults in method signature, cfr http://nedbatchelder.com/blog/200806/pylint.html
+        if self.options is None:
+            self.options = {}
         Thread.__init__(self)
 
     def stop(self):
@@ -94,7 +103,10 @@ class ThreadCommand(Command, Thread):
             pass
 
     @staticmethod
-    def createAndRun(args, query, callback, options={}):
+    def createAndRun(args, query, callback, options=None):
+        # Don't allow empty dicts or lists as defaults in method signature, cfr http://nedbatchelder.com/blog/200806/pylint.html
+        if options is None:
+            options = {}
         command = ThreadCommand(args, callback, query, options=options)
         command.start()
         killTimeout = Timer(command.timeout, command.stop)
