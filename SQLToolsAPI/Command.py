@@ -58,8 +58,8 @@ class Command:
                 str(queryTimerEnd-queryTimerStart)
                 )
             resultLine = "-"*(len(resultInfo)-3)
-            resultInfo = "{0}\n{1}".format(resultInfo,resultLine)
-            resultString = "{0}\n{1}\n{2}\n*/\n{3}".format(resultInfo,self.query,resultLine,resultString)
+            resultString = "{0}\n{1}\n{2}\n{3}\n*/\n{4}".format(resultInfo,
+                resultLine,self.query,resultLine,resultString)
 
         self.callback(resultString)
 
