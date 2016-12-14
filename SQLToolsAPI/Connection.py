@@ -113,6 +113,9 @@ class Connection:
             if query.lower().startswith('select'):
                 if not " limit " in query.lower()[-15:]:
                     if self.safe_limit:
+                        if ";" in query.lower()[-5:]:
+                            seperatorIndex = query.rfind(';')
+                            query = query[:seperatorIndex] + query[seperatorIndex+1:]
                         query += " LIMIT {0}".format(self.safe_limit)
             queryToRun += query + "\n"
 
