@@ -21,6 +21,7 @@ class Connection:
     password = None
     service = None
     safe_limit = None
+    show_query = None
 
     def __init__(self, name, options, settings={}, commandClass='ThreadCommand'):
         self.Command = getattr(C, commandClass)
@@ -48,6 +49,7 @@ class Connection:
         self.password  = options.get('password', None)
         self.service   = options.get('service', None)
         self.safe_limit = settings.get('safe_limit', None)
+        self.show_query = settings.get('show_query', None)
 
     def __str__(self):
         return self.name
@@ -111,7 +113,7 @@ class Connection:
 
         for query in queries:
             if query.lower().startswith('select'):
-                if not " limit " in query.lower()[-15:]:
+                if " limit " not in query.lower()[-15:]:
                     if self.safe_limit:
                         if ";" in query.lower()[-5:]:
                             seperatorIndex = query.rfind(';')
@@ -126,7 +128,7 @@ class Connection:
         if Connection.history:
             Connection.history.add(queryToRun)
 
-        self.Command.createAndRun(self.builArgs(), queryToRun, callback)
+        self.Command.createAndRun(self.builArgs(), queryToRun, callback, options={'show_query':self.show_query})
 
     def builArgs(self, queryName=None):
         cliOptions = self.getOptionsForSgdbCli()
