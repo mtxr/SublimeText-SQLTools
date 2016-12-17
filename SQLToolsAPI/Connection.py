@@ -116,9 +116,8 @@ class Connection:
             for query in sqlparse.split(rawQuery):
                 if self.safe_limit:
                     parsedTokens = sqlparse.parse(query.strip().replace("'", "\""))
-                    if ((parsedTokens[0].ttype in sqlparse.tokens.Keyword and
-                            parsedTokens[0].value == 'select') or
-                            query.strip().lower().startswith('select')):
+                    if ((parsedTokens[0][0].ttype in sqlparse.tokens.Keyword and
+                            parsedTokens[0][0].value == 'select')):
                         applySafeLimit = True
                         for parse in parsedTokens:
                             for token in parse.tokens:
