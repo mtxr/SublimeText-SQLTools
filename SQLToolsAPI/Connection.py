@@ -125,7 +125,6 @@ class Connection:
                                 if token.ttype in sqlparse.tokens.Keyword and token.value == 'limit':
                                     applySafeLimit = False
                         if applySafeLimit:
-                            print ('NO limit found in ' + query)
                             if (query.strip()[-1:] == ';'):
                                 query = query.strip()[:-1]
                             query += " LIMIT {0};".format(self.safe_limit)
