@@ -1,5 +1,6 @@
 import shutil
 import shlex
+import sqlparse
 
 from .Log import Log
 from . import Utils as U
@@ -111,24 +112,31 @@ class Connection:
         if isinstance(queries, str):
             queries = [queries]
 
-        for query in queries:
-            if query.lower().startswith('select'):
-                if " limit " not in query.lower()[-15:]:
-                    if self.safe_limit:
-                        if ";" in query.lower()[-5:]:
-                            seperatorIndex = query.rfind(';')
-                            query = query[:seperatorIndex] + query[seperatorIndex+1:]
-                        query += " LIMIT {0}".format(self.safe_limit)
-            queryToRun += query + "\n"
-
-        queryToRun = queryToRun.rstrip('\n')
+        for rawQuery in queries:
+            for query in sqlparse.split(rawQuery):
+                if self.safe_limit:
+                    parsedTokens = sqlparse.parse(query.strip().replace("'", "\""))
+                    if ((parsedTokens[0].ttype in sqlparse.tokens.Keyword and
+                            parsedTokens[0].value == 'select') or
+                            query.strip().lower().startswith('select')):
+                        applySafeLimit = True
+                        for parse in parsedTokens:
+                            for token in parse.tokens:
+                                if token.ttype in sqlparse.tokens.Keyword and token.value == 'limit':
+                                    applySafeLimit = False
+                        if applySafeLimit:
+                            print ('NO limit found in ' + query)
+                            if (query.strip()[-1:] == ';'):
+                                query = query.strip()[:-1]
+                            query += " LIMIT {0};".format(self.safe_limit)
+                queryToRun += query + "\n"
 
         Log("Query: " + queryToRun)
 
         if Connection.history:
             Connection.history.add(queryToRun)
 
-        self.Command.createAndRun(self.builArgs(), queryToRun, callback, options={'show_query':self.show_query})
+        self.Command.createAndRun(self.builArgs(), queryToRun, callback, options={'show_query': self.show_query})
 
     def builArgs(self, queryName=None):
         cliOptions = self.getOptionsForSgdbCli()
