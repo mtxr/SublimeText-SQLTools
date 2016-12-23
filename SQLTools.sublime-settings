@@ -6,6 +6,7 @@
     "clear_output"          : false,
     "safe_limit"            : false,
     "show_query"            : false,
+    "expand_to_paragraph"   : false,
     /**
      * The list of syntax selector for which the plugin autocompletion will be active.
      * An empty list means autocompletion always active.
