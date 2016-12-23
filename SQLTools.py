@@ -5,6 +5,7 @@ import os
 
 import sublime
 from sublime_plugin import WindowCommand, EventListener, TextCommand
+from Default.paragraph import expand_to_paragraph
 
 from .SQLToolsAPI import Utils
 from .SQLToolsAPI.Log import Log, Logger
@@ -132,7 +133,10 @@ def getSelection():
     if View().sel():
         for region in View().sel():
             if region.empty():
-                text.append(View().substr(View().line(region)))
+                if not settings.get('expand_to_paragraph', False):
+                    text.append(View().substr(View().line(region)))
+                else:
+                    text.append(View().substr(expand_to_paragraph(View(), region.b)))
             else:
                 text.append(View().substr(region))
     return text
