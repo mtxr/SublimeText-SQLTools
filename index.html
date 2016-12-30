@@ -179,7 +179,28 @@
 <td align="left">SQL formatting settings. You can check more on <a href="#sql-formatting">SQL Formatting</a>
 </td>
 <td><code>object</code></td>
-<td><code>{"limit": 50}</code></td>
+<td><code></code></td>
+</tr>
+<tr>
+<td><code>safe_limit</code></td>
+<td align="left">Optionally set a default LIMIT on queries. Parameter can be an INT or false.</a>
+</td>
+<td><code>object</code></td>
+<td><code>{"safe_limit": false}</code></td>
+</tr>
+<tr>
+<td><code>show_query</code></td>
+<td align="left">Optionally show the executed query above the results.</a>
+</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>expand_to_paragraph</code></td>
+<td align="left">Expand cursor selection to current paragraph upon running an SQL query.</a>
+</td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
 </tr>
 </tbody>
 </table>
