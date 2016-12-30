@@ -13,6 +13,14 @@ SQLTools will save you (for sure) a lot of time and help you to increase your pr
 
 <span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RSMB6DGK238V8" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
 
+## Contributors
+
+These fellows helped SQLTools become better than ever. Thank you so much!
+
+* [@tkopets](https://github.com/tkopets)
+* [@gabrielebarbieri](https://github.com/gabrielebarbieri)
+* [@optio](https://github.com/optio)
+
 ## Features
 
 * View table schemas (`CTRL+e, CTRL+d`)
@@ -44,7 +52,7 @@ Up coming features:
 If you are using [Sublime Package Control](http://wbond.net/sublime_packages/package_control), you can easily install SQLTools via the `Package Control: Install Package` menu item.
 
 1. Press `CTRL+SHIFT+p`
-2. Type *"Install Package"* 
+2. Type *"Install Package"*
 3. Find SQLTools
 4. Wait & Done!
 
@@ -60,14 +68,17 @@ I strongly recomend you to use Package Control. It helps you to keep the package
 
 ## Settings
 
-| Option                  | Description                                                                                                      | Type      | Default value     |
-| ---                     | :---                                                                                                             | ---       | ---               |
-| `unescape_quotes`       | Escape chars like \\" and \\' for extension in array                                                            | `array`   | `[ "php" ]`     |
-| `cli`                   | Path to desired command. You can check more on [Path to Cli](#path-to-commands)                                  | `object`  |                   |
-| `thread_timeout`        | Query execution time in miliseconds before kill. Prevents Sublime Text from lockup while running complex queries | `int`     | 5000              |
-| `show_result_on_window` | Show query result using a window (true) or a panel (false)                                                       | `boolean` | `false`           |
-| `show_records`          | Resultset settings. You can check more on [Show records options](#show-records-options)                          | `object`  | `{"limit": 50}` |
-| `format`                | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting)                                 | `object`  | `{"limit": 50}` |
+| Option                  | Description                                                                                                      | Type      | Default value           |
+| ---                     | :---                                                                                                             | ---       | ---                     |
+| `unescape_quotes`       | Escape chars like \\" and \\' for extension in array                                                             | `array`   | `[ "php" ]`             |
+| `cli`                   | Path to desired command. You can check more on [Path to Cli](#path-to-commands)                                  | `object`  |                         |
+| `thread_timeout`        | Query execution time in miliseconds before kill. Prevents Sublime Text from lockup while running complex queries | `int`     | 5000                    |
+| `show_result_on_window` | Show query result using a window (true) or a panel (false)                                                       | `boolean` | `false`                 |
+| `show_records`          | Resultset settings. You can check more on [Show records options](#show-records-options)                          | `object`  | `{"limit": 50}`         |
+| `format`                | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting)                                 | `object`  |                         |
+| `safe_limit`            | Optionally set a default LIMIT on queries.                                                                       | `object`  | `{"safe_limit": false}` |
+| `show_query`            | Optionally show the executed query above the results.                                                            | `boolean` | `false`                 |
+| `expand_to_paragraph`   | Expand cursor selection to current paragraph upon running an SQL query.                                          | `boolean` | `false`                 |
 
 ### <a id="show-records-options"></a>Show records options
 
@@ -93,7 +104,7 @@ In case your database command is not in your `PATH` enviroment var, you can set 
 
 | Option       | Default value |
 | ---          | ---           |
-| `"mysql"`    | `"mysql"`     | 
+| `"mysql"`    | `"mysql"`     |
 | `"pgsql"`    | `"psql"`      |
 | `"oracle"`   | `"sqlplus"`   |
 | `"vertica"`  | `"vsql"`      |
@@ -103,7 +114,7 @@ In case your database command is not in your `PATH` enviroment var, you can set 
 
 ## Connections
 
-You can setup your connecitons using the `Preferences` menu or `CTRL+SHIFT+P` and searching for `ST: Setup Connections`. 
+You can setup your connecitons using the `Preferences` menu or `CTRL+SHIFT+P` and searching for `ST: Setup Connections`.
 
 Below you can see an example of the `SQLToolsConnections.sublime-settings`:
 
@@ -124,6 +135,7 @@ Below you can see an example of the `SQLToolsConnections.sublime-settings`:
             "host"    : "127.0.0.1",
             "port"    :  5432,
             "username": "anotheruser",
+            "password" : null  // (if you are using postgresql, you must setup a pgpass file and set password to null)
             "database": "dbname",
             "encoding": "utf-8"
         },
@@ -151,7 +163,7 @@ After you select one connection, SQLTools prepare auto completions for you.
 PS: For a better experience, add this line to your sublime settings file
 
 1. `CTRL+SHIFT+p`, select "*Preferences: Settings - User*"
-2. add this option: 
+2. add this option:
 
 
 ```json
