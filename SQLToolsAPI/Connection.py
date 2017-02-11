@@ -92,16 +92,19 @@ class Connection:
 
     def getTableRecords(self, tableName, callback):
         query = self.getOptionsForSgdbCli()['queries']['show records']['query'].format(tableName, self.rowsLimit)
-        self.Command.createAndRun(self.builArgs('show records'), query, callback)
+        queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + [query])
+        self.Command.createAndRun(self.builArgs('show records'), queryToRun, callback)
 
     def getTableDescription(self, tableName, callback):
         query = self.getOptionsForSgdbCli()['queries']['desc table']['query'] % tableName
-        self.Command.createAndRun(self.builArgs('desc table'), query, callback)
+        queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + [query])
+        self.Command.createAndRun(self.builArgs('desc table'), queryToRun, callback)
 
     def getFunctionDescription(self, functionName, callback):
         query = self.getOptionsForSgdbCli()['queries']['desc function'][
             'query'] % functionName
-        self.Command.createAndRun(self.builArgs('desc function'), query, callback)
+        queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + [query])
+        self.Command.createAndRun(self.builArgs('desc function'), queryToRun, callback)
 
     def execute(self, queries, callback):
         queryToRun = ''
