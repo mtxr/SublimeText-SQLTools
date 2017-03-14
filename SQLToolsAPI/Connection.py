@@ -106,6 +106,11 @@ class Connection:
         queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + [query])
         self.Command.createAndRun(self.builArgs('desc function'), queryToRun, callback)
 
+    def explainPlan(self, query, callback):
+        query = self.getOptionsForSgdbCli()['queries']['explain plan']['query'].format(query)
+        queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + [query])
+        self.Command.createAndRun(self.builArgs('explain plan'), queryToRun, callback)
+
     def execute(self, queries, callback):
         queryToRun = ''
 

@@ -119,6 +119,11 @@
                     "query": "select * from {0} WHERE ROWNUM <= {1};",
                     "options": ["-S"],
                     "format" : "|%s|"
+                },
+                "explain plan": {
+                    "query": "explain plan for {0}; select plan_table_output from table(dbms_xplain.display());",
+                    "options": ["-S"],
+                    "format" : "|%s|"
                 }
             }
         },
