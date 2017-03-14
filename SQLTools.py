@@ -2,6 +2,7 @@ __version__ = "v0.6.7"
 
 import sys
 import os
+from functools import partial
 
 import sublime
 from sublime_plugin import WindowCommand, EventListener, TextCommand
@@ -90,6 +91,13 @@ def output(content, panel=None):
         panel = getOutputPlace()
     panel.run_command('append', {'characters': content})
     panel.set_read_only(True)
+
+
+def outputWithTableName(tableName, content, panel=None):
+    content = 'Table "{tableName}"\n{content}'.format(
+        tableName=tableName,
+        content=content)
+    output(content, panel)
 
 
 def toNewTab(content, name="", suffix="SQLTools Saved Query"):
@@ -310,7 +318,10 @@ class StShowRecords(WindowCommand):
         def cb(index):
             if index < 0:
                 return None
-            return ST.conn.getTableRecords(ST.tables[index], output)
+            tableName = ST.tables[index]
+            return ST.conn.getTableRecords(
+                tableName,
+                partial(outputWithTableName, tableName))
 
         ST.selectTable(cb)
 
