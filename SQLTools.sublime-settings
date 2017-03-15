@@ -121,7 +121,7 @@
                     "format" : "|%s|"
                 },
                 "explain plan": {
-                    "query": "explain plan for {0}; select plan_table_output from table(dbms_xplain.display());",
+                    "query": "explain plan for {0};\nselect plan_table_output from table(dbms_xplan.display());",
                     "options": ["-S"],
                     "format" : "|%s|"
                 }
