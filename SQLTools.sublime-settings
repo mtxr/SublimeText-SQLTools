@@ -11,7 +11,7 @@
      * The list of syntax selector for which the plugin autocompletion will be active.
      * An empty list means autocompletion always active.
      */
-    "selectors": ["source.sql"],
+    "selectors": ["source.sql", "source.pgsql", "source.plpgsql.postgres", "source.plsql.oracle", "source.tsql"],
     "unescape_quotes" : [
         "php"
     ],
