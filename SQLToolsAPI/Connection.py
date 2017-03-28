@@ -111,7 +111,7 @@ class Connection:
         stripped_queries = [
             queryFormat.format(query.strip().strip(";"))
             for rawQuery in queries
-            for query in sqlparse.split(rawQuery)
+            for query in filter(None, sqlparse.split(rawQuery))
         ]
         queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + stripped_queries)
         self.Command.createAndRun(self.builArgs('explain plan'), queryToRun, callback)
