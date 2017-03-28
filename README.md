@@ -35,6 +35,7 @@ These fellows helped SQLTools become better than ever. Thank you so much!
 * Auto complete (for PostgreSQL & MySQL. Looking for help with other SGDBs)
 * Run SQL Queries (`CTRL+e, CTRL+e`)
 ![Auto complete (PostgreSQL & MySQL) && Run SQL Queries](https://github.com/mtxr/SQLTools/raw/images/execute_auto_complete.gif?raw=true)
+* Show explain plan for queries (PostgreSQL, MySQL, Oracle, Vertica, SQLite) (`CTRL+e, CTRL+x`)
 * Formatting SQL Queries (`CTRL+e, CTRL+b`)
 ![Formatting SQL Queries](https://github.com/mtxr/SQLTools/raw/images/format_sql.gif?raw=true)
 * Threading Support (prevent ST lockups)
