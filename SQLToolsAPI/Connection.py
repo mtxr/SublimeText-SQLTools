@@ -107,7 +107,11 @@ class Connection:
         self.Command.createAndRun(self.builArgs('desc function'), queryToRun, callback)
 
     def explainPlan(self, queries, callback):
-        queryFormat = self.getOptionsForSgdbCli()['queries']['explain plan']['query']
+        try:
+            queryFormat = self.getOptionsForSgdbCli()['queries']['explain plan']['query']
+        except KeyError:
+            return # do nothing, if DBMS has no support for explain plan
+
         stripped_queries = [
             queryFormat.format(query.strip().strip(";"))
             for rawQuery in queries
