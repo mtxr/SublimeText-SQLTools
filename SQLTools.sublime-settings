@@ -79,7 +79,7 @@
                     "format" : "|%s|"
                 },
                 "explain plan": {
-                    "query": "explain {0}",
+                    "query": "explain {0};",
                     "options": [],
                     "format" : "|%s|"
                 }
@@ -158,7 +158,7 @@
                     "format" : "|%s|"
                 },
                 "explain plan": {
-                    "query": "explain {0}",
+                    "query": "explain {0};",
                     "options": ["-f", "--table"],
                     "format" : "|%s|"
                 }
@@ -185,7 +185,7 @@
                     "format" : "|%s|"
                 },
                 "explain plan": {
-                    "query": "explain {0}",
+                    "query": "explain {0};",
                     "options": [],
                     "format" : "|%s|"
                 }
@@ -237,7 +237,7 @@
                     "format" : "|%s|"
                 },
                 "explain plan": {
-                    "query": "EXPLAIN QUERY PLAN {0}",
+                    "query": "EXPLAIN QUERY PLAN {0};",
                     "options": ["-column"],
                     "format" : "|%s|"
                 }
