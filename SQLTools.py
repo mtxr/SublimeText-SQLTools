@@ -359,6 +359,16 @@ class StDescFunction(WindowCommand):
         ST.selectFunction(cb)
 
 
+class StExplainPlan(WindowCommand):
+    @staticmethod
+    def run():
+        if not ST.conn:
+            ST.selectConnection(tablesCallback=lambda: Window().run_command('st_explain_plan'))
+            return
+
+        ST.conn.explainPlan(getSelection(), output)
+
+
 class StExecute(WindowCommand):
     @staticmethod
     def run():
