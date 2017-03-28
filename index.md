@@ -162,3 +162,8 @@ PS: For a better experience, add this line to your sublime settings file
   ]
 }
 ```
+
+## Using SQLTools with Mac OS X
+
+Sublime Text has its PATH set from launchctl, not by your shell. Binaries installed by packages such as homebrew, for instance `Postgresql`, cannot be found by Sublime Text and results in a null pointer exception thrown by `SQLTools`. Installing the package `Fix Mac Path` resolve this issue. This package can be downloaded [here](https://github.com/int3h/SublimeFixMacPath).
+
