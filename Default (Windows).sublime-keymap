@@ -1,6 +1,7 @@
 [
     { "keys": ["ctrl+alt+e"], "command": "st_select_connection" },
     { "keys": ["ctrl+e", "ctrl+e"], "command": "st_execute" },
+    { "keys": ["ctrl+e", "ctrl+x"], "command": "st_explain_plan" },
     { "keys": ["ctrl+e", "ctrl+h"], "command": "st_history" },
     { "keys": ["ctrl+e", "ctrl+s"], "command": "st_show_records" },
     { "keys": ["ctrl+e", "ctrl+d"], "command": "st_desc_table" },
