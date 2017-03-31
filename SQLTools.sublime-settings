@@ -1,6 +1,6 @@
 {
     "debug"                 : true,
-    "thread_timeout"        : 5000,
+    "thread_timeout"        : 15,
     "history_size"          : 100,
     "show_result_on_window" : false,
     "clear_output"          : false,

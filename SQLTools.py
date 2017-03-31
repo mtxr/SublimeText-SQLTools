@@ -49,7 +49,7 @@ def startPlugin():
     Logger.setPackageVersion(__version__)
     Logger.setPackageName(__package__)
     Logger.setLogging(settings.get('debug', True))
-    Connection.setTimeout(settings.get('thread_timeout', 5000))
+    Connection.setTimeout(settings.get('thread_timeout', 15))
     Connection.setHistoryManager(history)
 
     Log(__package__ + " Loaded!")

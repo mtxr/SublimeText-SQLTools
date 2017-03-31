@@ -8,7 +8,7 @@ from .Log import Log
 
 
 class Command:
-    timeout = 5000
+    timeout = 15
 
     def __init__(self, args, callback, query=None, encoding='utf-8', options=None):
         self.query = query
