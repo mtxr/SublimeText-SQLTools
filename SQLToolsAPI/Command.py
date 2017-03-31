@@ -103,11 +103,11 @@ class ThreadCommand(Command, Thread):
             pass
 
     @staticmethod
-    def createAndRun(args, query, callback, options=None):
+    def createAndRun(args, query, callback, options=None, timeout=Command.timeout):
         # Don't allow empty dicts or lists as defaults in method signature, cfr http://nedbatchelder.com/blog/200806/pylint.html
         if options is None:
             options = {}
-        command = ThreadCommand(args, callback, query, options=options)
+        command = ThreadCommand(args, callback, query, options=options, timeout=timeout)
         command.start()
         killTimeout = Timer(command.timeout, command.stop)
         killTimeout.start()
