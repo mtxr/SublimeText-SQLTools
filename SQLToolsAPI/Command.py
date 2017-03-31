@@ -95,7 +95,9 @@ class ThreadCommand(Command, Thread):
             return
 
         try:
-            os.kill(self.process.pid, signal.SIGKILL)
+            # Windows does not provide SIGKILL, go with SIGTERM
+            sig = getattr(signal, 'SIGKILL', signal.SIGTERM)
+            os.kill(self.process.pid, sig)
             self.process = None
 
             Log.debug("Your command is taking too long to run. Process killed")
