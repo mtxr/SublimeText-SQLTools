@@ -100,7 +100,8 @@ class ThreadCommand(Command, Thread):
             os.kill(self.process.pid, sig)
             self.process = None
 
-            Log.debug("Your command is taking too long to run. Process killed")
+            Log("Your command is taking too long to run. Process killed")
+            self.callback("Command execution time exceeded 'thread_timeout'.\nProcess killed!\n\n")
         except Exception:
             pass
 
