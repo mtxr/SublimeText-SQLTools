@@ -63,12 +63,15 @@ I strongly recomend you to use Package Control. It helps you to keep the package
 
 | Option                  | Description                                                                                                      | Type      | Default value     |
 | ---                     | :---                                                                                                             | ---       | ---               |
-| `unescape_quotes`       | Escape chars like \\" and \\' for extension in array                                                            | `array`   | `[ "php" ]`     |
+| `unescape_quotes`       | Escape chars like \\" and \\' for extension in array                                                             | `array`   | `[ "php" ]`       |
 | `cli`                   | Path to desired command. You can check more on [Path to Cli](#path-to-commands)                                  | `object`  |                   |
-| `thread_timeout`        | Query execution time in miliseconds before kill. Prevents Sublime Text from lockup while running complex queries | `int`     | 5000              |
+| `thread_timeout`        | Query execution time in miliseconds before kill. Prevents Sublime Text from lockup while running complex queries | `int`     | 15                |
 | `show_result_on_window` | Show query result using a window (true) or a panel (false)                                                       | `boolean` | `false`           |
-| `show_records`          | Resultset settings. You can check more on [Show records options](#show-records-options)                          | `object`  | `{"limit": 50}` |
-| `format`                | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting)                                 | `object`  | `{"limit": 50}` |
+| `show_records`          | Resultset settings. You can check more on [Show records options](#show-records-options)                          | `object`  | `{"limit": 50}`   |
+| `format`                | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting)                                 | `object`  |                   |
+| `safe_limit`            | Optionally set a default LIMIT on queries.  Parameter can be an INT or false.                                    | `int`     | `false`           |
+| `show_query`            | Optionally show the executed query above the results.                                                            | `boolean` | `false`           |
+| `expand_to_paragraph`   | Expand cursor selection to current paragraph upon running an SQL query.                                          | `boolean` | `false`           |
 
 ### <a id="show-records-options"></a>Show records options
 
@@ -111,7 +114,7 @@ Below you can see an example of the `SQLToolsConnections.sublime-settings`:
 ```json
 {
     "connections": {
-        "Connection 1": {
+        "Connection MySQL": {
             "type"    : "mysql",
             "host"    : "127.0.0.1",
             "port"    : 3306,
@@ -120,7 +123,7 @@ Below you can see an example of the `SQLToolsConnections.sublime-settings`:
             "database": "dbname",
             "encoding": "utf-8"
         },
-        "Connection 2": {
+        "Connection PostgreSQL": {
             "type"    : "pgsql",
             "host"    : "127.0.0.1",
             "port"    :  5432,
@@ -128,7 +131,7 @@ Below you can see an example of the `SQLToolsConnections.sublime-settings`:
             "database": "dbname",
             "encoding": "utf-8"
         },
-        "Connection 3": {
+        "Connection Oracle": {
             "type"    : "oracle",
             "host"    : "127.0.0.1",
             "port"    :  1522,
@@ -137,9 +140,14 @@ Below you can see an example of the `SQLToolsConnections.sublime-settings`:
             "database": "dbname",
             "service" : "servicename",
             "encoding": "utf-8"
+        },
+        "Connection SQLite": {
+            "type"    : "sqlite",
+            "database": "d:/sqlite/sample_db/chinook.db",
+            "encoding": "utf-8"
         }
     },
-    "default": "Connection 1"
+    "default": "Connection MySQL"
 }
 ```
 
@@ -147,7 +155,7 @@ You can also add connections to your `.sublime-project` files to use per-project
 
 ## Auto Complete
 
-After you select one connection, SQLTools prepare auto completions for you.
+After you select one connection, SQLTools will prepare auto completions for you.
 
 PS: For a better experience, add this line to your sublime settings file
 
