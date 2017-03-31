@@ -95,7 +95,9 @@ class ThreadCommand(Command, Thread):
             return
 
         try:
-            os.kill(self.process.pid, signal.SIGKILL)
+            # Windows does not provide SIGKILL, go with SIGTERM
+            sig = getattr(signal, 'SIGKILL', signal.SIGTERM)
+            os.kill(self.process.pid, sig)
             self.process = None
 
             Log.debug("Your command is taking too long to run. Process killed")
@@ -103,11 +105,11 @@ class ThreadCommand(Command, Thread):
             pass
 
     @staticmethod
-    def createAndRun(args, query, callback, options=None):
+    def createAndRun(args, query, callback, options=None, timeout=Command.timeout):
         # Don't allow empty dicts or lists as defaults in method signature, cfr http://nedbatchelder.com/blog/200806/pylint.html
         if options is None:
             options = {}
-        command = ThreadCommand(args, callback, query, options=options)
+        command = ThreadCommand(args, callback, query, options=options, timeout=timeout)
         command.start()
         killTimeout = Timer(command.timeout, command.stop)
         killTimeout.start()

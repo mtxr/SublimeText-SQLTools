@@ -8,6 +8,7 @@ from . import Command as C
 
 
 class Connection:
+    timeout = None
     history = None
     settings = None
     rowsLimit = None
@@ -93,7 +94,7 @@ class Connection:
     def getTableRecords(self, tableName, callback):
         query = self.getOptionsForSgdbCli()['queries']['show records']['query'].format(tableName, self.rowsLimit)
         queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + [query])
-        self.Command.createAndRun(self.builArgs('show records'), queryToRun, callback)
+        self.Command.createAndRun(self.builArgs('show records'), queryToRun, callback, timeout=self.timeout)
 
     def getTableDescription(self, tableName, callback):
         query = self.getOptionsForSgdbCli()['queries']['desc table']['query'] % tableName
@@ -118,7 +119,7 @@ class Connection:
             for query in filter(None, sqlparse.split(rawQuery))
         ]
         queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + stripped_queries)
-        self.Command.createAndRun(self.builArgs('explain plan'), queryToRun, callback)
+        self.Command.createAndRun(self.builArgs('explain plan'), queryToRun, callback, timeout=self.timeout)
 
     def execute(self, queries, callback):
         queryToRun = ''
@@ -151,7 +152,7 @@ class Connection:
         if Connection.history:
             Connection.history.add(queryToRun)
 
-        self.Command.createAndRun(self.builArgs(), queryToRun, callback, options={'show_query': self.show_query})
+        self.Command.createAndRun(self.builArgs(), queryToRun, callback, options={'show_query': self.show_query}, timeout=self.timeout)
 
     def builArgs(self, queryName=None):
         cliOptions = self.getOptionsForSgdbCli()
@@ -178,7 +179,7 @@ class Connection:
     @staticmethod
     def setTimeout(timeout):
         Connection.timeout = timeout
-        Log('Connection timeout setted to {0} seconds'.format(timeout))
+        Log('Connection timeout set to {0} seconds'.format(timeout))
 
     @staticmethod
     def setHistoryManager(manager):
