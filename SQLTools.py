@@ -245,9 +245,12 @@ class ST(EventListener):
         completions = view.extract_completions(prefix)
 
         if prefix == "":
-            region = sublime.Region(locations[0], locations[0])
+            currentPoint = locations[0]
+            lineStartPoint = view.line(currentPoint).begin()
+            lineStartToLocation = sublime.Region(lineStartPoint, currentPoint)
             try:
-                prefix = view.substr(view.line(region)).split(" ").pop()
+                # everything after last space is a prefix
+                prefix = view.substr(lineStartToLocation).split(" ").pop()
             except Exception:
                 pass
 
