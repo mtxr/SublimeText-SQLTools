@@ -64,7 +64,7 @@
                     "format" : "|%s|"
                 },
                 "columns": {
-                    "query": "SELECT DISTINCT '|' || table_name || '.' || column_name || '|' FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() GROUP BY table_name, column_name;",
+                    "query": "SELECT DISTINCT '|' || quote_ident(table_name) || '.' || quote_ident(column_name) || '|' FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() GROUP BY table_name, column_name;",
                     "options": ["-t", "--no-psqlrc"],
                     "format" : "|%s|"
                 },
