@@ -4,7 +4,7 @@
 # Copyright (C) 2016 Andi Albrecht, albrecht.andi@gmail.com
 #
 # This module is part of python-sqlparse and is released under
-# the BSD License: http://www.opensource.org/licenses/bsd-license.php
+# the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
 """Module that contains the command line app.
 
@@ -21,6 +21,8 @@ Why does this file exist, and why not put this in __main__?
 
 import argparse
 import sys
+from io import TextIOWrapper
+from codecs import open, getreader
 
 import sqlparse
 from sqlparse.compat import PY2
@@ -118,12 +120,25 @@ def create_parser():
         type=int,
         help='Column after which lists should be wrapped')
 
+    group.add_argument(
+        '--comma_first',
+        dest='comma_first',
+        default=False,
+        type=bool,
+        help='Insert linebreak before comma (default False)')
+
+    group.add_argument(
+        '--encoding',
+        dest='encoding',
+        default='utf-8',
+        help='Specify the input encoding (default utf-8)')
+
     return parser
 
 
 def _error(msg):
     """Print msg and optionally exit with return code exit_."""
-    sys.stderr.write('[ERROR] {0}\n'.format(msg))
+    sys.stderr.write(u'[ERROR] {0}\n'.format(msg))
     return 1
 
 
@@ -132,19 +147,23 @@ def main(args=None):
     args = parser.parse_args(args)
 
     if args.filename == '-':  # read from stdin
-        data = sys.stdin.read()
+        if PY2:
+            data = getreader(args.encoding)(sys.stdin).read()
+        else:
+            data = TextIOWrapper(
+                sys.stdin.buffer, encoding=args.encoding).read()
     else:
         try:
-            # TODO: Needs to deal with encoding
-            data = ''.join(open(args.filename).readlines())
+            data = ''.join(open(args.filename, 'r', args.encoding).readlines())
         except IOError as e:
-            return _error('Failed to read {0}: {1}'.format(args.filename, e))
+            return _error(
+                u'Failed to read {0}: {1}'.format(args.filename, e))
 
     if args.outfile:
         try:
-            stream = open(args.outfile, 'w')
+            stream = open(args.outfile, 'w', args.encoding)
         except IOError as e:
-            return _error('Failed to open {0}: {1}'.format(args.outfile, e))
+            return _error(u'Failed to open {0}: {1}'.format(args.outfile, e))
     else:
         stream = sys.stdout
 
@@ -152,11 +171,9 @@ def main(args=None):
     try:
         formatter_opts = sqlparse.formatter.validate_options(formatter_opts)
     except SQLParseError as e:
-        return _error('Invalid options: {0}'.format(e))
+        return _error(u'Invalid options: {0}'.format(e))
 
     s = sqlparse.format(data, **formatter_opts)
-    if PY2:
-        s = s.encode('utf-8', 'replace')
     stream.write(s)
     stream.flush()
     return 0

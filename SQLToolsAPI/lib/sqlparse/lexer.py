@@ -3,7 +3,7 @@
 # Copyright (C) 2016 Andi Albrecht, albrecht.andi@gmail.com
 #
 # This module is part of python-sqlparse and is released under
-# the BSD License: http://www.opensource.org/licenses/bsd-license.php
+# the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
 """SQL Lexer"""
 
@@ -14,7 +14,7 @@
 
 from sqlparse import tokens
 from sqlparse.keywords import SQL_REGEX
-from sqlparse.compat import file_types, string_types, u
+from sqlparse.compat import bytes_type, text_type, file_types
 from sqlparse.utils import consume
 
 
@@ -37,10 +37,22 @@ class Lexer(object):
 
         ``stack`` is the inital stack (default: ``['root']``)
         """
-        if isinstance(text, string_types):
-            text = u(text, encoding)
-        elif isinstance(text, file_types):
-            text = u(text.read(), encoding)
+        if isinstance(text, file_types):
+            text = text.read()
+
+        if isinstance(text, text_type):
+            pass
+        elif isinstance(text, bytes_type):
+            if encoding:
+                text = text.decode(encoding)
+            else:
+                try:
+                    text = text.decode('utf-8')
+                except UnicodeDecodeError:
+                    text = text.decode('unicode-escape')
+        else:
+            raise TypeError(u"Expected text or file-like object, got {!r}".
+                            format(type(text)))
 
         iterable = enumerate(text)
         for pos, char in iterable:
@@ -50,14 +62,11 @@ class Lexer(object):
                 if not m:
                     continue
                 elif isinstance(action, tokens._TokenType):
-                    consume_pos = m.end() - pos - 1
                     yield action, m.group()
                 elif callable(action):
-                    ttype, value = action(m.group(), text[pos:])
-                    consume_pos = len(value) - 1
-                    yield ttype, value
+                    yield action(m.group())
 
-                consume(iterable, consume_pos)
+                consume(iterable, m.end() - pos - 1)
                 break
             else:
                 yield tokens.Error, char

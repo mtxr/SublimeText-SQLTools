@@ -3,7 +3,7 @@
 # Copyright (C) 2016 Andi Albrecht, albrecht.andi@gmail.com
 #
 # This module is part of python-sqlparse and is released under
-# the BSD License: http://www.opensource.org/licenses/bsd-license.php
+# the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
 """This module contains classes representing syntactical elements of SQL."""
 from __future__ import print_function
@@ -24,14 +24,17 @@ class Token(object):
     the type of the token.
     """
 
-    __slots__ = ('value', 'ttype', 'parent', 'normalized', 'is_keyword')
+    __slots__ = ('value', 'ttype', 'parent', 'normalized', 'is_keyword',
+                 'is_group', 'is_whitespace')
 
     def __init__(self, ttype, value):
         value = text_type(value)
         self.value = value
         self.ttype = ttype
         self.parent = None
+        self.is_group = False
         self.is_keyword = ttype in T.Keyword
+        self.is_whitespace = self.ttype in T.Whitespace
         self.normalized = value.upper() if self.is_keyword else value
 
     def __str__(self):
@@ -44,11 +47,9 @@ class Token(object):
     def __repr__(self):
         cls = self._get_repr_name()
         value = self._get_repr_value()
-        if value.startswith("'") and value.endswith("'"):
-            q = '"'
-        else:
-            q = "'"
-        return "<{cls} {q}{value}{q} at 0x{id:2X}>".format(
+
+        q = u'"' if value.startswith("'") and value.endswith("'") else u"'"
+        return u"<{cls} {q}{value}{q} at 0x{id:2X}>".format(
             id=id(self), **locals())
 
     def _get_repr_name(self):
@@ -98,14 +99,6 @@ class Token(object):
 
         return self.normalized in values
 
-    def is_group(self):
-        """Returns ``True`` if this object has children."""
-        return False
-
-    def is_whitespace(self):
-        """Return ``True`` if this token is a whitespace token."""
-        return self.ttype in T.Whitespace
-
     def within(self, group_cls):
         """Returns ``True`` if this token is within *group_cls*.
 
@@ -147,9 +140,10 @@ class TokenList(Token):
         self.tokens = tokens or []
         [setattr(token, 'parent', self) for token in tokens]
         super(TokenList, self).__init__(None, text_type(self))
+        self.is_group = True
 
     def __str__(self):
-        return ''.join(token.value for token in self.flatten())
+        return u''.join(token.value for token in self.flatten())
 
     # weird bug
     # def __len__(self):
@@ -166,18 +160,16 @@ class TokenList(Token):
 
     def _pprint_tree(self, max_depth=None, depth=0, f=None):
         """Pretty-print the object tree."""
-        indent = ' | ' * depth
+        indent = u' | ' * depth
         for idx, token in enumerate(self.tokens):
             cls = token._get_repr_name()
             value = token._get_repr_value()
-            if value.startswith("'") and value.endswith("'"):
-                q = '"'
-            else:
-                q = "'"
-            print("{indent}{idx:2d} {cls} {q}{value}{q}"
+
+            q = u'"' if value.startswith("'") and value.endswith("'") else u"'"
+            print(u"{indent}{idx:2d} {cls} {q}{value}{q}"
                   .format(**locals()), file=f)
 
-            if token.is_group() and (max_depth is None or depth < max_depth):
+            if token.is_group and (max_depth is None or depth < max_depth):
                 token._pprint_tree(max_depth, depth + 1, f)
 
     def get_token_at_offset(self, offset):
@@ -195,18 +187,15 @@ class TokenList(Token):
         This method is recursively called for all child tokens.
         """
         for token in self.tokens:
-            if token.is_group():
+            if token.is_group:
                 for item in token.flatten():
                     yield item
             else:
                 yield token
 
-    def is_group(self):
-        return True
-
     def get_sublists(self):
         for token in self.tokens:
-            if token.is_group():
+            if token.is_group:
                 yield token
 
     @property
@@ -245,7 +234,7 @@ class TokenList(Token):
         ignored too.
         """
         # this on is inconsistent, using Comment instead of T.Comment...
-        funcs = lambda tk: not ((skip_ws and tk.is_whitespace()) or
+        funcs = lambda tk: not ((skip_ws and tk.is_whitespace) or
                                 (skip_cm and imt(tk, t=T.Comment, i=Comment)))
         return self._token_matching(funcs)[1]
 
@@ -282,7 +271,7 @@ class TokenList(Token):
         if idx is None:
             return None, None
         idx += 1  # alot of code usage current pre-compensates for this
-        funcs = lambda tk: not ((skip_ws and tk.is_whitespace()) or
+        funcs = lambda tk: not ((skip_ws and tk.is_whitespace) or
                                 (skip_cm and imt(tk, t=T.Comment, i=Comment)))
         return self._token_matching(funcs, idx, reverse=_reverse)
 
@@ -300,7 +289,7 @@ class TokenList(Token):
         end_idx = end + include_end
 
         # will be needed later for new group_clauses
-        # while skip_ws and tokens and tokens[-1].is_whitespace():
+        # while skip_ws and tokens and tokens[-1].is_whitespace:
         #     tokens = tokens[:-1]
 
         if extend and isinstance(start, grp_cls):
@@ -475,7 +464,7 @@ class IdentifierList(TokenList):
         Whitespaces and punctuations are not included in this generator.
         """
         for token in self.tokens:
-            if not (token.is_whitespace() or token.match(T.Punctuation, ',')):
+            if not (token.is_whitespace or token.match(T.Punctuation, ',')):
                 yield token
 
 
@@ -538,7 +527,7 @@ class Where(TokenList):
     """A WHERE clause."""
     M_OPEN = T.Keyword, 'WHERE'
     M_CLOSE = T.Keyword, ('ORDER', 'GROUP', 'LIMIT', 'UNION', 'EXCEPT',
-                          'HAVING', 'RETURNING')
+                          'HAVING', 'RETURNING', 'INTO')
 
 
 class Case(TokenList):

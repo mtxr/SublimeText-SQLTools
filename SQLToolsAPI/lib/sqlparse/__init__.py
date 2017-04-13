@@ -3,7 +3,7 @@
 # Copyright (C) 2016 Andi Albrecht, albrecht.andi@gmail.com
 #
 # This module is part of python-sqlparse and is released under
-# the BSD License: http://www.opensource.org/licenses/bsd-license.php
+# the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
 """Parse SQL statements."""
 
@@ -17,7 +17,7 @@ from sqlparse import formatter
 
 from sqlparse.compat import text_type
 
-__version__ = '0.2.1'
+__version__ = '0.2.3'
 __all__ = ['engine', 'filters', 'formatter', 'sql', 'tokens', 'cli']
 
 
@@ -57,7 +57,7 @@ def format(sql, encoding=None, **options):
     options = formatter.validate_options(options)
     stack = formatter.build_filter_stack(stack, options)
     stack.postprocess.append(filters.SerializerUnicode())
-    return ''.join(stack.run(sql, encoding))
+    return u''.join(stack.run(sql, encoding))
 
 
 def split(sql, encoding=None):

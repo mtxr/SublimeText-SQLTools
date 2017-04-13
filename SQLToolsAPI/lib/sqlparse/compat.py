@@ -3,7 +3,7 @@
 # Copyright (C) 2016 Andi Albrecht, albrecht.andi@gmail.com
 #
 # This module is part of python-sqlparse and is released under
-# the BSD License: http://www.opensource.org/licenses/bsd-license.php
+# the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
 """Python 2/3 compatibility.
 
@@ -23,14 +23,10 @@ PY3 = sys.version_info[0] == 3
 
 
 if PY3:
-    def u(s, encoding=None):
-        return str(s)
-
-
     def unicode_compatible(cls):
         return cls
 
-
+    bytes_type = bytes
     text_type = str
     string_types = (str,)
     from io import StringIO
@@ -38,20 +34,12 @@ if PY3:
 
 
 elif PY2:
-    def u(s, encoding=None):
-        encoding = encoding or 'unicode-escape'
-        try:
-            return unicode(s)
-        except UnicodeDecodeError:
-            return unicode(s, encoding)
-
-
     def unicode_compatible(cls):
         cls.__unicode__ = cls.__str__
         cls.__str__ = lambda x: x.__unicode__().encode('utf-8')
         return cls
 
-
+    bytes_type = str
     text_type = unicode
     string_types = (str, unicode,)
     from StringIO import StringIO

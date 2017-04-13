@@ -3,7 +3,7 @@
 # Copyright (C) 2016 Andi Albrecht, albrecht.andi@gmail.com
 #
 # This module is part of python-sqlparse and is released under
-# the BSD License: http://www.opensource.org/licenses/bsd-license.php
+# the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
 from sqlparse import sql, tokens as T
 from sqlparse.compat import text_type
@@ -11,24 +11,26 @@ from sqlparse.utils import offset, indent
 
 
 class ReindentFilter(object):
-    def __init__(self, width=2, char=' ', wrap_after=0, n='\n'):
+    def __init__(self, width=2, char=' ', wrap_after=0, n='\n',
+                 comma_first=False):
         self.n = n
         self.width = width
         self.char = char
         self.indent = 0
         self.offset = 0
         self.wrap_after = wrap_after
+        self.comma_first = comma_first
         self._curr_stmt = None
         self._last_stmt = None
 
     def _flatten_up_to_token(self, token):
         """Yields all tokens up to token but excluding current."""
-        if token.is_group():
+        if token.is_group:
             token = next(token.flatten())
 
         for t in self._curr_stmt.flatten():
             if t == token:
-                raise StopIteration
+                break
             yield t
 
     @property
@@ -36,18 +38,20 @@ class ReindentFilter(object):
         return self.offset + self.indent * self.width
 
     def _get_offset(self, token):
-        raw = ''.join(map(text_type, self._flatten_up_to_token(token)))
+        raw = u''.join(map(text_type, self._flatten_up_to_token(token)))
         line = (raw or '\n').splitlines()[-1]
         # Now take current offset into account and return relative offset.
         return len(line) - len(self.char * self.leading_ws)
 
-    def nl(self):
-        return sql.Token(T.Whitespace, self.n + self.char * self.leading_ws)
+    def nl(self, offset=0):
+        return sql.Token(
+            T.Whitespace,
+            self.n + self.char * max(0, self.leading_ws + offset))
 
     def _next_token(self, tlist, idx=-1):
         split_words = ('FROM', 'STRAIGHT_JOIN$', 'JOIN$', 'AND', 'OR',
                        'GROUP', 'ORDER', 'UNION', 'VALUES',
-                       'SET', 'BETWEEN', 'EXCEPT', 'HAVING')
+                       'SET', 'BETWEEN', 'EXCEPT', 'HAVING', 'LIMIT')
         m_split = T.Keyword, split_words, True
         tidx, token = tlist.token_next_by(m=m_split, idx=idx)
 
@@ -65,7 +69,7 @@ class ReindentFilter(object):
             pidx, prev_ = tlist.token_prev(tidx, skip_ws=False)
             uprev = text_type(prev_)
 
-            if prev_ and prev_.is_whitespace():
+            if prev_ and prev_.is_whitespace:
                 del tlist.tokens[pidx]
                 tidx -= 1
 
@@ -80,7 +84,7 @@ class ReindentFilter(object):
         tidx, token = tlist.token_next_by(t=ttypes)
         while token:
             pidx, prev_ = tlist.token_prev(tidx, skip_ws=False)
-            if prev_ and prev_.is_whitespace():
+            if prev_ and prev_.is_whitespace:
                 del tlist.tokens[pidx]
                 tidx -= 1
             # only break if it's not the first token
@@ -123,7 +127,22 @@ class ReindentFilter(object):
                     # Add 1 for the "," separator
                     position += len(token.value) + 1
                     if position > (self.wrap_after - self.offset):
-                        tlist.insert_before(token, self.nl())
+                        adjust = 0
+                        if self.comma_first:
+                            adjust = -2
+                            _, comma = tlist.token_prev(
+                                tlist.token_index(token))
+                            if comma is None:
+                                continue
+                            token = comma
+                        tlist.insert_before(token, self.nl(offset=adjust))
+                        if self.comma_first:
+                            _, ws = tlist.token_next(
+                                tlist.token_index(token), skip_ws=False)
+                            if (ws is not None
+                                    and ws.ttype is not T.Text.Whitespace):
+                                tlist.insert_after(
+                                    token, sql.Token(T.Whitespace, ' '))
                         position = 0
         self._process_default(tlist)
 
@@ -143,12 +162,14 @@ class ReindentFilter(object):
                 with offset(self, len("WHEN ")):
                     self._process_default(tlist)
             end_idx, end = tlist.token_next_by(m=sql.Case.M_CLOSE)
-            tlist.insert_before(end_idx, self.nl())
+            if end_idx is not None:
+                tlist.insert_before(end_idx, self.nl())
 
     def _process_default(self, tlist, stmts=True):
         self._split_statements(tlist) if stmts else None
         self._split_kwds(tlist)
-        [self._process(sgroup) for sgroup in tlist.get_sublists()]
+        for sgroup in tlist.get_sublists():
+            self._process(sgroup)
 
     def process(self, stmt):
         self._curr_stmt = stmt

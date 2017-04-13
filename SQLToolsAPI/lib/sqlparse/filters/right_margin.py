@@ -3,7 +3,7 @@
 # Copyright (C) 2016 Andi Albrecht, albrecht.andi@gmail.com
 #
 # This module is part of python-sqlparse and is released under
-# the BSD License: http://www.opensource.org/licenses/bsd-license.php
+# the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
 import re
 
@@ -23,12 +23,12 @@ class RightMarginFilter(object):
 
     def _process(self, group, stream):
         for token in stream:
-            if token.is_whitespace() and '\n' in token.value:
+            if token.is_whitespace and '\n' in token.value:
                 if token.value.endswith('\n'):
                     self.line = ''
                 else:
                     self.line = token.value.splitlines()[-1]
-            elif token.is_group() and type(token) not in self.keep_together:
+            elif token.is_group and type(token) not in self.keep_together:
                 token.tokens = self._process(token, token.tokens)
             else:
                 val = text_type(token)

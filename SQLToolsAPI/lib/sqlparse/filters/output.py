@@ -3,7 +3,7 @@
 # Copyright (C) 2016 Andi Albrecht, albrecht.andi@gmail.com
 #
 # This module is part of python-sqlparse and is released under
-# the BSD License: http://www.opensource.org/licenses/bsd-license.php
+# the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
 from sqlparse import sql, tokens as T
 from sqlparse.compat import text_type
@@ -22,7 +22,7 @@ class OutputFilter(object):
     def process(self, stmt):
         self.count += 1
         if self.count > 1:
-            varname = '{f.varname}{f.count}'.format(f=self)
+            varname = u'{f.varname}{f.count}'.format(f=self)
         else:
             varname = self.varname
 
@@ -47,7 +47,7 @@ class OutputPythonFilter(OutputFilter):
         # Print the tokens on the quote
         for token in stream:
             # Token is a new line separator
-            if token.is_whitespace() and '\n' in token.value:
+            if token.is_whitespace and '\n' in token.value:
                 # Close quote and add a new line
                 yield sql.Token(T.Text, " '")
                 yield sql.Token(T.Whitespace, '\n')
@@ -93,7 +93,7 @@ class OutputPHPFilter(OutputFilter):
         # Print the tokens on the quote
         for token in stream:
             # Token is a new line separator
-            if token.is_whitespace() and '\n' in token.value:
+            if token.is_whitespace and '\n' in token.value:
                 # Close quote and add a new line
                 yield sql.Token(T.Text, ' ";')
                 yield sql.Token(T.Whitespace, '\n')

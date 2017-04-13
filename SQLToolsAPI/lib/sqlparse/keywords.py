@@ -3,27 +3,18 @@
 # Copyright (C) 2016 Andi Albrecht, albrecht.andi@gmail.com
 #
 # This module is part of python-sqlparse and is released under
-# the BSD License: http://www.opensource.org/licenses/bsd-license.php
+# the BSD License: https://opensource.org/licenses/BSD-3-Clause
 
 import re
 
 from sqlparse import tokens
 
 
-def is_keyword(value, remaining):
+def is_keyword(value):
     val = value.upper()
     return (KEYWORDS_COMMON.get(val) or
             KEYWORDS_ORACLE.get(val) or
             KEYWORDS.get(val, tokens.Name)), value
-
-
-def parse_literal_string(value, remaining):
-    try:
-        end = remaining[len(value):].index(value)
-    except ValueError:
-        return tokens.Name.Builtin, value
-    literal = remaining[:end + (len(value) * 2)]
-    return tokens.Literal, literal
 
 
 SQL_REGEX = {
@@ -44,11 +35,11 @@ SQL_REGEX = {
 
         (r"`(``|[^`])*`", tokens.Name),
         (r"´(´´|[^´])*´", tokens.Name),
-        (r'\$([_A-Z]\w*)?\$', parse_literal_string),
+        (r'(\$(?:[_A-Z]\w*)?\$)[\s\S]*?\1', tokens.Literal),
 
         (r'\?', tokens.Name.Placeholder),
         (r'%(\(\w+\))?s', tokens.Name.Placeholder),
-        (r'[$:?]\w+', tokens.Name.Placeholder),
+        (r'(?<!\w)[$:?]\w+', tokens.Name.Placeholder),
 
         # FIXME(andi): VALUES shouldn't be listed here
         # see https://github.com/andialbrecht/sqlparse/pull/64
@@ -82,10 +73,11 @@ SQL_REGEX = {
          r'|(CROSS\s+|NATURAL\s+)?)?JOIN\b', tokens.Keyword),
         (r'END(\s+IF|\s+LOOP|\s+WHILE)?\b', tokens.Keyword),
         (r'NOT\s+NULL\b', tokens.Keyword),
+        (r'UNION\s+ALL\b', tokens.Keyword),
         (r'CREATE(\s+OR\s+REPLACE)?\b', tokens.Keyword.DDL),
         (r'DOUBLE\s+PRECISION\b', tokens.Name.Builtin),
 
-        (r'[_A-Z]\w*', is_keyword),
+        (r'[_A-Z][_$#\w]*', is_keyword),
 
         (r'[;:()\[\],\.]', tokens.Punctuation),
         (r'[<>=~!]+', tokens.Operator.Comparison),
@@ -175,6 +167,7 @@ KEYWORDS = {
     'COMMIT': tokens.Keyword.DML,
     'COMMITTED': tokens.Keyword,
     'COMPLETION': tokens.Keyword,
+    'CONCURRENTLY': tokens.Keyword,
     'CONDITION_NUMBER': tokens.Keyword,
     'CONNECT': tokens.Keyword,
     'CONNECTION': tokens.Keyword,
@@ -521,7 +514,7 @@ KEYWORDS = {
     'SQLWARNING': tokens.Keyword,
     'STABLE': tokens.Keyword,
     'START': tokens.Keyword.DML,
-    'STATE': tokens.Keyword,
+    # 'STATE': tokens.Keyword,
     'STATEMENT': tokens.Keyword,
     'STATIC': tokens.Keyword,
     'STATISTICS': tokens.Keyword,
@@ -696,21 +689,6 @@ KEYWORDS_COMMON = {
     'MIN': tokens.Keyword,
     'MAX': tokens.Keyword,
     'DISTINCT': tokens.Keyword,
-
-     # PostgreSQL Syntax
-    'PARTITION':    tokens.Keyword,
-    'OVER':         tokens.Keyword,
-    'PERFORM':      tokens.Keyword,
-    'NOTICE':       tokens.Keyword,
-    'PLPGSQL':      tokens.Keyword,
-    'INHERIT':      tokens.Keyword,
-    'INDEXES':      tokens.Keyword,
-
-    'FOR':          tokens.Keyword,
-    'IN':           tokens.Keyword,
-    'LOOP':         tokens.Keyword,
-
-
 }
 
 KEYWORDS_ORACLE = {
@@ -744,7 +722,8 @@ KEYWORDS_ORACLE = {
     'FREELIST': tokens.Keyword,
     'FREELISTS': tokens.Keyword,
 
-    'GROUPS': tokens.Keyword,
+    # groups seems too common as table name
+    # 'GROUPS': tokens.Keyword,
 
     'INDICATOR': tokens.Keyword,
     'INITRANS': tokens.Keyword,
