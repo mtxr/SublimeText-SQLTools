@@ -11,9 +11,9 @@ class Logger:
         if not Logger.isLogging():
             return
 
-        print ("%s (%s): %s" % (Logger.packageName,
-                                Logger.packageVersion,
-                                message))
+        print("%s (%s): %s" % (Logger.packageName,
+                               Logger.packageVersion,
+                               message))
 
     @staticmethod
     def setLogging(param):
