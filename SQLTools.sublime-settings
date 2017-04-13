@@ -15,6 +15,11 @@
     "unescape_quotes" : [
         "php"
     ],
+    /**
+     * If DB cli binary is not in PATH, set the full path in "cli" section.
+     * Note: forward slashes ("/") should be used in path. Example:
+     *  "mysql"   : "c:/Program Files/MySQL/MySQL Server 5.7/bin/mysql.exe"
+     */
     "cli" : {
         "mysql"   : "mysql",
         "pgsql"   : "psql",

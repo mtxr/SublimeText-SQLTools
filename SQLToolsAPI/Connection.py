@@ -6,8 +6,17 @@ from .Log import Log
 from . import Utils as U
 from . import Command as C
 
-
 class Connection:
+    DB_CLI_NOT_FOUND_MESSAGE = """'{0}' could not be found.
+Please set the path to '{0}' binary in your SQLTools settings before continuing.
+Example of "cli" section in SQLTools.sublime-settings:
+    /* ...  (note the use of forward slashes) */
+    "cli" : {{
+        "mysql"   : "c:/Program Files/MySQL/MySQL Server 5.7/bin/mysql.exe",
+        "pgsql"   : "c:/Program Files/PostgreSQL/9.6/bin/psql.exe"
+    }}
+You might need to restart the editor for settings to be refreshed."""
+
     timeout = None
     history = None
     settings = None
@@ -29,15 +38,6 @@ class Connection:
         self.Command = getattr(C, commandClass)
 
         self.cli = settings.get('cli')[options['type']]
-        cli_path = shutil.which(self.cli)
-
-        if cli_path is None:
-            Log((
-                "'{0}' could not be found.\n\n" +
-                "Please set the '{0}' path in your SQLTools settings " +
-                "before continue.").format(self.cli))
-            return
-
         self.settings  = settings
         self.rowsLimit = settings.get('show_records', {}).get('limit', 50)
         self.options   = options
@@ -52,6 +52,11 @@ class Connection:
         self.service   = options.get('service', None)
         self.safe_limit = settings.get('safe_limit', None)
         self.show_query = settings.get('show_query', None)
+
+        cli_path = shutil.which(self.cli)
+        if cli_path is None:
+            Log(self.DB_CLI_NOT_FOUND_MESSAGE.format(self.cli))
+            raise FileNotFoundError(self.DB_CLI_NOT_FOUND_MESSAGE.format(self.cli))
 
     def __str__(self):
         return self.name

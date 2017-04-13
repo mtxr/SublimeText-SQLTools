@@ -65,18 +65,28 @@ def getConnections():
     options = connections.get('connections', {})
 
     for name, config in options.items():
-        connectionsObj[name] = Connection(name, config, settings=settings.all())
+        connectionsObj[name] = createConnection(name, config, settings=settings.all())
 
     # project settings
     try:
         options = Window().project_data().get('connections', {})
         for name, config in options.items():
-            connectionsObj[name] = Connection(name, config, settings=settings.all())
+            connectionsObj[name] = createConnection(name, config, settings=settings.all())
     except Exception:
         pass
 
     return connectionsObj
 
+def createConnection(name, config, settings):
+    newConnection = None
+    # if DB cli binary could not be found in path a FileNotFoundError is thrown
+    try:
+        newConnection = Connection(name, config, settings=settings)
+    except FileNotFoundError as e:
+        # use only first line of the Exception in status message
+        Window().status_message( __package__ + ": " + str(e).splitlines()[0] )
+        raise e
+    return newConnection
 
 def loadDefaultConnection():
     default = settings.get('default', False)
