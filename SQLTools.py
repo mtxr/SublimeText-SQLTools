@@ -29,7 +29,11 @@ history                      = None
 
 
 def startPlugin():
-    global USER_FOLDER, DEFAULT_FOLDER, SETTINGS_FILENAME, SETTINGS_FILENAME_DEFAULT, CONNECTIONS_FILENAME, CONNECTIONS_FILENAME_DEFAULT, QUERIES_FILENAME, QUERIES_FILENAME_DEFAULT, settings, queries, connections, history
+    global USER_FOLDER, DEFAULT_FOLDER
+    global SETTINGS_FILENAME, SETTINGS_FILENAME_DEFAULT
+    global CONNECTIONS_FILENAME, CONNECTIONS_FILENAME_DEFAULT
+    global QUERIES_FILENAME, QUERIES_FILENAME_DEFAULT
+    global settings, queries, connections, history
 
     USER_FOLDER = os.path.join(sublime.packages_path(), 'User')
     DEFAULT_FOLDER = os.path.dirname(__file__)
@@ -77,6 +81,7 @@ def getConnections():
 
     return connectionsObj
 
+
 def createConnection(name, config, settings):
     newConnection = None
     # if DB cli binary could not be found in path a FileNotFoundError is thrown
@@ -84,9 +89,10 @@ def createConnection(name, config, settings):
         newConnection = Connection(name, config, settings=settings)
     except FileNotFoundError as e:
         # use only first line of the Exception in status message
-        Window().status_message( __package__ + ": " + str(e).splitlines()[0] )
+        Window().status_message(__package__ + ": " + str(e).splitlines()[0])
         raise e
     return newConnection
+
 
 def loadDefaultConnection():
     default = settings.get('default', False)

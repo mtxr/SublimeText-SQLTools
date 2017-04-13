@@ -6,6 +6,7 @@ from .Log import Log
 from . import Utils as U
 from . import Command as C
 
+
 class Connection:
     DB_CLI_NOT_FOUND_MESSAGE = """'{0}' could not be found.
 Please set the path to '{0}' binary in your SQLTools settings before continuing.
@@ -116,7 +117,7 @@ You might need to restart the editor for settings to be refreshed."""
         try:
             queryFormat = self.getOptionsForSgdbCli()['queries']['explain plan']['query']
         except KeyError:
-            return # do nothing, if DBMS has no support for explain plan
+            return  # do nothing, if DBMS has no support for explain plan
 
         stripped_queries = [
             queryFormat.format(query.strip().strip(";"))

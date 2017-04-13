@@ -11,7 +11,7 @@ class Storage:
         self.defaultFile = default
         self.items = {}
 
-        #copy entire file, to keep comments
+        # copy entire file, to keep comments
         if not os.path.isfile(filename) and default and os.path.isfile(default):
             shutil.copyfile(default, filename)
 

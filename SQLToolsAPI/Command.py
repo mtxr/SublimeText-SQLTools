@@ -17,7 +17,8 @@ class Command:
         self.encoding = encoding
         self.callback = callback
         self.options = options
-        # Don't allow empty dicts or lists as defaults in method signature, cfr http://nedbatchelder.com/blog/200806/pylint.html
+        # Don't allow empty dicts or lists as defaults in method signature,
+        # cfr http://nedbatchelder.com/blog/200806/pylint.html
         if self.options is None:
             self.options = {}
         Thread.__init__(self)
@@ -58,17 +59,17 @@ class Command:
         if 'show_query' in self.options and self.options['show_query']:
             resultInfo = "/*\n-- Executed querie(s) at {0} took {1}ms --".format(
                 str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(queryTimerStart))),
-                str(queryTimerEnd-queryTimerStart)
-                )
-            resultLine = "-"*(len(resultInfo)-3)
-            resultString = "{0}\n{1}\n{2}\n{3}\n*/\n{4}".format(resultInfo,
-                resultLine,self.query,resultLine,resultString)
+                str(queryTimerEnd - queryTimerStart))
+            resultLine = "-" * (len(resultInfo) - 3)
+            resultString = "{0}\n{1}\n{2}\n{3}\n*/\n{4}".format(
+                resultInfo, resultLine, self.query, resultLine, resultString)
 
         self.callback(resultString)
 
     @staticmethod
     def createAndRun(args, query, callback, options=None):
-        # Don't allow empty dicts or lists as defaults in method signature, cfr http://nedbatchelder.com/blog/200806/pylint.html
+        # Don't allow empty dicts or lists as defaults in method signature,
+        # cfr http://nedbatchelder.com/blog/200806/pylint.html
         if options is None:
             options = {}
         command = Command(args, callback, query, options=options)
@@ -85,7 +86,8 @@ class ThreadCommand(Command, Thread):
         self.callback = callback
         self.options = options
         self.timeout = timeout
-        # Don't allow empty dicts or lists as defaults in method signature, cfr http://nedbatchelder.com/blog/200806/pylint.html
+        # Don't allow empty dicts or lists as defaults in method signature,
+        # cfr http://nedbatchelder.com/blog/200806/pylint.html
         if self.options is None:
             self.options = {}
         Thread.__init__(self)
@@ -107,7 +109,8 @@ class ThreadCommand(Command, Thread):
 
     @staticmethod
     def createAndRun(args, query, callback, options=None, timeout=Command.timeout):
-        # Don't allow empty dicts or lists as defaults in method signature, cfr http://nedbatchelder.com/blog/200806/pylint.html
+        # Don't allow empty dicts or lists as defaults in method signature,
+        # cfr http://nedbatchelder.com/blog/200806/pylint.html
         if options is None:
             options = {}
         command = ThreadCommand(args, callback, query, options=options, timeout=timeout)
