@@ -1,5 +1,5 @@
 [
-    { "keys": ["ctrl+alt+e"], "command": "st_select_connection" },
+    { "keys": ["ctrl+super+e"], "command": "st_select_connection" },
     { "keys": ["ctrl+e", "ctrl+e"], "command": "st_execute" },
     { "keys": ["ctrl+e", "ctrl+x"], "command": "st_explain_plan" },
     { "keys": ["ctrl+e", "ctrl+h"], "command": "st_history" },
