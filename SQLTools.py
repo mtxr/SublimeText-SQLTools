@@ -95,7 +95,7 @@ def createConnection(name, config, settings):
 
 
 def loadDefaultConnection():
-    default = settings.get('default', False)
+    default = connections.get('default', False)
     if not default:
         return
     Log('Default database set to ' + default + '. Loading options and auto complete.')
