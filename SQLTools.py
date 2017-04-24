@@ -14,6 +14,7 @@ from .SQLToolsAPI.Storage import Storage, Settings
 from .SQLToolsAPI.Connection import Connection
 from .SQLToolsAPI.History import History
 
+PLAIN_TEXT_SYNTAX            = 'Packages/Text/Plain text.tmLanguage'
 USER_FOLDER                  = None
 DEFAULT_FOLDER               = None
 SETTINGS_FILENAME            = None
@@ -102,18 +103,13 @@ def loadDefaultConnection():
     return default
 
 
-def output(content, panel=None):
+def output(content, panel=None, syntax=None, prependText=None):
     if not panel:
-        panel = getOutputPlace()
+        panel = getOutputPlace(syntax)
+    if prependText:
+        panel.run_command('append', {'characters': str(prependText)})
     panel.run_command('append', {'characters': content})
     panel.set_read_only(True)
-
-
-def outputWithTableName(tableName, content, panel=None):
-    content = 'Table "{tableName}"\n{content}'.format(
-        tableName=tableName,
-        content=content)
-    output(content, panel)
 
 
 def toNewTab(content, name="", suffix="SQLTools Saved Query"):
@@ -124,7 +120,7 @@ def toNewTab(content, name="", suffix="SQLTools Saved Query"):
     resultContainer.run_command('append', {'characters': content})
 
 
-def getOutputPlace(name="SQLTools Result"):
+def getOutputPlace(syntax=None, name="SQLTools Result"):
         if not settings.get('show_result_on_window', True):
             resultContainer = Window().create_output_panel(name)
             Window().run_command("show_panel", {"panel": "output." + name})
@@ -143,7 +139,12 @@ def getOutputPlace(name="SQLTools Result"):
         resultContainer.set_scratch(True)  # avoids prompting to save
         resultContainer.settings().set("word_wrap", "false")
         resultContainer.set_read_only(False)
-        resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
+        # set custom syntax highlight, only if one was passed explicitly,
+        # otherwise use Plain Text syntax
+        if syntax:
+            resultContainer.set_syntax_file(syntax)
+        else:
+            resultContainer.set_syntax_file(PLAIN_TEXT_SYNTAX)
 
         if settings.get('clear_output', False):
             resultContainer.run_command('select_all')
@@ -338,16 +339,21 @@ class StShowRecords(WindowCommand):
             if index < 0:
                 return None
             tableName = ST.tables[index]
+            prependText = 'Table "{tableName}"\n'.format(tableName=tableName)
             return ST.conn.getTableRecords(
                 tableName,
-                partial(outputWithTableName, tableName))
+                partial(output, prependText=prependText))
 
         ST.selectTable(cb)
 
 
 class StDescTable(WindowCommand):
-    @staticmethod
-    def run():
+    def run(self):
+        view = self.window.active_view()
+        currentSyntax = None
+        if view:
+            currentSyntax = view.settings().get('syntax')
+
         if not ST.conn:
             ST.selectConnection(tablesCallback=lambda: Window().run_command('st_desc_table'))
             return
@@ -355,14 +361,18 @@ class StDescTable(WindowCommand):
         def cb(index):
             if index < 0:
                 return None
-            return ST.conn.getTableDescription(ST.tables[index], output)
+            return ST.conn.getTableDescription(ST.tables[index], partial(output, syntax=currentSyntax))
 
         ST.selectTable(cb)
 
 
 class StDescFunction(WindowCommand):
-    @staticmethod
-    def run():
+    def run(self):
+        view = self.window.active_view()
+        currentSyntax = None
+        if view:
+            currentSyntax = view.settings().get('syntax')
+
         if not ST.conn:
             ST.selectConnection(functionsCallback=lambda: Window().run_command('st_desc_function'))
             return
@@ -371,7 +381,7 @@ class StDescFunction(WindowCommand):
             if index < 0:
                 return None
             functionName = ST.functions[index].split('(', 1)[0]
-            return ST.conn.getFunctionDescription(functionName, output)
+            return ST.conn.getFunctionDescription(functionName, partial(output, syntax=currentSyntax))
 
         # get everything until first occurence of "(", e.g. get "function_name"
         # from "function_name(int)"
@@ -402,14 +412,11 @@ class StFormat(TextCommand):
     @staticmethod
     def run(edit):
         for region in View().sel():
+            # if selection region is empty, use whole file as region
             if region.empty():
                 region = sublime.Region(0, View().size())
-                selection = View().substr(region)
-                View().replace(edit, region, Utils.formatSql(selection, settings.get('format', {})))
-                View().set_syntax_file("Packages/SQL/SQL.tmLanguage")
-            else:
-                text = View().substr(region)
-                View().replace(edit, region, Utils.formatSql(text, settings.get('format', {})))
+            textToFormat = View().substr(region)
+            View().replace(edit, region, Utils.formatSql(textToFormat, settings.get('format', {})))
 
 
 class StVersion(WindowCommand):
@@ -527,7 +534,6 @@ def reload():
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Connection"])
     except Exception as e:
         raise (e)
-        pass
 
     try:
         ST.bootstrap()
