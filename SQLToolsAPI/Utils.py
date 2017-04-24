@@ -9,7 +9,7 @@ dirpath = os.path.join(os.path.dirname(__file__), 'lib')
 if dirpath not in sys.path:
     sys.path.append(dirpath)
 
-from sqlparse import format
+import sqlparse
 
 # Regular expression for comments
 comment_re = re.compile(
@@ -66,7 +66,7 @@ def getResultAsList(results):
 
 def formatSql(raw, settings):
     try:
-        result = format(raw, **settings)
+        result = sqlparse.format(raw, **settings)
 
         return result
     except Exception:

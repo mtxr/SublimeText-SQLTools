@@ -18,41 +18,46 @@ Example of "cli" section in SQLTools.sublime-settings:
     }}
 You might need to restart the editor for settings to be refreshed."""
 
-    timeout = None
-    history = None
-    settings = None
-    rowsLimit = None
-    options = None
     name = None
+    options = None
+    settings = None
     type = None
-    database = None
     host = None
     port = None
+    database = None
     username = None
-    encoding = None
     password = None
+    encoding = None
     service = None
     safe_limit = None
     show_query = None
+    rowsLimit = None
+    history = None
+    timeout = None
 
-    def __init__(self, name, options, settings={}, commandClass='ThreadCommand'):
+    def __init__(self, name, options, settings=None, commandClass='ThreadCommand'):
         self.Command = getattr(C, commandClass)
 
-        self.cli = settings.get('cli')[options['type']]
-        self.settings  = settings
-        self.rowsLimit = settings.get('show_records', {}).get('limit', 50)
-        self.options   = options
-        self.name      = name
-        self.type      = options.get('type', None)
-        self.database  = options.get('database', None)
-        self.host      = options.get('host', None)
-        self.port      = options.get('port', None)
-        self.username  = options.get('username', None)
-        self.encoding  = options.get('encoding', None)
-        self.password  = options.get('password', None)
-        self.service   = options.get('service', None)
+        self.name = name
+        self.options = options
+
+        if settings is None:
+            settings = {}
+        self.settings = settings
+
+        self.type       = options.get('type', None)
+        self.host       = options.get('host', None)
+        self.port       = options.get('port', None)
+        self.database   = options.get('database', None)
+        self.username   = options.get('username', None)
+        self.password   = options.get('password', None)
+        self.encoding   = options.get('encoding', None)
+        self.service    = options.get('service', None)
+
         self.safe_limit = settings.get('safe_limit', None)
         self.show_query = settings.get('show_query', None)
+        self.rowsLimit  = settings.get('show_records', {}).get('limit', 50)
+        self.cli        = settings.get('cli')[options['type']]
 
         cli_path = shutil.which(self.cli)
         if cli_path is None:
@@ -62,7 +67,7 @@ You might need to restart the editor for settings to be refreshed."""
     def __str__(self):
         return self.name
 
-    def _info(self):
+    def info(self):
         return 'DB: {0}, Connection: {1}@{2}:{3}'.format(
             self.database, self.username, self.host, self.port)
 

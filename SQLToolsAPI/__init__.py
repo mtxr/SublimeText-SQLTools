@@ -7,6 +7,6 @@ __all__ = [
     'Command',
     'Connection',
     'History',
-    'Settings',
     'Storage',
+    'Settings'
 ]

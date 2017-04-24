@@ -121,36 +121,36 @@ def toNewTab(content, name="", suffix="SQLTools Saved Query"):
 
 
 def getOutputPlace(syntax=None, name="SQLTools Result"):
-        if not settings.get('show_result_on_window', True):
-            resultContainer = Window().create_output_panel(name)
-            Window().run_command("show_panel", {"panel": "output." + name})
-        else:
-            resultContainer = None
-            views = Window().views()
-            for view in views:
-                if view.name() == name:
-                    resultContainer = view
-                    Window().focus_view(resultContainer)
-                    break
-            if not resultContainer:
-                resultContainer = Window().new_file()
-                resultContainer.set_name(name)
+    if not settings.get('show_result_on_window', True):
+        resultContainer = Window().create_output_panel(name)
+        Window().run_command("show_panel", {"panel": "output." + name})
+    else:
+        resultContainer = None
+        views = Window().views()
+        for view in views:
+            if view.name() == name:
+                resultContainer = view
+                Window().focus_view(resultContainer)
+                break
+        if not resultContainer:
+            resultContainer = Window().new_file()
+            resultContainer.set_name(name)
 
-        resultContainer.set_scratch(True)  # avoids prompting to save
-        resultContainer.settings().set("word_wrap", "false")
-        resultContainer.set_read_only(False)
-        # set custom syntax highlight, only if one was passed explicitly,
-        # otherwise use Plain Text syntax
-        if syntax:
-            resultContainer.set_syntax_file(syntax)
-        else:
-            resultContainer.set_syntax_file(PLAIN_TEXT_SYNTAX)
+    resultContainer.set_scratch(True)  # avoids prompting to save
+    resultContainer.settings().set("word_wrap", "false")
+    resultContainer.set_read_only(False)
+    # set custom syntax highlight, only if one was passed explicitly,
+    # otherwise use Plain Text syntax
+    if syntax:
+        resultContainer.set_syntax_file(syntax)
+    else:
+        resultContainer.set_syntax_file(PLAIN_TEXT_SYNTAX)
 
-        if settings.get('clear_output', False):
-            resultContainer.run_command('select_all')
-            resultContainer.run_command('left_delete')
+    if settings.get('clear_output', False):
+        resultContainer.run_command('select_all')
+        resultContainer.run_command('left_delete')
 
-        return resultContainer
+    return resultContainer
 
 
 def getSelection():
@@ -237,7 +237,7 @@ class ST(EventListener):
 
         menu = []
         for name, conn in ST.connectionList.items():
-            menu.append([name, conn._info()])
+            menu.append([name, conn.info()])
         menu.sort()
         Window().show_quick_panel(menu, lambda index: ST.setConnection(index, tablesCallback, columnsCallback, functionsCallback))
 

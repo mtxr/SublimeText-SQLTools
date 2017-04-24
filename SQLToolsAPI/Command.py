@@ -10,18 +10,18 @@ from .Log import Log
 class Command:
     timeout = 15
 
-    def __init__(self, args, callback, query=None, encoding='utf-8', options=None):
-        self.query = query
-        self.process = None
+    def __init__(self, args, callback, query=None, encoding='utf-8',
+                 options=None, timeout=15):
+        if options is None:
+            options = {}
+
         self.args = args
-        self.encoding = encoding
         self.callback = callback
+        self.query = query
+        self.encoding = encoding
         self.options = options
-        # Don't allow empty dicts or lists as defaults in method signature,
-        # cfr http://nedbatchelder.com/blog/200806/pylint.html
-        if self.options is None:
-            self.options = {}
-        Thread.__init__(self)
+        self.timeout = timeout
+        self.process = None
 
     def run(self):
         if not self.query:
@@ -79,17 +79,16 @@ class Command:
 class ThreadCommand(Command, Thread):
     def __init__(self, args, callback, query=None, encoding='utf-8',
                  options=None, timeout=Command.timeout):
-        self.query = query
-        self.process = None
+        if options is None:
+            options = {}
+
         self.args = args
-        self.encoding = encoding
         self.callback = callback
+        self.query = query
+        self.encoding = encoding
         self.options = options
         self.timeout = timeout
-        # Don't allow empty dicts or lists as defaults in method signature,
-        # cfr http://nedbatchelder.com/blog/200806/pylint.html
-        if self.options is None:
-            self.options = {}
+        self.process = None
         Thread.__init__(self)
 
     def stop(self):
