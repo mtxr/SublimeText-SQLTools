@@ -67,9 +67,7 @@ class Command:
         self.callback(resultString)
 
     @staticmethod
-    def createAndRun(args, query, callback, options=None):
-        # Don't allow empty dicts or lists as defaults in method signature,
-        # cfr http://nedbatchelder.com/blog/200806/pylint.html
+    def createAndRun(args, query, callback, options=None, timeout=Command.timeout):
         if options is None:
             options = {}
         command = Command(args, callback, query, options=options)
