@@ -14,7 +14,9 @@ from .SQLToolsAPI.Storage import Storage, Settings
 from .SQLToolsAPI.Connection import Connection
 from .SQLToolsAPI.History import History
 
-PLAIN_TEXT_SYNTAX            = 'Packages/Text/Plain text.tmLanguage'
+SYNTAX_PLAIN_TEXT = 'Packages/Text/Plain text.tmLanguage'
+SYNTAX_SQL = 'Packages/SQL/SQL.tmLanguage'
+
 USER_FOLDER                  = None
 DEFAULT_FOLDER               = None
 SETTINGS_FILENAME            = None
@@ -116,7 +118,7 @@ def toNewTab(content, name="", suffix="SQLTools Saved Query"):
     resultContainer = Window().new_file()
     resultContainer.set_name(
         ((name + " - ") if name != "" else "") + suffix)
-    resultContainer.set_syntax_file('Packages/SQL/SQL.tmLanguage')
+    resultContainer.set_syntax_file(SYNTAX_SQL)
     resultContainer.run_command('append', {'characters': content})
 
 
@@ -142,9 +144,13 @@ def getOutputPlace(syntax=None, name="SQLTools Result"):
     # set custom syntax highlight, only if one was passed explicitly,
     # otherwise use Plain Text syntax
     if syntax:
-        resultContainer.set_syntax_file(syntax)
+        # if custom and SQL related, use that, otherwise defaults to SQL
+        if 'sql' in syntax.lower():
+            resultContainer.set_syntax_file(syntax)
+        else:
+            resultContainer.set_syntax_file(SYNTAX_SQL)
     else:
-        resultContainer.set_syntax_file(PLAIN_TEXT_SYNTAX)
+        resultContainer.set_syntax_file(SYNTAX_PLAIN_TEXT)
 
     if settings.get('clear_output', False):
         resultContainer.run_command('select_all')

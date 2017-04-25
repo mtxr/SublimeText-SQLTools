@@ -67,10 +67,10 @@ class Command:
         self.callback(resultString)
 
     @staticmethod
-    def createAndRun(args, query, callback, options=None, timeout=Command.timeout):
+    def createAndRun(args, query, callback, options=None, timeout=15):
         if options is None:
             options = {}
-        command = Command(args, callback, query, options=options)
+        command = Command(args, callback, query, options=options, timeout=timeout)
         command.run()
 
 
