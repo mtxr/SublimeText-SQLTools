@@ -286,10 +286,10 @@ class ST(EventListener):
         sublimeCompletions = view.extract_completions(sublimePrefix, locations[0])
 
         # preferably get prefix ourselves instead of using default sublime "prefix".
-        # Sublime will return only last portion of this preceding text
-        # given: SELECT table.col|
+        # Sublime will return only last portion of this preceding text. Given:
+        # SELECT table.col|
         # sublime will return: "col", and we need: "table.col"
-        # to know more precisely which completions are more desirable in that case
+        # to know more precisely which completions are more appropriate
 
         # get a Region that starts at the beginning of current line
         # and ends at current cursor position

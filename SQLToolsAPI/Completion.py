@@ -4,21 +4,28 @@ from collections import namedtuple
 # TODO: back to local import
 from .ParseUtils import extractTables
 
-# this dict is used in prefixMatchScore to remove punctuation from strings
-removePunctuationTable = str.maketrans({key: None for key in string.punctuation})
 keywords_list = ['SELECT', 'UPDATE', 'DELETE', 'INSERT', 'INTO', 'FROM',
                  'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING', 'JOIN',
                  'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'USING',
                  'LIMIT', 'DISTINCT', 'SET']
 
 
+# this function is generously used in completions code to get rid
+# of all sorts of leading and trailing quotes in RDBMS identifiers
 def _stipQuotes(ident):
     return ident.strip('"\'`')
 
 
 class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
+    """
+    Represents a potential or actual completion item.
+      * type - Type of item e.g. (Table, Function, Column)
+      * ident - identifier e.g. ("tablename.column", "database.table", "alias")
+      * score - the lower score, the better is match for completion item
+    """
     __slots__ = ()
 
+    # parent of identifier, e.g. "table" from "table.column"
     @property
     def parent(self):
         if self.ident.count('.') == 0:
@@ -26,46 +33,26 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
         else:
             return self.ident.partition('.')[0]
 
+    # name of identifier, e.g. "column" from "table.column"
     @property
     def name(self):
         return self.ident.split('.').pop()
 
-    @property
-    def matchIdent(self):
+    # for functions - strip open bracket "(" and everything after that
+    # e.g: mydb.myAdd(int, int) --> mydb.myadd
+    def _matchIdent(self):
         if self.type == 'Function':
             return self.ident.partition('(')[0].lower()
         return self.ident.lower()
 
-    @property
-    def matchSublimeCompletion(self):
-        if self.type == 'Function':
-            return _stipQuotes(self.ident.split('.').pop().partition('(')[0])
-        return _stipQuotes(self.ident.split('.').pop())
-
-    def format(self):
-        typeLabel = ''
-        if self.type == 'Table':
-            typeLabel = self.type
-        elif self.type == 'Function':
-            typeLabel = 'Func'
-        elif self.type == 'Column':
-            typeLabel = 'Col'
-        elif self.type == 'Keyword':
-            typeLabel = self.type
-        elif self.type == 'Alias':
-            typeLabel = self.type
-        elif self.type == 'Unknown':
-            typeLabel = ''
-
-        if not typeLabel:
-            return ("{0}".format(self.ident), self.ident)
-
-        part = self.ident.split('.')
-        if len(part) > 1:
-            return ("{0}\t({1} {2})".format(part[1], part[0], typeLabel), part[1])
-        else:
-            return ("{0}\t({1})".format(part[0], typeLabel), part[0])
-
+    """
+    Helper method for string matching
+    When exactly is true:
+      matches search string to target exactly, but empty search string matches anything
+    When exactly is false:
+      if only one char given in search string match this single char with start
+      of target string, otherwise match search string anywhere in target string
+    """
     @staticmethod
     def _stringMatched(target, search_str, exactly):
         if exactly:
@@ -75,12 +62,21 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
                 return target.startswith(search_str)
             return search_str in target
 
+    """
+    Method to match completion item against search string (prefix).
+    Lower score means a better match.
+    If completion item matches prefix with parent identifier, e.g.:
+        table_name.column ~ table_name.co, then score = 1
+    If completion item matches prefix without parent identifier, e.g.:
+        table_name.column ~ co, then score = 2
+    If completion item matches, but prefix has no parent, e.g.:
+        table ~ tab, then score = 3
+    """
     def prefixMatchScore(self, search_str, exactly=False):
-        # matching parent object (before '.') exactly and
-        # matching object (after '.') as fuzzy
-        target = self.matchIdent
+        target = self._matchIdent()
         search_str = search_str.lower()
 
+        # match parent exactly and partially match name
         if '.' in target and '.' in search_str:
             search_list = search_str.split('.')
             search_object = _stipQuotes(search_list.pop())
@@ -88,26 +84,46 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
             target_list = target.split('.')
             target_object = _stipQuotes(target_list.pop())
             target_parent = _stipQuotes(target_list.pop())
-            # highest score if
-            # prefix matches exactly and object is partially matches
             if search_parent == target_parent and self._stringMatched(target_object, search_object, exactly):
-                return 1
+                return 1   # highest score
 
+        # second part matches ?
         if '.' in target:
             target_object_noquote = _stipQuotes(target.split('.').pop())
             search_noquote = _stipQuotes(search_str)
-            # second part matches ?
             if self._stringMatched(target_object_noquote, search_noquote, exactly):
                 return 2
         else:
             target_noquote = _stipQuotes(target)
             search_noquote = _stipQuotes(search_str)
-
             if self._stringMatched(target_noquote, search_noquote, exactly):
                 return 3
             else:
                 return 0
         return 0
+
+    # format completion item according to sublime text completions format
+    def format(self):
+        typeDisplay = ''
+        if self.type == 'Table':
+            typeDisplay = self.type
+        elif self.type == 'Keyword':
+            typeDisplay = self.type
+        elif self.type == 'Alias':
+            typeDisplay = self.type
+        elif self.type == 'Function':
+            typeDisplay = 'Func'
+        elif self.type == 'Column':
+            typeDisplay = 'Col'
+
+        if not typeDisplay:
+            return (self.ident, self.ident)
+
+        part = self.ident.split('.')
+        if len(part) > 1:
+            return ("{0}\t({1} {2})".format(part[1], part[0], typeDisplay), part[1])
+
+        return ("{0}\t({1})".format(self.ident, typeDisplay), self.ident)
 
 
 class Completion:
@@ -127,7 +143,7 @@ class Completion:
 
     def getAutoCompleteList(self, prefix, sublimeCompletions, sql):
         """
-        Since it's too complicated to handle the specifics of identifiers case sensivity
+        Since it's too complicated to handle the specifics of identifiers case sensitivity
         as well as all nuances of quoting of those identifiers for each RDBMS, we always
         match against lower-cased and stripped quotes of both prefix and our internal saved
         identifiers (tables, columns, functions). E.g. "MyTable"."myCol" --> mytable.mycol
@@ -164,7 +180,7 @@ class Completion:
         # output columns related to current statement, then
         # search for columns, tables, functions with prefix
 
-        # use set, as we are interested only in unique idetifiers
+        # use set, as we are interested only in unique identifiers
         sql_aliases = set()
         sql_tables = set()
         sql_columns = set()
@@ -186,6 +202,7 @@ class Completion:
 
         autocompleteList = []
 
+        # first of all list aliases and identifiers related to currently parsed statement
         for item in sql_aliases:
             score = item.prefixMatchScore(prefix)
             if score and item.ident != prefix:
@@ -206,16 +223,13 @@ class Completion:
             if score:
                 autocompleteList.append(CompletionItem(item.type, item.ident, score))
 
+        # add keywords to auto-complete results
         for item in self.allKeywords:
             score = item.prefixMatchScore(prefix)
             if score:
                 autocompleteList.append(CompletionItem(item.type, item.ident, score))
 
-        # if len(autocompleteList) > 0:
-        #     print("thats it: " + str(autocompleteList))
-        #     return autocompleteList, True
-
-        # #############################################
+        # add the rest of the columns, tables and functions that also match the prefix
         for item in self.allColumns:
             score = item.prefixMatchScore(prefix)
             if score:
@@ -244,7 +258,7 @@ class Completion:
         sql_table_aliases = set()
         sql_query_aliases = set()
 
-        # we use set, as we are interested only in unique idetifiers
+        # we use set, as we are interested only in unique identifiers
         for ident in identifiers:
             if ident.has_alias() and ident.alias == prefix_ref:
                 if ident.is_query_alias:
@@ -284,13 +298,8 @@ class Completion:
 
         return autocompleteList, inhibit
 
+    # match only columns if prefix contains multiple dots (db.table.col)
     def _multiDotCompletions(self, prefix, sublimeCompletions, identifiers):
-        # prefix_list = prefix.split(".")
-        # prefix_obj = _stipQuotes(prefix_list.pop())
-        # prefix_ref = _stipQuotes(prefix_list.pop())
-        # prefix = prefix_ref + '.' + prefix_obj
-        print("match columns only, new prefix: " + prefix)
-
         autocompleteList = []
         for item in self.allColumns:
             score = item.prefixMatchScore(prefix)
@@ -301,12 +310,3 @@ class Completion:
             return autocompleteList, True
 
         return None, False
-
-# itm = CompletionItem('Function', 'common.testing()');
-# print(str(itm))
-# print(str(itm.parent))
-# print(str(itm.name))
-# print(str(itm.matchIdent))
-# print(str(itm.matchSublimeCompletion))
-# print(str(itm.prefixMatchScore('common.test')))
-# print(str(itm.format()))
