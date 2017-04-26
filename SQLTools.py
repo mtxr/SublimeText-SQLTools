@@ -278,11 +278,19 @@ class ST(EventListener):
         if not selectorMatched:
             return None
 
+        # no completions inside strings
+        if view.match_selector(locations[0], 'string'):
+            return None
+
         sublimePrefix = prefix
         sublimeCompletions = view.extract_completions(sublimePrefix, locations[0])
 
-        print("prefix ST: " + str(sublimePrefix))
-        # don't use default sublime "prefix", get one ourselves
+        # preferably get prefix ourselves instead of using default sublime "prefix".
+        # Sublime will return only last portion of this preceding text
+        # given: SELECT table.col|
+        # sublime will return: "col", and we need: "table.col"
+        # to know more precisely which completions are more desirable in that case
+
         # get a Region that starts at the beginning of current line
         # and ends at current cursor position
         currentPoint = locations[0]
@@ -291,14 +299,16 @@ class ST(EventListener):
         try:
             lineStr = view.substr(lineStartToLocation)
             prefix = re.split('[^\w.]+', lineStr).pop()
-            print("prefix my: " + str(prefix))
         except Exception as e:
             Log(e)
             pass
 
+        sql = view.substr(view.extract_scope(locations[0]))
+        print("new sql: " + sql)
+        # use current paragraph as sql text to parse
         sql = view.substr(expand_to_paragraph(view, locations[0]))
 
-        # keywords should be upper case?
+        # determine desired keywords case from settings
         formatSettings = settings.get('format', {})
         keywordCase = formatSettings.get('keyword_case', 'upper')
         uppercaseKeywords = (keywordCase.lower() == 'upper')
@@ -309,10 +319,7 @@ class ST(EventListener):
         if ST.autoCompleteList is None:
             return None
 
-        print("FINAL: " + str(ST.autoCompleteList))
-
         if inhibit:
-            print("sublime.INHIBIT_WORD_COMPLETIONS")
             return (ST.autoCompleteList, sublime.INHIBIT_WORD_COMPLETIONS)
 
         return ST.autoCompleteList

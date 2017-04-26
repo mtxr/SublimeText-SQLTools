@@ -126,12 +126,23 @@ class Completion:
             self.allKeywords.append(CompletionItem('Keyword', keyword, 0))
 
     def getAutoCompleteList(self, prefix, sublimeCompletions, sql):
+        """
+        Since it's too complicated to handle the specifics of identifiers case sensivity
+        as well as all nuances of quoting of those identifiers for each RDBMS, we always
+        match against lower-cased and stripped quotes of both prefix and our internal saved
+        identifiers (tables, columns, functions). E.g. "MyTable"."myCol" --> mytable.mycol
+        """
+
         # TODO: add completions of function out fields
         prefix = prefix.lower()
         prefix_dots = prefix.count('.')
 
-        identifiers = extractTables(sql)
-        print("identifiers: " + str(identifiers))
+        # continue with empty identifiers list, even if we failed to parse identifiers
+        identifiers = []
+        try:
+            identifiers = extractTables(sql)
+        except Exception as e:
+            print(e)
 
         autocompleteList = []
         inhibit = False
