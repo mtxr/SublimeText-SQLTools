@@ -143,7 +143,7 @@
             "args": "-h{host} -P{port} -u\"{username}\" -p\"{password}\" -D\"{database}\"",
             "queries": {
                 "desc" : {
-                    "query": "show tables",
+                    "query": "select concat(table_schema, '.', table_name) from information_schema.tables where table_schema = database();",
                     "options": ["-f", "--table", "--skip-column-names"],
                     "format" : "|%s|"
                 },
@@ -158,8 +158,8 @@
                     "format" : "|%s|"
                 },
                 "columns": {
-                    "query": "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = DATABASE();",
-                    "options": ["-f", "--table"],
+                    "query": "select concat(table_name, '.', column_name) from information_schema.columns where table_schema = database();",
+                    "options": ["-f", "--table", "--skip-column-names"],
                     "format" : "|%s|"
                 },
                 "explain plan": {
