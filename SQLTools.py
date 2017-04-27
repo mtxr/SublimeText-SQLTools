@@ -282,8 +282,8 @@ class ST(EventListener):
         if view.match_selector(locations[0], 'string'):
             return None
 
-        sublimePrefix = prefix
-        sublimeCompletions = view.extract_completions(sublimePrefix, locations[0])
+        # sublimePrefix = prefix
+        # sublimeCompletions = view.extract_completions(sublimePrefix, locations[0])
 
         # preferably get prefix ourselves instead of using default sublime "prefix".
         # Sublime will return only last portion of this preceding text. Given:
@@ -303,8 +303,6 @@ class ST(EventListener):
             Log(e)
             pass
 
-        sql = view.substr(view.extract_scope(locations[0]))
-        print("new sql: " + sql)
         # use current paragraph as sql text to parse
         sql = view.substr(expand_to_paragraph(view, locations[0]))
 
@@ -314,9 +312,11 @@ class ST(EventListener):
         uppercaseKeywords = (keywordCase.lower() == 'upper')
 
         completion = Completion(uppercaseKeywords, ST.tables, ST.columns, ST.functions)
-        ST.autoCompleteList, inhibit = completion.getAutoCompleteList(prefix, sublimeCompletions, sql)
+        ST.autoCompleteList, inhibit = completion.getAutoCompleteList(prefix, sql)
 
-        if ST.autoCompleteList is None:
+        # safe check here, so even if we return empty completions and inhibit is true
+        # we return empty completions to show default sublime completions
+        if ST.autoCompleteList is None or len(ST.autoCompleteList) == 0:
             return None
 
         if inhibit:

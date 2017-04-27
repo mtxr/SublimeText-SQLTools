@@ -1,7 +1,6 @@
 import string
 from collections import namedtuple
 
-# TODO: back to local import
 from .ParseUtils import extractTables
 
 keywords_list = ['SELECT', 'UPDATE', 'DELETE', 'INSERT', 'INTO', 'FROM',
@@ -54,13 +53,13 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
       of target string, otherwise match search string anywhere in target string
     """
     @staticmethod
-    def _stringMatched(target, search_str, exactly):
+    def _stringMatched(target, search, exactly):
         if exactly:
-            return target == search_str or search_str == ''
+            return target == search or search == ''
         else:
-            if (len(search_str) == 1):
-                return target.startswith(search_str)
-            return search_str in target
+            if (len(search) == 1):
+                return target.startswith(search)
+            return search in target
 
     """
     Method to match completion item against search string (prefix).
@@ -72,31 +71,32 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
     If completion item matches, but prefix has no parent, e.g.:
         table ~ tab, then score = 3
     """
-    def prefixMatchScore(self, search_str, exactly=False):
+    def prefixMatchScore(self, search, exactly=False):
         target = self._matchIdent()
-        search_str = search_str.lower()
+        search = search.lower()
 
         # match parent exactly and partially match name
-        if '.' in target and '.' in search_str:
-            search_list = search_str.split('.')
-            search_object = _stipQuotes(search_list.pop())
-            search_parent = _stipQuotes(search_list.pop())
-            target_list = target.split('.')
-            target_object = _stipQuotes(target_list.pop())
-            target_parent = _stipQuotes(target_list.pop())
-            if search_parent == target_parent and self._stringMatched(target_object, search_object, exactly):
+        if '.' in target and '.' in search:
+            searchList = search.split('.')
+            searchObject = _stipQuotes(searchList.pop())
+            searchParent = _stipQuotes(searchList.pop())
+            targetList = target.split('.')
+            targetObject = _stipQuotes(targetList.pop())
+            targetParent = _stipQuotes(targetList.pop())
+            if (searchParent == targetParent and
+                    self._stringMatched(targetObject, searchObject, exactly)):
                 return 1   # highest score
 
         # second part matches ?
         if '.' in target:
-            target_object_noquote = _stipQuotes(target.split('.').pop())
-            search_noquote = _stipQuotes(search_str)
-            if self._stringMatched(target_object_noquote, search_noquote, exactly):
+            targetObjectNoQuote = _stipQuotes(target.split('.').pop())
+            searchNoQuote = _stipQuotes(search)
+            if self._stringMatched(targetObjectNoQuote, searchNoQuote, exactly):
                 return 2
         else:
-            target_noquote = _stipQuotes(target)
-            search_noquote = _stipQuotes(search_str)
-            if self._stringMatched(target_noquote, search_noquote, exactly):
+            targetNoQuote = _stipQuotes(target)
+            searchNoQuote = _stipQuotes(search)
+            if self._stringMatched(targetNoQuote, searchNoQuote, exactly):
                 return 3
             else:
                 return 0
@@ -141,7 +141,7 @@ class Completion:
 
             self.allKeywords.append(CompletionItem('Keyword', keyword, 0))
 
-    def getAutoCompleteList(self, prefix, sublimeCompletions, sql):
+    def getAutoCompleteList(self, prefix, sql):
         """
         Since it's too complicated to handle the specifics of identifiers case sensitivity
         as well as all nuances of quoting of those identifiers for each RDBMS, we always
@@ -151,7 +151,7 @@ class Completion:
 
         # TODO: add completions of function out fields
         prefix = prefix.lower()
-        prefix_dots = prefix.count('.')
+        prefixDots = prefix.count('.')
 
         # continue with empty identifiers list, even if we failed to parse identifiers
         identifiers = []
@@ -162,12 +162,12 @@ class Completion:
 
         autocompleteList = []
         inhibit = False
-        if prefix_dots == 0:
-            autocompleteList, inhibit = self._noDotsCompletions(prefix, sublimeCompletions, identifiers)
-        elif prefix_dots == 1:
-            autocompleteList, inhibit = self._singleDotCompletions(prefix, sublimeCompletions, identifiers)
+        if prefixDots == 0:
+            autocompleteList, inhibit = self._noDotsCompletions(prefix, identifiers)
+        elif prefixDots == 1:
+            autocompleteList, inhibit = self._singleDotCompletions(prefix, identifiers)
         else:
-            autocompleteList, inhibit = self._multiDotCompletions(prefix, sublimeCompletions, identifiers)
+            autocompleteList, inhibit = self._multiDotCompletions(prefix, identifiers)
 
         if autocompleteList is not None and len(autocompleteList) > 0:
             autocompleteList = [item.format() for item in autocompleteList]
@@ -175,50 +175,68 @@ class Completion:
 
         return None, False
 
-    def _noDotsCompletions(self, prefix, sublimeCompletions, identifiers):
-        # output aliases first, then
-        # output columns related to current statement, then
-        # search for columns, tables, functions with prefix
+    def _noDotsCompletions(self, prefix, identifiers):
+        """
+        Method handles most generic completions when prefix does not contain any dots.
+        In this case completions can be anything: cols, tables, functions that have this name.
+        Still we try to predict users needs and output aliases, tables, columns and function
+        that are used in currently parsed statement first, then show everything else that
+        could be related.
+        Order: statement aliases -> statement cols -> statement tables -> statement functions,
+        then:  other cols -> other tables -> other functions that match the prefix in their names
+        """
 
         # use set, as we are interested only in unique identifiers
-        sql_aliases = set()
-        sql_tables = set()
-        sql_columns = set()
-        sql_functions = set()
+        sqlAliases = set()
+        sqlTables = set()
+        sqlColumns = set()
+        sqlFunctions = set()
 
         for ident in identifiers:
             if ident.has_alias():
-                    sql_aliases.add(CompletionItem('Alias', ident.alias, 0))
+                    sqlAliases.add(CompletionItem('Alias', ident.alias, 0))
 
             if ident.is_function:
-                functions = [fun for fun in self.allFunctions if fun.prefixMatchScore(ident.full_name, exactly=True) > 0]
-                sql_functions.update(functions)
+                functions = [
+                    fun
+                    for fun in self.allFunctions
+                    if fun.prefixMatchScore(ident.full_name, exactly=True) > 0
+                ]
+                sqlFunctions.update(functions)
             else:
-                tables = [table for table in self.allTables if table.prefixMatchScore(ident.full_name, exactly=True) > 0]
-                sql_tables.update(tables)
-                prefix_for_column_match = ident.name + '.'
-                columns = [col for col in self.allColumns if col.prefixMatchScore(prefix_for_column_match, exactly=True) > 0]
-                sql_columns.update(columns)
+                tables = [
+                    table
+                    for table in self.allTables
+                    if table.prefixMatchScore(ident.full_name, exactly=True) > 0
+                ]
+                sqlTables.update(tables)
+                prefixForColumnMatch = ident.name + '.'
+                columns = [
+                    col
+                    for col in self.allColumns
+                    if col.prefixMatchScore(prefixForColumnMatch, exactly=True) > 0
+                ]
+                sqlColumns.update(columns)
 
         autocompleteList = []
 
         # first of all list aliases and identifiers related to currently parsed statement
-        for item in sql_aliases:
+        for item in sqlAliases:
             score = item.prefixMatchScore(prefix)
             if score and item.ident != prefix:
                 autocompleteList.append(CompletionItem(item.type, item.ident, score))
 
-        for item in sql_columns:
+        for item in sqlColumns:
             score = item.prefixMatchScore(prefix)
             if score:
                 autocompleteList.append(CompletionItem(item.type, item.ident, score))
 
-        for item in sql_tables:
+        for item in sqlTables:
             score = item.prefixMatchScore(prefix)
             if score:
                 autocompleteList.append(CompletionItem(item.type, item.ident, score))
 
-        for item in sql_functions:
+        for item in sqlFunctions:
             score = item.prefixMatchScore(prefix)
             if score:
                 autocompleteList.append(CompletionItem(item.type, item.ident, score))
@@ -233,50 +251,61 @@ class Completion:
         for item in self.allColumns:
             score = item.prefixMatchScore(prefix)
             if score:
-                if item not in sql_columns:
+                if item not in sqlColumns:
                     autocompleteList.append(CompletionItem(item.type, item.ident, score))
 
         for item in self.allTables:
             score = item.prefixMatchScore(prefix)
             if score:
-                if item not in sql_tables:
+                if item not in sqlTables:
                     autocompleteList.append(CompletionItem(item.type, item.ident, score))
 
         for item in self.allFunctions:
             score = item.prefixMatchScore(prefix)
             if score:
-                if item not in sql_functions:
+                if item not in sqlFunctions:
                     autocompleteList.append(CompletionItem(item.type, item.ident, score))
 
         return autocompleteList, False
 
-    def _singleDotCompletions(self, prefix, sublimeCompletions, identifiers):
-        prefix_list = prefix.split(".")
-        prefix_obj = prefix_list.pop()
-        prefix_ref = prefix_list.pop()
+    def _singleDotCompletions(self, prefix, identifiers):
+        """
+        More inteligent completions can be shown if we have single dot in prefix in certain cases.
+        """
+        prefixList = prefix.split(".")
+        prefixObject = prefixList.pop()
+        prefixParent = prefixList.pop()
 
-        sql_table_aliases = set()
-        sql_query_aliases = set()
+        sqlTableAliases = set()  # set of CompletionItem
+        sqlQueryAliases = set()  # set of strings
 
         # we use set, as we are interested only in unique identifiers
         for ident in identifiers:
-            if ident.has_alias() and ident.alias == prefix_ref:
+            if ident.has_alias() and ident.alias == prefixParent:
                 if ident.is_query_alias:
-                    sql_query_aliases.add(ident.alias)
+                    sqlQueryAliases.add(ident.alias)
 
                 if ident.is_table_alias:
-                    tables = [(ident.alias, table) for table in self.allTables if table.prefixMatchScore(ident.full_name, exactly=True) > 0]
-                    sql_table_aliases.update(tables)
+                    tables = [
+                        (ident.alias, table)
+                        for table in self.allTables
+                        if table.prefixMatchScore(ident.full_name, exactly=True) > 0
+                    ]
+                    sqlTableAliases.update(tables)
 
         autocompleteList = []
 
-        for alias, table_item in sql_table_aliases:
-            prefix_to_match = table_item.name + '.' + prefix_obj
+        # first of all expand table aliases to real table names and try
+        # to match their columns with prefix of these expanded identifiers
+        # e.g. select x.co| from tab x   //  "x.co" will expland to "tab.co"
+        for alias, table_item in sqlTableAliases:
+            prefix_to_match = table_item.name + '.' + prefixObject
             for item in self.allColumns:
                 score = item.prefixMatchScore(prefix_to_match)
                 if score:
                     autocompleteList.append(CompletionItem(item.type, item.ident, score))
 
+        # try to match all our other objects (tables, columns, functions) with prefix
         for item in self.allColumns:
             score = item.prefixMatchScore(prefix)
             if score:
@@ -292,14 +321,16 @@ class Completion:
             if score:
                 autocompleteList.append(CompletionItem(item.type, item.ident, score))
 
-        inhibit = True
-        if prefix_ref in sql_query_aliases:
+        inhibit = len(autocompleteList) > 0
+        # in case prefix parent is a query alias we simply don't know what those
+        # columns might be so, set inhibit = False to allow sublime default completions
+        if prefixParent in sqlQueryAliases:
             inhibit = False
 
         return autocompleteList, inhibit
 
     # match only columns if prefix contains multiple dots (db.table.col)
-    def _multiDotCompletions(self, prefix, sublimeCompletions, identifiers):
+    def _multiDotCompletions(self, prefix, identifiers):
         autocompleteList = []
         for item in self.allColumns:
             score = item.prefixMatchScore(prefix)
