@@ -56,11 +56,11 @@ def saveJson(content, filename):
 def getResultAsList(results):
     resultList = []
     for result in results.splitlines():
-        try:
-            resultList.append(result.split('|')[1].strip())
-        except IndexError:
-            pass
-
+        lineResult = ''
+        for element in result.strip('|').split('|'):
+            lineResult += element.strip()
+        if lineResult:
+            resultList.append(lineResult)
     return resultList
 
 
