@@ -278,6 +278,14 @@ class ST(EventListener):
         if not selectorMatched:
             return None
 
+        # completions enabled? if yes, determine which type
+        completionType = settings.get('autocompletion', 'smart')
+        if not completionType:
+            return None         # autocompletion disabled
+        completionType = str(completionType).strip()
+        if completionType not in ['basic', 'smart']:
+            completionType = 'smart'
+
         # no completions inside strings
         if view.match_selector(locations[0], 'string'):
             return None
@@ -303,16 +311,23 @@ class ST(EventListener):
             Log(e)
             pass
 
-        # use current paragraph as sql text to parse
-        sql = view.substr(expand_to_paragraph(view, locations[0]))
-
         # determine desired keywords case from settings
         formatSettings = settings.get('format', {})
         keywordCase = formatSettings.get('keyword_case', 'upper')
         uppercaseKeywords = (keywordCase.lower() == 'upper')
 
+        inhibit = False
         completion = Completion(uppercaseKeywords, ST.tables, ST.columns, ST.functions)
-        ST.autoCompleteList, inhibit = completion.getAutoCompleteList(prefix, sql)
+
+        if completionType == 'basic':
+            ST.autoCompleteList = completion.getBasicAutoCompleteList(prefix)
+        else:
+            # use current paragraph as sql text to parse
+            sqlRegion = expand_to_paragraph(view, currentPoint)
+            sql = view.substr(sqlRegion)
+            sqlToCursorRegion = sublime.Region(sqlRegion.begin(), currentPoint)
+            sqlToCursor = view.substr(sqlToCursorRegion)
+            ST.autoCompleteList, inhibit = completion.getAutoCompleteList(prefix, sql, sqlToCursor)
 
         # safe check here, so even if we return empty completions and inhibit is true
         # we return empty completions to show default sublime completions

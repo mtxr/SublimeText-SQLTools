@@ -1,18 +1,30 @@
 import string
+import re
 from collections import namedtuple
 
 from .ParseUtils import extractTables
 
-keywords_list = ['SELECT', 'UPDATE', 'DELETE', 'INSERT', 'INTO', 'FROM',
-                 'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING', 'JOIN',
-                 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'USING',
-                 'LIMIT', 'DISTINCT', 'SET']
+_join_cond_regex_pattern = r"\s+?JOIN\s+?[\w\.`\"]+\s+?(?:AS\s+)?(\w+)\s+?ON\s+?(?:[\w\.]+)?$"
+JOIN_COND_REGEX = re.compile(_join_cond_regex_pattern, re.IGNORECASE)
+
+keywords_list = [
+    'SELECT', 'UPDATE', 'DELETE', 'INSERT', 'INTO', 'FROM',
+    'WHERE', 'GROUP BY', 'ORDER BY', 'HAVING', 'JOIN',
+    'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'USING',
+    'LIMIT', 'DISTINCT', 'SET'
+]
 
 
 # this function is generously used in completions code to get rid
 # of all sorts of leading and trailing quotes in RDBMS identifiers
 def _stipQuotes(ident):
     return ident.strip('"\'`')
+
+
+def _stripPrefix(text, prefix):
+    if text.startswith(prefix):
+        return text[len(prefix):]
+    return text  # or whatever
 
 
 class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
@@ -141,7 +153,33 @@ class Completion:
 
             self.allKeywords.append(CompletionItem('Keyword', keyword, 0))
 
-    def getAutoCompleteList(self, prefix, sql):
+    def getBasicAutoCompleteList(self, prefix):
+        prefix = prefix.lower()
+        autocompleteList = []
+
+        # columns, tables and functions that match the prefix
+        for item in self.allColumns:
+            score = item.prefixMatchScore(prefix)
+            if score:
+                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+
+        for item in self.allTables:
+            score = item.prefixMatchScore(prefix)
+            if score:
+                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+
+        for item in self.allFunctions:
+            score = item.prefixMatchScore(prefix)
+            if score:
+                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+
+        if len(autocompleteList) == 0:
+            return None
+
+        autocompleteList = [item.format() for item in autocompleteList]
+        return autocompleteList
+
+    def getAutoCompleteList(self, prefix, sql, sqlToCursor):
         """
         Since it's too complicated to handle the specifics of identifiers case sensitivity
         as well as all nuances of quoting of those identifiers for each RDBMS, we always
@@ -160,22 +198,32 @@ class Completion:
         except Exception as e:
             print(e)
 
+        joinAlias = None
+        if prefixDots <= 1:
+            try:
+                joinCondMatch = JOIN_COND_REGEX.search(sqlToCursor, re.IGNORECASE)
+                if joinCondMatch:
+                    joinAlias = joinCondMatch.group(1)
+            except Exception as e:
+                print(e)
+                pass
+
         autocompleteList = []
         inhibit = False
         if prefixDots == 0:
-            autocompleteList, inhibit = self._noDotsCompletions(prefix, identifiers)
+            autocompleteList, inhibit = self._noDotsCompletions(prefix, identifiers, joinAlias)
         elif prefixDots == 1:
-            autocompleteList, inhibit = self._singleDotCompletions(prefix, identifiers)
+            autocompleteList, inhibit = self._singleDotCompletions(prefix, identifiers, joinAlias)
         else:
             autocompleteList, inhibit = self._multiDotCompletions(prefix, identifiers)
 
-        if autocompleteList is not None and len(autocompleteList) > 0:
-            autocompleteList = [item.format() for item in autocompleteList]
-            return autocompleteList, inhibit
+        if not autocompleteList:
+            return None, False
 
-        return None, False
+        autocompleteList = [item.format() for item in autocompleteList]
+        return autocompleteList, inhibit
 
-    def _noDotsCompletions(self, prefix, identifiers):
+    def _noDotsCompletions(self, prefix, identifiers, joinAlias=None):
         """
         Method handles most generic completions when prefix does not contain any dots.
         In this case completions can be anything: cols, tables, functions that have this name.
@@ -185,6 +233,10 @@ class Completion:
         Order: statement aliases -> statement cols -> statement tables -> statement functions,
         then:  other cols -> other tables -> other functions that match the prefix in their names
         """
+        # get join conditions
+        joinConditions = []
+        if joinAlias:
+            joinConditions = self._joinConditionCompletions(identifiers, joinAlias)
 
         # use set, as we are interested only in unique identifiers
         sqlAliases = set()
@@ -219,6 +271,10 @@ class Completion:
                 sqlColumns.update(columns)
 
         autocompleteList = []
+
+        for condition in joinConditions:
+            if condition.ident.lower().startswith(prefix):
+                autocompleteList.append(CompletionItem(condition.type, condition.ident, 1))
 
         # first of all list aliases and identifiers related to currently parsed statement
         for item in sqlAliases:
@@ -268,13 +324,18 @@ class Completion:
 
         return autocompleteList, False
 
-    def _singleDotCompletions(self, prefix, identifiers):
+    def _singleDotCompletions(self, prefix, identifiers, joinAlias=None):
         """
         More inteligent completions can be shown if we have single dot in prefix in certain cases.
         """
         prefixList = prefix.split(".")
         prefixObject = prefixList.pop()
         prefixParent = prefixList.pop()
+
+        # get join conditions
+        joinConditions = []
+        if joinAlias:
+            joinConditions = self._joinConditionCompletions(identifiers, joinAlias)
 
         sqlTableAliases = set()  # set of CompletionItem
         sqlQueryAliases = set()  # set of strings
@@ -294,6 +355,12 @@ class Completion:
                     sqlTableAliases.update(tables)
 
         autocompleteList = []
+
+        for condition in joinConditions:
+            aliasPrefix = prefixParent + '.'
+            if condition.ident.lower().startswith(aliasPrefix):
+                autocompleteList.append(CompletionItem(condition.type,
+                                                       _stripPrefix(condition.ident, aliasPrefix), 1))
 
         # first of all expand table aliases to real table names and try
         # to match their columns with prefix of these expanded identifiers
@@ -341,3 +408,55 @@ class Completion:
             return autocompleteList, True
 
         return None, False
+
+    def _joinConditionCompletions(self, identifiers, joinAlias=None):
+        if not joinAlias:
+            return None
+
+        # use set, as we are interested only in unique identifiers
+        sqlTableAliases = set()
+        joinAliasColumns = set()
+        sqlOtherColumns = set()
+
+        for ident in identifiers:
+            if ident.has_alias() and not ident.is_function:
+                sqlTableAliases.add(CompletionItem('Alias', ident.alias, 0))
+
+                prefixForColumnMatch = ident.name + '.'
+                columns = [
+                    (ident.alias, col)
+                    for col in self.allColumns
+                    if (col.prefixMatchScore(prefixForColumnMatch, exactly=True) > 0 and
+                        _stipQuotes(col.name).lower().endswith('id'))
+                ]
+
+                if ident.alias == joinAlias:
+                    joinAliasColumns.update(columns)
+                else:
+                    sqlOtherColumns.update(columns)
+
+        joinCandidatesCompletions = []
+        for joinAlias, joinColumn in joinAliasColumns:
+            # str.endswith can be matched against a tuple
+            columnsToMatch = None
+            if _stipQuotes(joinColumn.name).lower() == 'id':
+                columnsToMatch = (
+                    _stipQuotes(joinColumn.parent).lower() + _stipQuotes(joinColumn.name).lower(),
+                    _stipQuotes(joinColumn.parent).lower() + '_' + _stipQuotes(joinColumn.name).lower()
+                )
+            else:
+                columnsToMatch = (
+                    _stipQuotes(joinColumn.name).lower(),
+                    _stipQuotes(joinColumn.parent).lower() + _stipQuotes(joinColumn.name).lower(),
+                    _stipQuotes(joinColumn.parent).lower() + '_' + _stipQuotes(joinColumn.name).lower()
+                )
+
+            for otherAlias, otherColumn in sqlOtherColumns:
+                if _stipQuotes(otherColumn.name).lower().endswith(columnsToMatch):
+                    sideA = joinAlias + '.' + joinColumn.name
+                    sideB = otherAlias + '.' + otherColumn.name
+
+                    joinCandidatesCompletions.append(CompletionItem('Condition', sideA + ' = ' + sideB, 0))
+                    joinCandidatesCompletions.append(CompletionItem('Condition', sideB + ' = ' + sideA, 0))
+
+        return joinCandidatesCompletions

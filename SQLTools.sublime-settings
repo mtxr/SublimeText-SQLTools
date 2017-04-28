@@ -12,6 +12,7 @@
      * An empty list means autocompletion always active.
      */
     "selectors": ["source.sql", "source.pgsql", "source.plpgsql.postgres", "source.plsql.oracle", "source.tsql"],
+    "autocompletion": "smart",  /* possible values: "basic", "smart" or false (disable) */
     "unescape_quotes" : [
         "php"
     ],
@@ -159,6 +160,11 @@
                 },
                 "columns": {
                     "query": "select concat(table_name, '.', column_name) from information_schema.columns where table_schema = database();",
+                    "options": ["-f", "--table", "--skip-column-names"],
+                    "format" : "|%s|"
+                },
+                "functions": {
+                    "query": "select concat(routine_schema, '.', routine_name) from information_schema.routines where routine_schema = database();",
                     "options": ["-f", "--table", "--skip-column-names"],
                     "format" : "|%s|"
                 },
