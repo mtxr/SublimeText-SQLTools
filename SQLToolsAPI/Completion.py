@@ -181,6 +181,22 @@ class Completion:
 
     def getAutoCompleteList(self, prefix, sql, sqlToCursor):
         """
+        Generally, we recognize 3 different variations in prefix:
+          * ident|           // no dots (.) in prefix
+            In this case we show completions for all available identifiers (tables, columns,
+            functions) that have "ident" text in them. Identifiers relevant to current
+            statement shown first.
+          * parent.ident|   // single dot in prefix
+            In this case, if "parent" matches on of parsed table aliases we show column
+            completions for them, as well as we do prefix search for all other identifiers.
+            If something is matched, we return results as well as set a flag to suppress
+            Sublime completions.
+            If we don't find any objects using prefix search or we know that "parent" is
+            a query alias, we don't return anything and allow Sublime to do it's job by
+            showing most relevant completions.
+          * database.table.col|   // multiple dots in prefix
+            In this case we only show columns for "table" column, as there is nothing else
+            that could be referenced that way.
         Since it's too complicated to handle the specifics of identifiers case sensitivity
         as well as all nuances of quoting of those identifiers for each RDBMS, we always
         match against lower-cased and stripped quotes of both prefix and our internal saved
@@ -198,6 +214,8 @@ class Completion:
         except Exception as e:
             print(e)
 
+        # joinAlias is set only if user is editing join condition with alias. E.g.
+        # SELECT a.* from tbl_a a inner join tbl_b b ON |
         joinAlias = None
         if prefixDots <= 1:
             try:
@@ -326,7 +344,7 @@ class Completion:
 
     def _singleDotCompletions(self, prefix, identifiers, joinAlias=None):
         """
-        More inteligent completions can be shown if we have single dot in prefix in certain cases.
+        More intelligent completions can be shown if we have single dot in prefix in certain cases.
         """
         prefixList = prefix.split(".")
         prefixObject = prefixList.pop()
