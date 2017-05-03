@@ -12,6 +12,7 @@
      * An empty list means autocompletion always active.
      */
     "selectors": ["source.sql", "source.pgsql", "source.plpgsql.postgres", "source.plsql.oracle", "source.tsql"],
+    "autocompletion": "smart",  /* possible values: "basic", "smart" or false (disable) */
     "unescape_quotes" : [
         "php"
     ],
@@ -54,8 +55,8 @@
             "args": "-h {host} -p {port} -U {username} -d {database}",
             "queries": {
                 "desc" : {
-                    "query": "SELECT  '|' || CASE WHEN n.nspname = current_schema() THEN quote_ident(c.relname) ELSE quote_ident(n.nspname)||'.'||quote_ident(c.relname) END ||'|' AS tblname FROM pg_catalog.pg_class AS c INNER JOIN pg_catalog.pg_namespace AS n ON n.oid = c.relnamespace WHERE relkind = 'r' AND n.nspname NOT IN ('pg_catalog', 'pg_toast', 'information_schema') ORDER BY n.nspname = current_schema() DESC, pg_catalog.pg_table_is_visible(c.oid) DESC, n.nspname, c.relname",
-                    "options": ["-t", "--no-psqlrc"],
+                    "query": "select '|' || quote_ident(table_schema)||'.'||quote_ident(table_name) ||'|' as tblname from information_schema.tables where table_schema = any(current_schemas(false)) and table_schema not in ('pg_catalog', 'information_schema') order by table_schema = current_schema() desc, table_schema, table_name",
+                    "options": ["--tuples-only", "--no-psqlrc"],
                     "format" : "|%s|"
                 },
                 "desc table": {
@@ -69,13 +70,13 @@
                     "format" : "|%s|"
                 },
                 "columns": {
-                    "query": "SELECT DISTINCT '|' || quote_ident(table_name) || '.' || quote_ident(column_name) || '|' FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() GROUP BY table_name, column_name;",
-                    "options": ["-t", "--no-psqlrc"],
+                    "query": "select '|' || quote_ident(table_name) || '.' || quote_ident(column_name) || '|' from information_schema.columns where table_schema = any(current_schemas(false)) and table_schema not in ('pg_catalog', 'information_schema') order by table_name, ordinal_position",
+                    "options": ["--tuples-only", "--no-psqlrc"],
                     "format" : "|%s|"
                 },
                 "functions": {
-                    "query": "SELECT '|' || CASE WHEN n.nspname = current_schema() THEN quote_ident(f.proname) ELSE quote_ident(n.nspname)||'.'||quote_ident(f.proname) END || '(' || pg_get_function_identity_arguments(f.oid) || ')' || '|' AS funname FROM pg_catalog.pg_proc AS f INNER JOIN pg_catalog.pg_namespace AS n ON n.oid = f.pronamespace WHERE proisagg = false AND n.nspname NOT IN ('pg_catalog', 'information_schema')",
-                    "options": ["-t", "--no-psqlrc"],
+                    "query": "select '|' || quote_ident(n.nspname)||'.'||quote_ident(f.proname) || '(' || pg_get_function_identity_arguments(f.oid) || ')' || '|' as funname from pg_catalog.pg_proc as f inner join pg_catalog.pg_namespace as n on n.oid = f.pronamespace where f.proisagg = false and n.nspname = any(current_schemas(false)) and n.nspname not in ('pg_catalog', 'information_schema')",
+                    "options": ["--tuples-only", "--no-psqlrc"],
                     "format" : "|%s|"
                 },
                 "desc function": {
@@ -116,7 +117,12 @@
             "args": "{username}/{password}@\"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVICE_NAME={service})))\"",
             "queries": {
                 "desc" : {
-                    "query": "select CONCAT(CONCAT('| ', table_name), ' |') as tables from user_tables;",
+                    "query": "select concat(concat(concat(concat('|', owner), '.'), table_name), '|') as tbls from all_tables where owner = sys_context('USERENV', 'CURRENT_SCHEMA');",
+                    "options": ["-S"],
+                    "format" : "|%s|"
+                },
+                "columns": {
+                    "query": "select concat(concat(concat(concat('|', c.table_name), '.'), c.column_name), '|') as cols from all_tab_columns c inner join all_tables t ON c.owner = t.owner and c.table_name = t.table_name where c.owner = sys_context('USERENV', 'CURRENT_SCHEMA');",
                     "options": ["-S"],
                     "format" : "|%s|"
                 },
@@ -143,7 +149,7 @@
             "args": "-h{host} -P{port} -u\"{username}\" -p\"{password}\" -D\"{database}\"",
             "queries": {
                 "desc" : {
-                    "query": "show tables",
+                    "query": "select concat(table_schema, '.', table_name) from information_schema.tables where table_schema = database() order by table_name;",
                     "options": ["-f", "--table", "--skip-column-names"],
                     "format" : "|%s|"
                 },
@@ -158,8 +164,13 @@
                     "format" : "|%s|"
                 },
                 "columns": {
-                    "query": "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = DATABASE();",
-                    "options": ["-f", "--table"],
+                    "query": "select concat(table_name, '.', column_name) from information_schema.columns where table_schema = database() order by table_name, ordinal_position;",
+                    "options": ["-f", "--table", "--skip-column-names"],
+                    "format" : "|%s|"
+                },
+                "functions": {
+                    "query": "select concat(routine_schema, '.', routine_name) from information_schema.routines where routine_schema = database();",
+                    "options": ["-f", "--table", "--skip-column-names"],
                     "format" : "|%s|"
                 },
                 "explain plan": {
@@ -175,8 +186,13 @@
             "args": "-h {host} -p {port} -U \"{username}\" -w \"{password}\" -d \"{database}\"",
             "queries": {
                 "desc" : {
-                    "query": "\\dt",
-                    "options": ["-t"],
+                    "query": "select '|' || table_schema || '.' || table_name || '|' as tblname from v_catalog.tables where is_system_table = false",
+                    "options": ["--tuples-only", "--no-vsqlrc"],
+                    "format" : "|%s|"
+                },
+                "columns": {
+                    "query": "select '|' || table_name || '.' || column_name || '|' as tblname from v_catalog.columns where is_system_table = false order by table_name, ordinal_position",
+                    "options": ["--tuples-only", "--no-vsqlrc"],
                     "format" : "|%s|"
                 },
                 "desc table": {
@@ -202,7 +218,13 @@
             "args": "-S {host}:{port} -U\"{username}\" -P\"{password}\" -D{database}",
             "queries": {
                 "desc": {
-                    "query": "select table_name from information_schema.tables order by 1;",
+                    "query": "select concat(table_schema, '.', table_name) from information_schema.tables order by table_name;",
+                    "before" :["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""],
+                    "options": [],
+                    "format": "|%s|"
+                },
+                "columns": {
+                    "query": "select concat(table_name, '.', column_name) from information_schema.columns order by table_name, ordinal_position;",
                     "before" :["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""],
                     "options": [],
                     "format": "|%s|"

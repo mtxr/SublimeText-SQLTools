@@ -2,6 +2,7 @@ __version__ = "v0.8.1"
 
 import sys
 import os
+import re
 from functools import partial
 
 import sublime
@@ -13,6 +14,7 @@ from .SQLToolsAPI.Log import Log, Logger
 from .SQLToolsAPI.Storage import Storage, Settings
 from .SQLToolsAPI.Connection import Connection
 from .SQLToolsAPI.History import History
+from .SQLToolsAPI.Completion import Completion
 
 SYNTAX_PLAIN_TEXT = 'Packages/Text/Plain text.tmLanguage'
 SYNTAX_SQL = 'Packages/SQL/SQL.tmLanguage'
@@ -265,56 +267,85 @@ class ST(EventListener):
 
     @staticmethod
     def on_query_completions(view, prefix, locations):
-        completions = view.extract_completions(prefix)
+        # skip completions, if no connection
+        if ST.conn is None:
+            return None
 
-        if prefix == "":
-            currentPoint = locations[0]
-            lineStartPoint = view.line(currentPoint).begin()
-            lineStartToLocation = sublime.Region(lineStartPoint, currentPoint)
-            try:
-                # everything after last space is a prefix
-                prefix = view.substr(lineStartToLocation).split(" ").pop()
-            except Exception:
-                pass
+        if not len(locations):
+            return None
 
         selectors = settings.get('selectors', [])
-        if not selectors:
-            return completions + ST.getAutoCompleteList(prefix)
-        for selector in selectors:
-            if view.match_selector(locations[0], selector):
-                return completions + ST.getAutoCompleteList(prefix)
-        return None
+        selectorMatched = False
+        if selectors:
+            for selector in selectors:
+                if view.match_selector(locations[0], selector):
+                    selectorMatched = True
+                    break
 
-    @staticmethod
-    def getAutoCompleteList(word):
-        ST.autoCompleteList = []
-        for w in ST.tables:
-            try:
-                if word.lower() in w.lower():
-                    ST.autoCompleteList.append(
-                        ("{0}\t({1})".format(w, 'Table'), w))
-            except UnicodeDecodeError:
-                continue
+        if not selectorMatched:
+            return None
 
-        for w in ST.columns:
-            try:
-                if word.lower() in w.lower():
-                    w = w.split(".")
-                    ST.autoCompleteList.append(("{0}\t({1})".format(
-                        w[1], w[0] + ' Col'), w[1]))
-            except Exception:
-                continue
+        # completions enabled? if yes, determine which type
+        completionType = settings.get('autocompletion', 'smart')
+        if not completionType:
+            return None         # autocompletion disabled
+        completionType = str(completionType).strip()
+        if completionType not in ['basic', 'smart']:
+            completionType = 'smart'
 
-        for w in ST.functions:
-            try:
-                if word.lower() in w.lower():
-                    ST.autoCompleteList.append(
-                        ("{0}\t({1})".format(w, 'Func'), w))
-            except Exception:
-                continue
+        # no completions inside strings
+        if view.match_selector(locations[0], 'string'):
+            return None
 
-        ST.autoCompleteList.sort()
-        return (ST.autoCompleteList)
+        # sublimePrefix = prefix
+        # sublimeCompletions = view.extract_completions(sublimePrefix, locations[0])
+
+        # preferably get prefix ourselves instead of using default sublime "prefix".
+        # Sublime will return only last portion of this preceding text. Given:
+        # SELECT table.col|
+        # sublime will return: "col", and we need: "table.col"
+        # to know more precisely which completions are more appropriate
+
+        # get a Region that starts at the beginning of current line
+        # and ends at current cursor position
+        currentPoint = locations[0]
+        lineStartPoint = view.line(currentPoint).begin()
+        lineStartToLocation = sublime.Region(lineStartPoint, currentPoint)
+        try:
+            lineStr = view.substr(lineStartToLocation)
+            prefix = re.split('[^\w.]+', lineStr).pop()
+        except Exception as e:
+            Log(e)
+            pass
+
+        # determine desired keywords case from settings
+        formatSettings = settings.get('format', {})
+        keywordCase = formatSettings.get('keyword_case', 'upper')
+        uppercaseKeywords = (keywordCase.lower() == 'upper')
+
+        inhibit = False
+        completion = Completion(uppercaseKeywords, ST.tables, ST.columns, ST.functions)
+
+        if completionType == 'basic':
+            ST.autoCompleteList = completion.getBasicAutoCompleteList(prefix)
+        else:
+            # use current paragraph as sql text to parse
+            sqlRegion = expand_to_paragraph(view, currentPoint)
+            sql = view.substr(sqlRegion)
+            sqlToCursorRegion = sublime.Region(sqlRegion.begin(), currentPoint)
+            sqlToCursor = view.substr(sqlToCursorRegion)
+            ST.autoCompleteList, inhibit = completion.getAutoCompleteList(prefix, sql, sqlToCursor)
+
+        # safe check here, so even if we return empty completions and inhibit is true
+        # we return empty completions to show default sublime completions
+        if ST.autoCompleteList is None or len(ST.autoCompleteList) == 0:
+            return None
+
+        if inhibit:
+            return (ST.autoCompleteList, sublime.INHIBIT_WORD_COMPLETIONS)
+
+        return ST.autoCompleteList
+
 
 # #
 # # Commands
@@ -533,6 +564,7 @@ def reload():
         import imp
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI"])
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Utils"])
+        imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Completion"])
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Storage"])
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.History"])
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Log"])
