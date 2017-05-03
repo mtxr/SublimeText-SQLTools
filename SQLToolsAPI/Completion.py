@@ -1,4 +1,3 @@
-import string
 import re
 from collections import namedtuple
 
@@ -56,14 +55,12 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
             return self.ident.partition('(')[0].lower()
         return self.ident.lower()
 
-    """
-    Helper method for string matching
-    When exactly is true:
-      matches search string to target exactly, but empty search string matches anything
-    When exactly is false:
-      if only one char given in search string match this single char with start
-      of target string, otherwise match search string anywhere in target string
-    """
+    # Helper method for string matching
+    # When exactly is true:
+    #   matches search string to target exactly, but empty search string matches anything
+    # When exactly is false:
+    #   if only one char given in search string match this single char with start
+    #   of target string, otherwise match search string anywhere in target string
     @staticmethod
     def _stringMatched(target, search, exactly):
         if exactly:
@@ -73,16 +70,14 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
                 return target.startswith(search)
             return search in target
 
-    """
-    Method to match completion item against search string (prefix).
-    Lower score means a better match.
-    If completion item matches prefix with parent identifier, e.g.:
-        table_name.column ~ table_name.co, then score = 1
-    If completion item matches prefix without parent identifier, e.g.:
-        table_name.column ~ co, then score = 2
-    If completion item matches, but prefix has no parent, e.g.:
-        table ~ tab, then score = 3
-    """
+    # Method to match completion item against search string (prefix).
+    # Lower score means a better match.
+    # If completion item matches prefix with parent identifier, e.g.:
+    #     table_name.column ~ table_name.co, then score = 1
+    # If completion item matches prefix without parent identifier, e.g.:
+    #     table_name.column ~ co, then score = 2
+    # If completion item matches, but prefix has no parent, e.g.:
+    #     table ~ tab, then score = 3
     def prefixMatchScore(self, search, exactly=False):
         target = self._matchIdent()
         search = search.lower()
@@ -224,7 +219,6 @@ class Completion:
                     joinAlias = joinCondMatch.group(1)
             except Exception as e:
                 print(e)
-                pass
 
         autocompleteList = []
         inhibit = False
@@ -264,7 +258,7 @@ class Completion:
 
         for ident in identifiers:
             if ident.has_alias():
-                    sqlAliases.add(CompletionItem('Alias', ident.alias, 0))
+                sqlAliases.add(CompletionItem('Alias', ident.alias, 0))
 
             if ident.is_function:
                 functions = [
@@ -366,7 +360,7 @@ class Completion:
 
                 if ident.is_table_alias:
                     tables = [
-                        (ident.alias, table)
+                        table
                         for table in self.allTables
                         if table.prefixMatchScore(ident.full_name, exactly=True) > 0
                     ]
@@ -383,7 +377,7 @@ class Completion:
         # first of all expand table aliases to real table names and try
         # to match their columns with prefix of these expanded identifiers
         # e.g. select x.co| from tab x   //  "x.co" will expland to "tab.co"
-        for alias, table_item in sqlTableAliases:
+        for table_item in sqlTableAliases:
             prefix_to_match = table_item.name + '.' + prefixObject
             for item in self.allColumns:
                 score = item.prefixMatchScore(prefix_to_match)
