@@ -59,17 +59,18 @@
   },
   {
     "caption": "ST: Setup Connections",
-    "command": "open_file",
-    "args": {"file": "${packages}/User/SQLToolsConnections.sublime-settings"}
+    "command": "edit_settings", "args":
+    {
+      "base_file": "${packages}/SQLTools/SQLToolsConnections.sublime-settings",
+      "default": "// List all your connections to DBs here\n{\n\t\"connections\": {\n\t\t$0\n\t},\n\t\"default\": null\n}"
+    }
   },
   {
-    "command": "open_file",
-    "args": {"file": "${packages}/SQLTools/SQLTools.sublime-settings"},
-    "caption": "ST: Settings – Default"
-  },
-  {
-    "command": "open_file",
-    "args": {"file": "${packages}/User/SQLTools.sublime-settings"},
-    "caption": "ST: Settings – User"
+    "caption": "ST: Settings",
+    "command": "edit_settings", "args":
+    {
+      "base_file": "${packages}/SQLTools/SQLTools.sublime-settings",
+      "default": "// Settings in here override those in \"SQLTools/SQLTools.sublime-settings\"\n{\n\t$0\n}\n"
+    }
   }
 ]

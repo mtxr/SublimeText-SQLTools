@@ -16,71 +16,29 @@
                         "children":
                         [
                             {
-                                "command": "open_file",
-                                "args": {"file": "${packages}/User/SQLToolsConnections.sublime-settings"},
-                                "caption": "Connections – User"
-                            },
-                            {"caption": "-", "id":"separator"},
-                            {
-                                "command": "open_file",
-                                "args": {"file": "${packages}/SQLTools/SQLTools.sublime-settings"},
-                                "caption": "Settings – Default"
+                                "caption": "Connections",
+                                "command": "edit_settings", "args":
+                                {
+                                    "base_file": "${packages}/SQLTools/SQLToolsConnections.sublime-settings",
+                                    "default": "// List all your connections to DBs here\n{\n\t\"connections\": {\n\t\t$0\n\t},\n\t\"default\": null\n}"
+                                }
                             },
                             {
-                                "command": "open_file",
-                                "args": {"file": "${packages}/User/SQLTools.sublime-settings"},
-                                "caption": "Settings – User"
-                            },
-                            {"caption": "-", "id":"separator"},
-                            {
-                                "command": "open_file",
-                                "args": {
-                                    "file": "${packages}/SQLTools/Default (Windows).sublime-keymap",
-                                    "platform": "Windows"
-                                },
-                                "caption": "Key Bindings – Default"
+                                "caption": "Settings",
+                                "command": "edit_settings", "args":
+                                {
+                                    "base_file": "${packages}/SQLTools/SQLTools.sublime-settings",
+                                    "default": "// Settings in here override those in \"SQLTools/SQLTools.sublime-settings\"\n{\n\t$0\n}\n"
+                                }
                             },
                             {
-                                "command": "open_file",
-                                "args": {
-                                    "file": "${packages}/SQLTools/Default (OSX).sublime-keymap",
-                                    "platform": "OSX"
-                                },
-                                "caption": "Key Bindings – Default"
-                            },
-                            {
-                                "command": "open_file",
-                                "args": {
-                                    "file": "${packages}/SQLTools/Default (Linux).sublime-keymap",
-                                    "platform": "Linux"
-                                },
-                                "caption": "Key Bindings – Default"
-                            },
-                            {
-                                "command": "open_file",
-                                "args": {
-                                    "file": "${packages}/User/Default (Windows).sublime-keymap",
-                                    "platform": "Windows"
-                                },
-                                "caption": "Key Bindings – User"
-                            },
-                            {
-                                "command": "open_file",
-                                "args": {
-                                    "file": "${packages}/User/Default (OSX).sublime-keymap",
-                                    "platform": "OSX"
-                                },
-                                "caption": "Key Bindings – User"
-                            },
-                            {
-                                "command": "open_file",
-                                "args": {
-                                    "file": "${packages}/User/Default (Linux).sublime-keymap",
-                                    "platform": "Linux"
-                                },
-                                "caption": "Key Bindings – User"
-                            },
-                            { "caption": "-" }
+                                "caption": "Key Bindings",
+                                "command": "edit_settings", "args":
+                                {
+                                    "base_file": "${packages}/SQLTools/Default ($platform).sublime-keymap",
+                                    "default": "[\n\t$0\n]\n"
+                                }
+                            }
                         ]
                     }
                 ]
