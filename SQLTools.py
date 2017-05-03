@@ -18,6 +18,9 @@ from .SQLToolsAPI.Completion import Completion
 
 SYNTAX_PLAIN_TEXT = 'Packages/Text/Plain text.tmLanguage'
 SYNTAX_SQL = 'Packages/SQL/SQL.tmLanguage'
+SQLTOOLS_SETTINGS_FILE = 'SQLTools.sublime-settings'
+SQLTOOLS_CONNECTIONS_FILE = 'SQLToolsConnections.sublime-settings'
+SQLTOOLS_QUERIES_FILE = 'SQLToolsSavedQueries.sublime-settings'
 
 USER_FOLDER                  = None
 DEFAULT_FOLDER               = None
@@ -43,12 +46,12 @@ def startPlugin():
     USER_FOLDER = os.path.join(sublime.packages_path(), 'User')
     DEFAULT_FOLDER = os.path.dirname(__file__)
 
-    SETTINGS_FILENAME            = os.path.join(USER_FOLDER, "SQLTools.sublime-settings")
-    SETTINGS_FILENAME_DEFAULT    = os.path.join(DEFAULT_FOLDER, "SQLTools.sublime-settings")
-    CONNECTIONS_FILENAME         = os.path.join(USER_FOLDER, "SQLToolsConnections.sublime-settings")
-    CONNECTIONS_FILENAME_DEFAULT = os.path.join(DEFAULT_FOLDER, "SQLToolsConnections.sublime-settings")
-    QUERIES_FILENAME             = os.path.join(USER_FOLDER, "SQLToolsSavedQueries.sublime-settings")
-    QUERIES_FILENAME_DEFAULT     = os.path.join(DEFAULT_FOLDER, "SQLToolsSavedQueries.sublime-settings")
+    SETTINGS_FILENAME            = os.path.join(USER_FOLDER, SQLTOOLS_SETTINGS_FILE)
+    SETTINGS_FILENAME_DEFAULT    = os.path.join(DEFAULT_FOLDER, SQLTOOLS_SETTINGS_FILE)
+    CONNECTIONS_FILENAME         = os.path.join(USER_FOLDER, SQLTOOLS_CONNECTIONS_FILE)
+    CONNECTIONS_FILENAME_DEFAULT = os.path.join(DEFAULT_FOLDER, SQLTOOLS_CONNECTIONS_FILE)
+    QUERIES_FILENAME             = os.path.join(USER_FOLDER, SQLTOOLS_QUERIES_FILE)
+    QUERIES_FILENAME_DEFAULT     = os.path.join(DEFAULT_FOLDER, SQLTOOLS_QUERIES_FILE)
 
     settings    = Settings(SETTINGS_FILENAME, default=SETTINGS_FILENAME_DEFAULT)
     queries     = Storage(QUERIES_FILENAME, default=QUERIES_FILENAME_DEFAULT)
@@ -580,6 +583,13 @@ def reload():
 
 
 def plugin_loaded():
+    # this ensures we have empty settings file in 'User' directory during first start
+    # otherwise sublime will copy entire contents of 'SQLTools.sublime-settings'
+    # which is not desirable and prevents future changes to queries and other
+    # sensible defaults defined in settings file, as those would be overriden by content
+    # from older versions of SQLTools in 'User\SQLTools.sublime-settings'
+    sublime.save_settings(SQLTOOLS_SETTINGS_FILE)
+
     try:
         from package_control import events
 

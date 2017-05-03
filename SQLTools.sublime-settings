@@ -1,6 +1,9 @@
+// NOTE: it is strongly advised to override
+// only those settings that you wish to change
+// in your Users/SQLTools.sublime-settings
 {
     "debug"                 : true,
-    "thread_timeout"        : 15,
+    "thread_timeout"        : 15,     // query timeout in seconds
     "history_size"          : 100,
     "show_result_on_window" : false,
     "clear_output"          : false,
@@ -8,14 +11,15 @@
     "show_query"            : false,
     "expand_to_paragraph"   : false,
     /**
-     * The list of syntax selector for which the plugin autocompletion will be active.
+     * The list of syntax selectors for which the plugin autocompletion will be active.
      * An empty list means autocompletion always active.
      */
     "selectors": ["source.sql", "source.pgsql", "source.plpgsql.postgres", "source.plsql.oracle", "source.tsql"],
-    "autocompletion": "smart",  /* possible values: "basic", "smart" or false (disable) */
-    "unescape_quotes" : [
-        "php"
-    ],
+    /**
+     * Possible values for autocompletion: "basic", "smart" or false (disable)
+     * Completion keywords case is controlled by format.keyword_case (see below)
+     */
+    "autocompletion": "smart",
     /**
      * If DB cli binary is not in PATH, set the full path in "cli" section.
      * Note: forward slashes ("/") should be used in path. Example:
@@ -41,8 +45,11 @@
         "indent_width"    : 4,
         "reindent"        : true
     },
+    "unescape_quotes" : [
+        "php"
+    ],
     /**
-     * Client options for you SGBD.
+     * Client options for you RDBMS.
      * In this file, the section cli has the names you can use here. Eg: "pgsql": "psql"
      * So here, you must have "psql with the same sections listed bellow (options, before, args and queries)"
      *
