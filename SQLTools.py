@@ -35,6 +35,8 @@ queries                      = None
 connections                  = None
 history                      = None
 
+def getSublimeUserFolder():
+    return os.path.join(sublime.packages_path(), 'User')
 
 def startPlugin():
     global USER_FOLDER, DEFAULT_FOLDER
@@ -43,7 +45,7 @@ def startPlugin():
     global QUERIES_FILENAME, QUERIES_FILENAME_DEFAULT
     global settings, queries, connections, history
 
-    USER_FOLDER = os.path.join(sublime.packages_path(), 'User')
+    USER_FOLDER = getSublimeUserFolder()
     DEFAULT_FOLDER = os.path.dirname(__file__)
 
     SETTINGS_FILENAME            = os.path.join(USER_FOLDER, SQLTOOLS_SETTINGS_FILE)
@@ -588,7 +590,10 @@ def plugin_loaded():
     # which is not desirable and prevents future changes to queries and other
     # sensible defaults defined in settings file, as those would be overriden by content
     # from older versions of SQLTools in 'User\SQLTools.sublime-settings'
-    sublime.save_settings(SQLTOOLS_SETTINGS_FILE)
+    sublimeUserFolder = getSublimeUserFolder()
+    userSettingFile = os.path.join(sublimeUserFolder, SQLTOOLS_SETTINGS_FILE)
+    if not os.path.isfile(userSettingFile):
+        sublime.save_settings(SQLTOOLS_SETTINGS_FILE)
 
     try:
         from package_control import events
