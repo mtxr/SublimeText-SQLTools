@@ -593,6 +593,7 @@ def plugin_loaded():
     sublimeUserFolder = getSublimeUserFolder()
     userSettingFile = os.path.join(sublimeUserFolder, SQLTOOLS_SETTINGS_FILE)
     if not os.path.isfile(userSettingFile):
+        # create empty settings file in 'User' folder
         sublime.save_settings(SQLTOOLS_SETTINGS_FILE)
 
     try:
