@@ -26,6 +26,7 @@ def _stripQuotesOnDemand(ident, doStrip=True):
     return ident
 
 def _startsWithQuote(ident):
+    # str.startswith can be matched against a tuple
     quotes = ('`', '"')
     return ident.startswith(quotes)
 

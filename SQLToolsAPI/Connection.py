@@ -213,7 +213,6 @@ You might need to restart the editor for settings to be refreshed."""
         try:
             formattedArg = argument.format(**formatOptions)
         except (KeyError, IndexError):
-            print("caught exception")
             return None
 
         if argument == formattedArg:  # string not changed after format
