@@ -16,6 +16,7 @@ from .SQLToolsAPI.Connection import Connection
 from .SQLToolsAPI.History import History
 from .SQLToolsAPI.Completion import Completion
 
+MESSAGE_RUNNING_CMD = 'Executing SQL command...'
 SYNTAX_PLAIN_TEXT = 'Packages/Text/Plain text.tmLanguage'
 SYNTAX_SQL = 'Packages/SQL/SQL.tmLanguage'
 SQLTOOLS_SETTINGS_FILE = 'SQLTools.sublime-settings'
@@ -115,6 +116,8 @@ def loadDefaultConnection():
 
 
 def output(content, panel=None, syntax=None, prependText=None):
+    # hide previously set command running message (if any)
+    Window().status_message('')
     if not panel:
         panel = getOutputPlace(syntax)
     if prependText:
@@ -389,6 +392,7 @@ class StShowRecords(WindowCommand):
         def cb(index):
             if index < 0:
                 return None
+            Window().status_message(MESSAGE_RUNNING_CMD)
             tableName = ST.tables[index]
             prependText = 'Table "{tableName}"\n'.format(tableName=tableName)
             return ST.conn.getTableRecords(
@@ -409,6 +413,7 @@ class StDescTable(WindowCommand):
         def cb(index):
             if index < 0:
                 return None
+            Window().status_message(MESSAGE_RUNNING_CMD)
             return ST.conn.getTableDescription(ST.tables[index], partial(output, syntax=currentSyntax))
 
         ST.selectTable(cb)
@@ -425,6 +430,7 @@ class StDescFunction(WindowCommand):
         def cb(index):
             if index < 0:
                 return None
+            Window().status_message(MESSAGE_RUNNING_CMD)
             functionName = ST.functions[index].split('(', 1)[0]
             return ST.conn.getFunctionDescription(functionName, partial(output, syntax=currentSyntax))
 
@@ -440,6 +446,7 @@ class StExplainPlan(WindowCommand):
             ST.selectConnection(tablesCallback=lambda: Window().run_command('st_explain_plan'))
             return
 
+        Window().status_message(MESSAGE_RUNNING_CMD)
         ST.conn.explainPlan(getSelection(), output)
 
 
@@ -447,9 +454,10 @@ class StExecute(WindowCommand):
     @staticmethod
     def run():
         if not ST.conn:
-            ST.selectConnection(tablesCallback=lambda: ST.conn.execute(getSelection(), output))
+            ST.selectConnection(tablesCallback=lambda: Window().run_command('st_execute'))
             return
 
+        Window().status_message(MESSAGE_RUNNING_CMD)
         ST.conn.execute(getSelection(), output)
 
 
