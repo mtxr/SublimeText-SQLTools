@@ -16,9 +16,18 @@ keywords_list = [
 
 # this function is generously used in completions code to get rid
 # of all sorts of leading and trailing quotes in RDBMS identifiers
-def _stipQuotes(ident):
+def _stripQuotes(ident):
     return ident.strip('"\'`')
 
+# used for formatting output
+def _stripQuotesOnDemand(ident, doStrip=True):
+    if doStrip:
+        return ident.strip('"\'`')
+    return ident
+
+def _startsWithQuote(ident):
+    quotes = ('`', '"')
+    return ident.startswith(quotes)
 
 def _stripPrefix(text, prefix):
     if text.startswith(prefix):
@@ -85,24 +94,24 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
         # match parent exactly and partially match name
         if '.' in target and '.' in search:
             searchList = search.split('.')
-            searchObject = _stipQuotes(searchList.pop())
-            searchParent = _stipQuotes(searchList.pop())
+            searchObject = _stripQuotes(searchList.pop())
+            searchParent = _stripQuotes(searchList.pop())
             targetList = target.split('.')
-            targetObject = _stipQuotes(targetList.pop())
-            targetParent = _stipQuotes(targetList.pop())
+            targetObject = _stripQuotes(targetList.pop())
+            targetParent = _stripQuotes(targetList.pop())
             if (searchParent == targetParent and
                     self._stringMatched(targetObject, searchObject, exactly)):
                 return 1   # highest score
 
         # second part matches ?
         if '.' in target:
-            targetObjectNoQuote = _stipQuotes(target.split('.').pop())
-            searchNoQuote = _stipQuotes(search)
+            targetObjectNoQuote = _stripQuotes(target.split('.').pop())
+            searchNoQuote = _stripQuotes(search)
             if self._stringMatched(targetObjectNoQuote, searchNoQuote, exactly):
                 return 2
         else:
-            targetNoQuote = _stipQuotes(target)
-            searchNoQuote = _stipQuotes(search)
+            targetNoQuote = _stripQuotes(target)
+            searchNoQuote = _stripQuotes(search)
             if self._stringMatched(targetNoQuote, searchNoQuote, exactly):
                 return 3
             else:
@@ -110,7 +119,7 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
         return 0
 
     # format completion item according to sublime text completions format
-    def format(self):
+    def format(self, stripQuotes=False):
         typeDisplay = ''
         if self.type == 'Table':
             typeDisplay = self.type
@@ -124,13 +133,15 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
             typeDisplay = 'Col'
 
         if not typeDisplay:
-            return (self.ident, self.ident)
+            return (self.ident, _stripQuotesOnDemand(self.ident, stripQuotes))
 
         part = self.ident.split('.')
         if len(part) > 1:
-            return ("{0}\t({1} {2})".format(part[1], part[0], typeDisplay), part[1])
+            return ("{0}\t({1} {2})".format(part[1], part[0], typeDisplay),
+                    _stripQuotesOnDemand(part[1], stripQuotes))
 
-        return ("{0}\t({1})".format(self.ident, typeDisplay), self.ident)
+        return ("{0}\t({1})".format(self.ident, typeDisplay),
+                _stripQuotesOnDemand(self.ident, stripQuotes))
 
 
 class Completion:
@@ -171,7 +182,10 @@ class Completion:
         if len(autocompleteList) == 0:
             return None
 
-        autocompleteList = [item.format() for item in autocompleteList]
+        # return completions with or without quotes?
+        # determined based on ident after last dot
+        startsWithQuote = _startsWithQuote(prefix.split(".").pop())
+        autocompleteList = [item.format(startsWithQuote) for item in autocompleteList]
         return autocompleteList
 
     def getAutoCompleteList(self, prefix, sql, sqlToCursor):
@@ -232,7 +246,12 @@ class Completion:
         if not autocompleteList:
             return None, False
 
-        autocompleteList = [item.format() for item in autocompleteList]
+        # return completions with or without quotes?
+        # determined based on ident after last dot
+        startsWithQuote = _startsWithQuote(prefix.split(".").pop())
+        print("checking: " + prefix.split(".").pop())
+        print("starts with quote: " + str(startsWithQuote))
+        autocompleteList = [item.format(startsWithQuote) for item in autocompleteList]
         return autocompleteList, inhibit
 
     def _noDotsCompletions(self, prefix, identifiers, joinAlias=None):
@@ -439,7 +458,7 @@ class Completion:
                     (ident.alias, col)
                     for col in self.allColumns
                     if (col.prefixMatchScore(prefixForColumnMatch, exactly=True) > 0 and
-                        _stipQuotes(col.name).lower().endswith('id'))
+                        _stripQuotes(col.name).lower().endswith('id'))
                 ]
 
                 if ident.alias == joinAlias:
@@ -451,20 +470,20 @@ class Completion:
         for joinAlias, joinColumn in joinAliasColumns:
             # str.endswith can be matched against a tuple
             columnsToMatch = None
-            if _stipQuotes(joinColumn.name).lower() == 'id':
+            if _stripQuotes(joinColumn.name).lower() == 'id':
                 columnsToMatch = (
-                    _stipQuotes(joinColumn.parent).lower() + _stipQuotes(joinColumn.name).lower(),
-                    _stipQuotes(joinColumn.parent).lower() + '_' + _stipQuotes(joinColumn.name).lower()
+                    _stripQuotes(joinColumn.parent).lower() + _stripQuotes(joinColumn.name).lower(),
+                    _stripQuotes(joinColumn.parent).lower() + '_' + _stripQuotes(joinColumn.name).lower()
                 )
             else:
                 columnsToMatch = (
-                    _stipQuotes(joinColumn.name).lower(),
-                    _stipQuotes(joinColumn.parent).lower() + _stipQuotes(joinColumn.name).lower(),
-                    _stipQuotes(joinColumn.parent).lower() + '_' + _stipQuotes(joinColumn.name).lower()
+                    _stripQuotes(joinColumn.name).lower(),
+                    _stripQuotes(joinColumn.parent).lower() + _stripQuotes(joinColumn.name).lower(),
+                    _stripQuotes(joinColumn.parent).lower() + '_' + _stripQuotes(joinColumn.name).lower()
                 )
 
             for otherAlias, otherColumn in sqlOtherColumns:
-                if _stipQuotes(otherColumn.name).lower().endswith(columnsToMatch):
+                if _stripQuotes(otherColumn.name).lower().endswith(columnsToMatch):
                     sideA = joinAlias + '.' + joinColumn.name
                     sideB = otherAlias + '.' + otherColumn.name
 
