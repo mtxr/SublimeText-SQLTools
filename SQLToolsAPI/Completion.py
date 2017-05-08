@@ -249,8 +249,6 @@ class Completion:
         # return completions with or without quotes?
         # determined based on ident after last dot
         startsWithQuote = _startsWithQuote(prefix.split(".").pop())
-        print("checking: " + prefix.split(".").pop())
-        print("starts with quote: " + str(startsWithQuote))
         autocompleteList = [item.format(startsWithQuote) for item in autocompleteList]
         return autocompleteList, inhibit
 
