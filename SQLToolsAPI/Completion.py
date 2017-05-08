@@ -22,7 +22,7 @@ def _stripQuotes(ident):
 # used for formatting output
 def _stripQuotesOnDemand(ident, doStrip=True):
     if doStrip:
-        return ident.strip('"\'`')
+        return _stripQuotes(ident)
     return ident
 
 def _startsWithQuote(ident):
@@ -32,7 +32,7 @@ def _startsWithQuote(ident):
 def _stripPrefix(text, prefix):
     if text.startswith(prefix):
         return text[len(prefix):]
-    return text  # or whatever
+    return text
 
 
 class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
