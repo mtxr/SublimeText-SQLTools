@@ -57,7 +57,7 @@
      */
     "cli_options": {
         "pgsql": {
-            "options": [],
+            "options": ["--no-password"],
             "before": [],
             "args": "-h {host} -p {port} -U {username} -d {database}",
             "queries": {
