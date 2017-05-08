@@ -35,8 +35,10 @@ queries                      = None
 connections                  = None
 history                      = None
 
+
 def getSublimeUserFolder():
     return os.path.join(sublime.packages_path(), 'User')
+
 
 def startPlugin():
     global USER_FOLDER, DEFAULT_FOLDER
@@ -329,7 +331,6 @@ class ST(EventListener):
             prefix = re.split('[^\w.]+', lineStr).pop()
         except Exception as e:
             Log(e)
-            pass
 
         # determine desired keywords case from settings
         formatSettings = settings.get('format', {})
