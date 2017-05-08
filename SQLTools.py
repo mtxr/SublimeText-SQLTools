@@ -180,6 +180,14 @@ def getSelection():
     return text
 
 
+def getCurrentSyntax():
+    view = View()
+    currentSyntax = None
+    if view:
+        currentSyntax = view.settings().get('syntax')
+    return currentSyntax
+
+
 class ST(EventListener):
     conn             = None
     tables           = []
@@ -391,10 +399,7 @@ class StShowRecords(WindowCommand):
 
 class StDescTable(WindowCommand):
     def run(self):
-        view = self.window.active_view()
-        currentSyntax = None
-        if view:
-            currentSyntax = view.settings().get('syntax')
+        currentSyntax = getCurrentSyntax()
 
         if not ST.conn:
             ST.selectConnection(tablesCallback=lambda: Window().run_command('st_desc_table'))
@@ -410,10 +415,7 @@ class StDescTable(WindowCommand):
 
 class StDescFunction(WindowCommand):
     def run(self):
-        view = self.window.active_view()
-        currentSyntax = None
-        if view:
-            currentSyntax = view.settings().get('syntax')
+        currentSyntax = getCurrentSyntax()
 
         if not ST.conn:
             ST.selectConnection(functionsCallback=lambda: Window().run_command('st_desc_function'))
