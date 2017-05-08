@@ -169,23 +169,56 @@ You might need to restart the editor for settings to be refreshed."""
         cliOptions = self.getOptionsForSgdbCli()
         args = [self.cli]
 
-        if len(cliOptions['options']) > 0:
-            args = args + cliOptions['options']
+        # append otional args (if any) - could be a single value or a list
+        optionalArgs = cliOptions.get('args_optional')
+        if optionalArgs:  # only if we have optional args
+            formattedOptArgList = []
+            if isinstance(optionalArgs, list):
+                for item in optionalArgs:
+                    formattedItem = self.formatOptionalArgument(item, self.options)
+                    if formattedItem:
+                        args = args + shlex.split(formattedItem)
+            else:
+                formattedItem = self.formatOptionalArgument(optionalArgs, self.options)
+                if formattedItem:
+                        args = args + shlex.split(formattedItem)
 
-        if queryName and len(cliOptions['queries'][queryName]['options']) > 0:
-            args = args + cliOptions['queries'][queryName]['options']
+        # append options (args without values)
+        options = cliOptions.get('options', None)
+        if options:
+            args = args + options
 
-        if isinstance(cliOptions['args'], list):
-            cliOptions['args'] = ' '.join(cliOptions['args'])
+        # append query specific options
+        if queryName:
+            queryOptions = cliOptions['queries'][queryName]['options']
+            if len(queryOptions) > 0:
+                args = args + queryOptions
 
-        cliOptions = cliOptions['args'].format(**self.options)
-        args = args + shlex.split(cliOptions)
+        # append main args - could be a single value or a list
+        mainArgs = cliOptions['args']
+        if isinstance(mainArgs, list):
+            mainArgs = ' '.join(mainArgs)
+
+        mainArgs = mainArgs.format(**self.options)
+        args = args + shlex.split(mainArgs)
 
         Log('Using cli args ' + ' '.join(args))
         return args
 
     def getOptionsForSgdbCli(self):
         return self.settings.get('cli_options', {}).get(self.type)
+
+    @staticmethod
+    def formatOptionalArgument(argument, formatOptions):
+        try:
+            formattedArg = argument.format(**formatOptions)
+        except (KeyError, IndexError):
+            print("caught exception")
+            return None
+
+        if argument == formattedArg:  # string not changed after format
+            return None
+        return formattedArg
 
     @staticmethod
     def setTimeout(timeout):

@@ -153,7 +153,8 @@
         "mysql": {
             "options": ["-f", "--table"],
             "before": [],
-            "args": "-h{host} -P{port} -u\"{username}\" -p\"{password}\" -D\"{database}\"",
+            "args": "-h{host} -P{port} -u\"{username}\" -D\"{database}\"",
+            "args_optional": ["--defaults-extra-file=\"{defaults_extra_file}\"", "--defaults-file=\"{defaults-file}\"", "-p\"{password}\""],
             "queries": {
                 "desc" : {
                     "query": "select concat(table_schema, '.', table_name) from information_schema.tables where table_schema = database() order by table_name;",
