@@ -174,7 +174,6 @@ You might need to restart the editor for settings to be refreshed."""
         # append otional args (if any) - could be a single value or a list
         optionalArgs = cliOptions.get('args_optional')
         if optionalArgs:  # only if we have optional args
-            formattedOptArgList = []
             if isinstance(optionalArgs, list):
                 for item in optionalArgs:
                     formattedItem = self.formatOptionalArgument(item, self.options)
@@ -183,7 +182,7 @@ You might need to restart the editor for settings to be refreshed."""
             else:
                 formattedItem = self.formatOptionalArgument(optionalArgs, self.options)
                 if formattedItem:
-                        args = args + shlex.split(formattedItem)
+                    args = args + shlex.split(formattedItem)
 
         # append query specific options
         if queryName:

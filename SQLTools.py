@@ -407,7 +407,8 @@ class StShowRecords(WindowCommand):
 
 
 class StDescTable(WindowCommand):
-    def run(self):
+    @staticmethod
+    def run():
         currentSyntax = getCurrentSyntax()
 
         if not ST.conn:
