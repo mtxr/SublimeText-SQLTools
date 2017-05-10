@@ -425,7 +425,8 @@ class StDescTable(WindowCommand):
 
 
 class StDescFunction(WindowCommand):
-    def run(self):
+    @staticmethod
+    def run():
         currentSyntax = getCurrentSyntax()
 
         if not ST.conn:
