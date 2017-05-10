@@ -196,8 +196,8 @@ def getCurrentSyntax():
 class ST(EventListener):
     conn             = None
     tables           = []
-    functions        = []
     columns          = []
+    functions        = []
     connectionList   = None
     autoCompleteList = []
 
@@ -249,6 +249,10 @@ class ST(EventListener):
         connListNames = list(ST.connectionList.keys())
         connListNames.sort()
         ST.conn = ST.connectionList.get(connListNames[index])
+        # clear list of identifiers in case connection is changed
+        ST.tables = []
+        ST.columns = []
+        ST.functions = []
 
         ST.loadConnectionData(tablesCallback, columnsCallback, functionsCallback)
 
@@ -338,7 +342,7 @@ class ST(EventListener):
         # determine desired keywords case from settings
         formatSettings = settings.get('format', {})
         keywordCase = formatSettings.get('keyword_case', 'upper')
-        uppercaseKeywords = (keywordCase.lower() == 'upper')
+        uppercaseKeywords = keywordCase.lower().startswith('upper')
 
         inhibit = False
         completion = Completion(uppercaseKeywords, ST.tables, ST.columns, ST.functions)

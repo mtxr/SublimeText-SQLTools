@@ -77,7 +77,8 @@ You might need to restart the editor for settings to be refreshed."""
         def cb(result):
             callback(U.getResultAsList(result))
 
-        self.Command.createAndRun(self.builArgs('desc'), query, cb)
+        self.Command.createAndRun(self.builArgs('desc'),
+                                  query, cb, silenceErrors=True)
 
     def getColumns(self, callback):
 
@@ -86,7 +87,8 @@ You might need to restart the editor for settings to be refreshed."""
 
         try:
             query = self.getOptionsForSgdbCli()['queries']['columns']['query']
-            self.Command.createAndRun(self.builArgs('columns'), query, cb)
+            self.Command.createAndRun(self.builArgs('columns'),
+                                      query, cb, silenceErrors=True)
         except Exception:
             pass
 
@@ -97,8 +99,8 @@ You might need to restart the editor for settings to be refreshed."""
 
         try:
             query = self.getOptionsForSgdbCli()['queries']['functions']['query']
-            self.Command.createAndRun(self.builArgs(
-                'functions'), query, cb)
+            self.Command.createAndRun(self.builArgs('functions'),
+                                      query, cb, silenceErrors=True)
         except Exception:
             pass
 
@@ -183,16 +185,16 @@ You might need to restart the editor for settings to be refreshed."""
                 if formattedItem:
                         args = args + shlex.split(formattedItem)
 
-        # append options (args without values)
-        options = cliOptions.get('options', None)
-        if options:
-            args = args + options
-
         # append query specific options
         if queryName:
             queryOptions = cliOptions['queries'][queryName]['options']
             if len(queryOptions) > 0:
                 args = args + queryOptions
+        else:
+            # append generic options (only if not custom query)
+            options = cliOptions.get('options', None)
+            if options:
+                args = args + options
 
         # append main args - could be a single value or a list
         mainArgs = cliOptions['args']

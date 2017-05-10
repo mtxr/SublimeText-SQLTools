@@ -11,7 +11,7 @@ class Command:
     timeout = 15
 
     def __init__(self, args, callback, query=None, encoding='utf-8',
-                 options=None, timeout=15):
+                 options=None, timeout=15, silenceErrors=False):
         if options is None:
             options = {}
 
@@ -21,6 +21,7 @@ class Command:
         self.encoding = encoding
         self.options = options
         self.timeout = timeout
+        self.silenceErrors = silenceErrors
         self.process = None
 
     def run(self):
@@ -52,7 +53,7 @@ class Command:
             resultString += results.decode(self.encoding,
                                            'replace').replace('\r', '')
 
-        if errors:
+        if errors and not self.silenceErrors:
             resultString += errors.decode(self.encoding,
                                           'replace').replace('\r', '')
 
@@ -67,16 +68,17 @@ class Command:
         self.callback(resultString)
 
     @staticmethod
-    def createAndRun(args, query, callback, options=None, timeout=15):
+    def createAndRun(args, query, callback, options=None, timeout=15, silenceErrors=False):
         if options is None:
             options = {}
-        command = Command(args, callback, query, options=options, timeout=timeout)
+        command = Command(args, callback, query, options=options,
+                          timeout=timeout, silenceErrors=silenceErrors)
         command.run()
 
 
 class ThreadCommand(Command, Thread):
     def __init__(self, args, callback, query=None, encoding='utf-8',
-                 options=None, timeout=Command.timeout):
+                 options=None, timeout=Command.timeout, silenceErrors=False):
         if options is None:
             options = {}
 
@@ -86,6 +88,7 @@ class ThreadCommand(Command, Thread):
         self.encoding = encoding
         self.options = options
         self.timeout = timeout
+        self.silenceErrors = silenceErrors
         self.process = None
         Thread.__init__(self)
 
@@ -105,12 +108,13 @@ class ThreadCommand(Command, Thread):
             pass
 
     @staticmethod
-    def createAndRun(args, query, callback, options=None, timeout=Command.timeout):
+    def createAndRun(args, query, callback, options=None, timeout=Command.timeout, silenceErrors=False):
         # Don't allow empty dicts or lists as defaults in method signature,
         # cfr http://nedbatchelder.com/blog/200806/pylint.html
         if options is None:
             options = {}
-        command = ThreadCommand(args, callback, query, options=options, timeout=timeout)
+        command = ThreadCommand(args, callback, query, options=options,
+                                timeout=timeout, silenceErrors=silenceErrors)
         command.start()
         killTimeout = Timer(command.timeout, command.stop)
         killTimeout.start()
