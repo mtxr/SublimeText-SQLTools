@@ -1,48 +1,52 @@
 {
-    "connections": {
-    /*
-        "Generic Template": {        // Connection name, used in menu (Display name)
-            "type"     : "pgsql",    // DB type: (mysql, pgsql, oracle, vertica, sqlite, firebird, sqsh)
-            "host"     : "HOSTNAME", // DB host to connect to
-            "port"     : "PORT",     // DB port
-            "database" : "DATABASE", // DB name (for SQLite this is the path to DB file)
-            "username" : "USERNAME", // DB username
-            "password" : null,       // (if you are using PostgreSQL, you must setup a "pgpass.conf" file and set it to null)
-            "encoding" : "utf-8"     // Your DB encoding. Default: utf-8
-        },
-        "Connection MySQL": {
-            "type"    : "mysql",
-            "host"    : "127.0.0.1",
-            "port"    : 3306,
-            "username": "user",
-            "password": "password",
-            "database": "dbname",
-            "encoding": "utf-8"
-        },
-        "Connection PostgreSQL": {
-            "type"    : "pgsql",
-            "host"    : "127.0.0.1",
-            "port"    :  5432,
-            "username": "anotheruser",
-            "database": "dbname",
-            "encoding": "utf-8"
-        },
-        "Connection Oracle": {
-            "type"    : "oracle",
-            "host"    : "127.0.0.1",
-            "port"    :  1522,
-            "username": "anotheruser",
-            "password": "password",
-            "database": "dbname",
-            "service" : "servicename",
-            "encoding": "utf-8"
-        },
-        "Connection SQLite": {
-            "type"    : "sqlite",
-            "database": "d:/sqlite/sample_db/chinook.db", // note the forward slashes in path
-            "encoding": "utf-8"
-        }
-    */
+  "connections": {
+  /*
+    "Generic Template": {      // Connection name, used in menu (Display name)
+      "type"     : "pgsql",    // DB type: (mysql, pgsql, oracle, vertica, sqlite, firebird, sqsh)
+      "host"     : "HOSTNAME", // DB host to connect to
+      "port"     : "PORT",     // DB port
+      "database" : "DATABASE", // DB name (for SQLite this is the path to DB file)
+      "username" : "USERNAME", // DB username
+      "password" : "PASSWORD", // if you are using PostgreSQL - setup a "pgpass.conf" file and set it to null
+      "encoding" : "utf-8"     // DB encoding. Default: utf-8
     },
-    "default": null
+    "Connection MySQL": {
+      "type"    : "mysql",
+      "host"    : "127.0.0.1",
+      "port"    :  3306,
+      "database": "dbname",
+      "username": "user",
+      // use of password for MySQL is not recommended (use "defaults-extra-file" or "login-path")
+      "password": "password",  // you will get a security warning in the output
+      // "defaults-extra-file": "/path/to/defaults_file_with_password",  // use [client] or [mysql] section
+      // "login-path": "your_login_path",  // login path in your ".mylogin.cnf"
+      "encoding": "utf-8"
+    },
+    "Connection PostgreSQL": {
+      "type"    : "pgsql",
+      "host"    : "127.0.0.1",
+      "port"    :  5432,
+      "database": "dbname",
+      "username": "anotheruser",
+      "encoding": "utf-8"
+      // for PostgreSQL "password" is not needed, instead setup "pgpass.conf" file
+    },
+    "Connection Oracle": {
+      "type"    : "oracle",
+      "host"    : "127.0.0.1",
+      "port"    :  1522,
+      "database": "dbname",
+      "username": "anotheruser",
+      "password": "password",
+      "service" : "servicename",
+      "encoding": "utf-8"
+    },
+    "Connection SQLite": {
+      "type"    : "sqlite",
+      "database": "d:/sqlite/sample_db/chinook.db", // note the forward slashes in path
+      "encoding": "utf-8"
+    }
+  */
+  },
+  "default": null
 }
