@@ -33,5 +33,6 @@
 
 - *Version*: vX.Y.Z
 - *OS*: ...
+- *RDBMS*: (MySQL, PostgreSQL, Oracle, MSSQL, SQLite, Vertica, ...)
 
 You can get this information from executing `ST: About` from Sublime `Command Palette`.
