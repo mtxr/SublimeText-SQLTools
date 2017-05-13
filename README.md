@@ -74,6 +74,7 @@ I strongly recomend you to use Package Control. It helps you to keep the package
 | `unescape_quotes`       | Escape chars like \\" and \\' for extension in array                                                             | `array`   | `[ "php" ]`       |
 | `cli`                   | Path to desired command. You can check more on [Path to Cli](#path-to-commands)                                  | `object`  |                   |
 | `thread_timeout`        | Query execution time in miliseconds before kill. Prevents Sublime Text from lockup while running complex queries | `int`     | 15                |
+| `use_streams`        | Stream results to output | `boolean`     | `false`                |
 | `show_result_on_window` | Show query result using a window (true) or a panel (false)                                                       | `boolean` | `false`           |
 | `show_records`          | Resultset settings. You can check more on [Show records options](#show-records-options)                          | `object`  | `{"limit": 50}`   |
 | `format`                | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting)                                 | `object`  |                   |
