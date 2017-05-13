@@ -7,7 +7,7 @@ from . import Utils as U
 from . import Command as C
 
 
-class Connection:
+class Connection(object):
     DB_CLI_NOT_FOUND_MESSAGE = """'{0}' could not be found.
 Please set the path to '{0}' binary in your SQLTools settings before continuing.
 Example of "cli" section in SQLTools.sublime-settings:
@@ -134,7 +134,7 @@ You might need to restart the editor for settings to be refreshed."""
         queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + stripped_queries)
         self.Command.createAndRun(self.builArgs('explain plan'), queryToRun, callback, timeout=self.timeout)
 
-    def execute(self, queries, callback):
+    def execute(self, queries, callback, stream=False):
         queryToRun = ''
 
         for query in self.getOptionsForSgdbCli()['before']:
@@ -165,7 +165,7 @@ You might need to restart the editor for settings to be refreshed."""
         if Connection.history:
             Connection.history.add(queryToRun)
 
-        self.Command.createAndRun(self.builArgs(), queryToRun, callback, options={'show_query': self.show_query}, timeout=self.timeout)
+        self.Command.createAndRun(self.builArgs(), queryToRun, callback, options={'show_query': self.show_query}, timeout=self.timeout, stream=stream)
 
     def builArgs(self, queryName=None):
         cliOptions = self.getOptionsForSgdbCli()

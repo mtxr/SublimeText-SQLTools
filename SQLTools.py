@@ -115,15 +115,20 @@ def loadDefaultConnection():
     return default
 
 
-def output(content, panel=None, syntax=None, prependText=None):
+def createOutput(panel=None, syntax=None, prependText=None):
     # hide previously set command running message (if any)
     Window().status_message('')
     if not panel:
         panel = getOutputPlace(syntax)
     if prependText:
         panel.run_command('append', {'characters': str(prependText)})
-    panel.run_command('append', {'characters': content})
-    panel.set_read_only(True)
+
+    def append(outputContent):
+        panel.set_read_only(False)
+        panel.run_command('append', {'characters': outputContent})
+        panel.set_read_only(True)
+
+    return append
 
 
 def toNewTab(content, name="", suffix="SQLTools Saved Query"):
@@ -401,7 +406,7 @@ class StShowRecords(WindowCommand):
             prependText = 'Table "{tableName}"\n'.format(tableName=tableName)
             return ST.conn.getTableRecords(
                 tableName,
-                partial(output, prependText=prependText))
+                createOutput(prependText=prependText))
 
         ST.selectTable(cb)
 
@@ -419,7 +424,7 @@ class StDescTable(WindowCommand):
             if index < 0:
                 return None
             Window().status_message(MESSAGE_RUNNING_CMD)
-            return ST.conn.getTableDescription(ST.tables[index], partial(output, syntax=currentSyntax))
+            return ST.conn.getTableDescription(ST.tables[index], createOutput(syntax=currentSyntax))
 
         ST.selectTable(cb)
 
@@ -438,7 +443,7 @@ class StDescFunction(WindowCommand):
                 return None
             Window().status_message(MESSAGE_RUNNING_CMD)
             functionName = ST.functions[index].split('(', 1)[0]
-            return ST.conn.getFunctionDescription(functionName, partial(output, syntax=currentSyntax))
+            return ST.conn.getFunctionDescription(functionName, createOutput(syntax=currentSyntax))
 
         # get everything until first occurence of "(", e.g. get "function_name"
         # from "function_name(int)"
@@ -453,7 +458,7 @@ class StExplainPlan(WindowCommand):
             return
 
         Window().status_message(MESSAGE_RUNNING_CMD)
-        ST.conn.explainPlan(getSelection(), output)
+        ST.conn.explainPlan(getSelection(), createOutput())
 
 
 class StExecute(WindowCommand):
@@ -464,7 +469,7 @@ class StExecute(WindowCommand):
             return
 
         Window().status_message(MESSAGE_RUNNING_CMD)
-        ST.conn.execute(getSelection(), output)
+        ST.conn.execute(getSelection(), createOutput(), stream=settings.get('use_streams', False))
 
 
 class StFormat(TextCommand):
@@ -498,7 +503,7 @@ class StHistory(WindowCommand):
         def cb(index):
             if index < 0:
                 return None
-            return ST.conn.execute(history.get(index), output)
+            return ST.conn.execute(history.get(index), createOutput())
 
         Window().show_quick_panel(history.all(), cb)
 
@@ -534,7 +539,7 @@ class StListQueries(WindowCommand):
             if index < 0:
                 return None
 
-            param2 = output if mode == "run" else options[index][0]
+            param2 = createOutput() if mode == "run" else options[index][0]
             func = ST.conn.execute if mode == "run" else toNewTab
             return func(options[index][1], param2)
 

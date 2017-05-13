@@ -7,14 +7,15 @@ from threading import Thread, Timer
 from .Log import Log
 
 
-class Command:
+class Command(object):
     timeout = 15
 
     def __init__(self, args, callback, query=None, encoding='utf-8',
-                 options=None, timeout=15, silenceErrors=False):
+                 options=None, timeout=15, silenceErrors=False, stream=False):
         if options is None:
             options = {}
 
+        self.stream = stream
         self.args = args
         self.callback = callback
         self.query = query
@@ -43,6 +44,23 @@ class Command:
                                         env=os.environ.copy(),
                                         startupinfo=si)
 
+        if self.stream:
+            self.process.stdin.write(self.query.encode())
+            self.process.stdin.close()
+            for line in self.process.stdout:
+                self.callback(line.decode(self.encoding,
+                    'replace').replace('\r', ''))
+
+            queryTimerEnd = time.time()
+            if 'show_query' in self.options and self.options['show_query']:
+                resultInfo = "/*\n-- Executed querie(s) at {0} took {1:.3f}ms --".format(
+                    str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(queryTimerStart))),
+                    (queryTimerEnd - queryTimerStart))
+                resultLine = "-" * (len(resultInfo) - 3)
+                resultString = "{0}\n{1}\n{2}\n{3}\n*/".format(
+                    resultInfo, resultLine, self.query, resultLine)
+                return self.callback(resultString)
+        
         results, errors = self.process.communicate(input=self.query.encode())
 
         queryTimerEnd = time.time()
@@ -58,9 +76,9 @@ class Command:
                                           'replace').replace('\r', '')
 
         if 'show_query' in self.options and self.options['show_query']:
-            resultInfo = "/*\n-- Executed querie(s) at {0} took {1}ms --".format(
+            resultInfo = "/*\n-- Executed querie(s) at {0} took {1:.3f}ms --".format(
                 str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(queryTimerStart))),
-                str(queryTimerEnd - queryTimerStart))
+                (queryTimerEnd - queryTimerStart))
             resultLine = "-" * (len(resultInfo) - 3)
             resultString = "{0}\n{1}\n{2}\n{3}\n*/\n{4}".format(
                 resultInfo, resultLine, self.query, resultLine, resultString)
@@ -68,7 +86,7 @@ class Command:
         self.callback(resultString)
 
     @staticmethod
-    def createAndRun(args, query, callback, options=None, timeout=15, silenceErrors=False):
+    def createAndRun(args, query, callback, options=None, timeout=15, silenceErrors=False, stream=False):
         if options is None:
             options = {}
         command = Command(args, callback, query, options=options,
@@ -78,18 +96,14 @@ class Command:
 
 class ThreadCommand(Command, Thread):
     def __init__(self, args, callback, query=None, encoding='utf-8',
-                 options=None, timeout=Command.timeout, silenceErrors=False):
+                 options=None, timeout=Command.timeout, silenceErrors=False, stream=False):
         if options is None:
             options = {}
 
-        self.args = args
-        self.callback = callback
-        self.query = query
-        self.encoding = encoding
-        self.options = options
-        self.timeout = timeout
-        self.silenceErrors = silenceErrors
-        self.process = None
+        Command.__init__(self, args, callback, query=query,
+                         encoding=encoding, options=options,
+                         timeout=timeout, silenceErrors=silenceErrors,
+                         stream=stream)
         Thread.__init__(self)
 
     def stop(self):
@@ -108,13 +122,14 @@ class ThreadCommand(Command, Thread):
             pass
 
     @staticmethod
-    def createAndRun(args, query, callback, options=None, timeout=Command.timeout, silenceErrors=False):
+    def createAndRun(args, query, callback, options=None,
+                     timeout=Command.timeout, silenceErrors=False, stream=False):
         # Don't allow empty dicts or lists as defaults in method signature,
         # cfr http://nedbatchelder.com/blog/200806/pylint.html
         if options is None:
             options = {}
         command = ThreadCommand(args, callback, query, options=options,
-                                timeout=timeout, silenceErrors=silenceErrors)
+                                timeout=timeout, silenceErrors=silenceErrors, stream=stream)
         command.start()
         killTimeout = Timer(command.timeout, command.stop)
         killTimeout.start()
