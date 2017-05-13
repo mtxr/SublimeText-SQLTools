@@ -60,7 +60,7 @@ class Command(object):
                 resultString = "{0}\n{1}\n{2}\n{3}\n*/".format(
                     resultInfo, resultLine, self.query, resultLine)
                 return self.callback(resultString)
-        
+
         results, errors = self.process.communicate(input=self.query.encode())
 
         queryTimerEnd = time.time()
