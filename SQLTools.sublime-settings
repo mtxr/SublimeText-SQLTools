@@ -10,6 +10,7 @@
     "safe_limit"            : false,
     "show_query"            : false,
     "expand_to_paragraph"   : false,
+    "use_streams"           : false, // use streams for results
     /**
      * The list of syntax selectors for which the plugin autocompletion will be active.
      * An empty list means autocompletion always active.
