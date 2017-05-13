@@ -3,7 +3,6 @@ __version__ = "v0.8.3"
 import sys
 import os
 import re
-from functools import partial
 
 import sublime
 from sublime_plugin import WindowCommand, EventListener, TextCommand
