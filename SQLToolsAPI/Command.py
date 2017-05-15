@@ -37,9 +37,17 @@ class Command(object):
             si = subprocess.STARTUPINFO()
             si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
+        # select appropriate file handle for stderr
+        # usually we want to redirect stderr to stdout, so erros are shown
+        # in the output in the right place (where they actually occurred)
+        # only if silenceErrors=True, we separate stderr from stdout and discard it
+        stderrHandle = subprocess.STDOUT
+        if self.silenceErrors:
+            stderrHandle = subprocess.PIPE
+
         self.process = subprocess.Popen(self.args,
                                         stdout=subprocess.PIPE,
-                                        stderr=subprocess.PIPE,
+                                        stderr=stderrHandle,
                                         stdin=subprocess.PIPE,
                                         env=os.environ.copy(),
                                         startupinfo=si)
@@ -52,6 +60,9 @@ class Command(object):
                     'replace').replace('\r', ''))
 
             queryTimerEnd = time.time()
+            # we are done with the output, terminate the process
+            self.process.terminate()
+
             if 'show_query' in self.options and self.options['show_query']:
                 resultInfo = "/*\n-- Executed querie(s) at {0} took {1:.3f}ms --".format(
                     str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(queryTimerStart))),
@@ -61,6 +72,10 @@ class Command(object):
                     resultInfo, resultLine, self.query, resultLine)
                 return self.callback(resultString)
 
+            return
+
+        # regular mode is handled with more reliable Popen.communicate
+        # which also terminates the process afterwards
         results, errors = self.process.communicate(input=self.query.encode())
 
         queryTimerEnd = time.time()
@@ -108,6 +123,10 @@ class ThreadCommand(Command, Thread):
 
     def stop(self):
         if not self.process:
+            return
+
+        # if poll returns None - proc still running, otherwise returns process return code
+        if self.process.poll() is not None:
             return
 
         try:
