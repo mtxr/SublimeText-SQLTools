@@ -162,7 +162,11 @@
                     "options": ["-f", "--silent", "--raw"]
                 },
                 "functions": {
-                    "query": "select concat('|', routine_schema, '.', routine_name, '|') from information_schema.routines where routine_schema = database();",
+                    "query": "select concat('|', routine_schema, '.', routine_name, '()', '|') from information_schema.routines where routine_schema = database();",
+                    "options": ["-f", "--silent", "--raw"]
+                },
+                "desc function": {
+                    "query": "select routine_definition from information_schema.routines where concat(routine_schema, '.', routine_name) = '%s';",
                     "options": ["-f", "--silent", "--raw"]
                 },
                 "explain plan": {
