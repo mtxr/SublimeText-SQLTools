@@ -162,8 +162,8 @@ You might need to restart the editor for settings to be refreshed."""
 
         Log("Query: " + queryToRun)
 
-        if Connection.history:
-            Connection.history.add(queryToRun)
+        if self.history:
+            self.history.add(queryToRun)
 
         self.Command.createAndRun(self.builArgs(), queryToRun, callback, options={'show_query': self.show_query}, timeout=self.timeout, stream=stream)
 
