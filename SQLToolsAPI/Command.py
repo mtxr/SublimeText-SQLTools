@@ -29,8 +29,6 @@ class Command(object):
         if not self.query:
             return
 
-        queryTimerStart = time.time()
-
         self.args = map(str, self.args)
         si = None
         if os.name == 'nt':
@@ -44,6 +42,8 @@ class Command(object):
         stderrHandle = subprocess.STDOUT
         if self.silenceErrors:
             stderrHandle = subprocess.PIPE
+
+        queryTimerStart = time.time()
 
         self.process = subprocess.Popen(self.args,
                                         stdout=subprocess.PIPE,
@@ -64,13 +64,8 @@ class Command(object):
             self.process.terminate()
 
             if 'show_query' in self.options and self.options['show_query']:
-                resultInfo = "/*\n-- Executed querie(s) at {0} took {1:.3f}ms --".format(
-                    str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(queryTimerStart))),
-                    (queryTimerEnd - queryTimerStart))
-                resultLine = "-" * (len(resultInfo) - 3)
-                resultString = "{0}\n{1}\n{2}\n{3}\n*/".format(
-                    resultInfo, resultLine, self.query, resultLine)
-                return self.callback(resultString)
+                formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
+                self.callback(formattedQueryInfo)
 
             return
 
@@ -91,14 +86,20 @@ class Command(object):
                                           'replace').replace('\r', '')
 
         if 'show_query' in self.options and self.options['show_query']:
-            resultInfo = "/*\n-- Executed querie(s) at {0} took {1:.3f}ms --".format(
-                str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(queryTimerStart))),
-                (queryTimerEnd - queryTimerStart))
-            resultLine = "-" * (len(resultInfo) - 3)
-            resultString = "{0}\n{1}\n{2}\n{3}\n*/\n{4}".format(
-                resultInfo, resultLine, self.query, resultLine, resultString)
+            formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
+            resultString = "{0}\n{1}".format(formattedQueryInfo, resultString)
 
         self.callback(resultString)
+
+    @staticmethod
+    def _formatShowQuery(query, queryTimeStart, queryTimeEnd):
+        resultInfo = "/*\n-- Executed querie(s) at {0} took {1:.3f} s --".format(
+            str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(queryTimeStart))),
+            (queryTimeEnd - queryTimeStart))
+        resultLine = "-" * (len(resultInfo) - 3)
+        resultString = "{0}\n{1}\n{2}\n{3}\n*/".format(
+            resultInfo, resultLine, query, resultLine)
+        return resultString
 
     @staticmethod
     def createAndRun(args, query, callback, options=None, timeout=15, silenceErrors=False, stream=False):
