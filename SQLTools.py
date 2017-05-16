@@ -502,7 +502,8 @@ class StHistory(WindowCommand):
         def cb(index):
             if index < 0:
                 return None
-            return ST.conn.execute(history.get(index), createOutput())
+            return ST.conn.execute(history.get(index), createOutput(),
+                                   stream=settings.get('use_streams', False))
 
         Window().show_quick_panel(history.all(), cb)
 
@@ -538,9 +539,14 @@ class StListQueries(WindowCommand):
             if index < 0:
                 return None
 
-            param2 = createOutput() if mode == "run" else options[index][0]
-            func = ST.conn.execute if mode == "run" else toNewTab
-            return func(options[index][1], param2)
+            alias, query = options[index]
+            if mode == "run":
+                ST.conn.execute(query, createOutput(),
+                                stream=settings.get('use_streams', False))
+            else:
+                toNewTab(query, alias)
+
+            return
 
         try:
             Window().show_quick_panel(options, cb)

@@ -61,7 +61,8 @@ class Command(object):
 
             queryTimerEnd = time.time()
             # we are done with the output, terminate the process
-            self.process.terminate()
+            if self.process:
+                self.process.terminate()
 
             if 'show_query' in self.options and self.options['show_query']:
                 formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
