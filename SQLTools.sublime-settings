@@ -6,7 +6,7 @@
     "thread_timeout"        : 15,     // query timeout in seconds
     "history_size"          : 100,
     "show_result_on_window" : false,
-    "clear_output"          : false,
+    "clear_output"          : true,
     "safe_limit"            : false,
     "show_query"            : false,
     "expand_to_paragraph"   : false,
