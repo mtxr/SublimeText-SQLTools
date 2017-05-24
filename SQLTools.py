@@ -140,7 +140,9 @@ def toNewTab(content, name="", suffix="SQLTools Saved Query"):
 
 def getOutputPlace(syntax=None, name="SQLTools Result"):
     if not settings.get('show_result_on_window', True):
-        resultContainer = Window().create_output_panel(name)
+        resultContainer = Window().find_output_panel(name)
+        if resultContainer is None:
+            resultContainer = Window().create_output_panel(name)
         Window().run_command("show_panel", {"panel": "output." + name})
     else:
         resultContainer = None
