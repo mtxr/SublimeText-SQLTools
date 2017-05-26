@@ -19,16 +19,19 @@ keywords_list = [
 def _stripQuotes(ident):
     return ident.strip('"\'`')
 
+
 # used for formatting output
 def _stripQuotesOnDemand(ident, doStrip=True):
     if doStrip:
         return _stripQuotes(ident)
     return ident
 
+
 def _startsWithQuote(ident):
     # str.startswith can be matched against a tuple
     quotes = ('`', '"')
     return ident.startswith(quotes)
+
 
 def _stripPrefix(text, prefix):
     if text.startswith(prefix):
@@ -36,12 +39,11 @@ def _stripPrefix(text, prefix):
     return text
 
 
-class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
+class CompletionItem(namedtuple('CompletionItem', ['type', 'ident'])):
     """
     Represents a potential or actual completion item.
       * type - Type of item e.g. (Table, Function, Column)
       * ident - identifier e.g. ("tablename.column", "database.table", "alias")
-      * score - the lower score, the better is match for completion item
     """
     __slots__ = ()
 
@@ -100,9 +102,10 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
             targetList = target.split('.')
             targetObject = _stripQuotes(targetList.pop())
             targetParent = _stripQuotes(targetList.pop())
-            if (searchParent == targetParent and
-                    self._stringMatched(targetObject, searchObject, exactly)):
-                return 1   # highest score
+            if (searchParent == targetParent):
+                if self._stringMatched(targetObject, searchObject, exactly):
+                    return 1   # highest score
+            return 0
 
         # second part matches ?
         if '.' in target:
@@ -117,6 +120,13 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
                 return 3
             else:
                 return 0
+        return 0
+
+    def prefixMatchListScore(self, searchList, exactly=False):
+        for item in searchList:
+            score = self.prefixMatchScore(item, exactly)
+            if score:
+                return score
         return 0
 
     # format completion item according to sublime text completions format
@@ -147,9 +157,9 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident', 'score'])):
 
 class Completion:
     def __init__(self, uppercaseKeywords, allTables, allColumns, allFunctions):
-        self.allTables = [CompletionItem('Table', table, 0) for table in allTables]
-        self.allColumns = [CompletionItem('Column', column, 0) for column in allColumns]
-        self.allFunctions = [CompletionItem('Function', func, 0) for func in allFunctions]
+        self.allTables = [CompletionItem('Table', table) for table in allTables]
+        self.allColumns = [CompletionItem('Column', column) for column in allColumns]
+        self.allFunctions = [CompletionItem('Function', func) for func in allFunctions]
 
         self.allKeywords = []
         for keyword in keywords_list:
@@ -158,7 +168,7 @@ class Completion:
             else:
                 keyword = keyword.lower()
 
-            self.allKeywords.append(CompletionItem('Keyword', keyword, 0))
+            self.allKeywords.append(CompletionItem('Keyword', keyword))
 
     def getBasicAutoCompleteList(self, prefix):
         prefix = prefix.lower()
@@ -168,17 +178,17 @@ class Completion:
         for item in self.allColumns:
             score = item.prefixMatchScore(prefix)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                autocompleteList.append(item)
 
         for item in self.allTables:
             score = item.prefixMatchScore(prefix)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                autocompleteList.append(item)
 
         for item in self.allFunctions:
             score = item.prefixMatchScore(prefix)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                autocompleteList.append(item)
 
         if len(autocompleteList) == 0:
             return None
@@ -263,94 +273,93 @@ class Completion:
         Order: statement aliases -> statement cols -> statement tables -> statement functions,
         then:  other cols -> other tables -> other functions that match the prefix in their names
         """
-        # get join conditions
-        joinConditions = []
-        if joinAlias:
-            joinConditions = self._joinConditionCompletions(identifiers, joinAlias)
 
         # use set, as we are interested only in unique identifiers
         sqlAliases = set()
-        sqlTables = set()
-        sqlColumns = set()
-        sqlFunctions = set()
+        sqlTables = []
+        sqlColumns = []
+        sqlFunctions = []
+        otherTables = []
+        otherColumns = []
+        otherFunctions = []
+        otherKeywords = []
+        otherJoinConditions = []
+
+        # utilitary temp lists
+        identTables = set()
+        identColumns = set()
+        identFunctions = set()
 
         for ident in identifiers:
             if ident.has_alias():
-                sqlAliases.add(CompletionItem('Alias', ident.alias, 0))
+                aliasItem = CompletionItem('Alias', ident.alias)
+                score = aliasItem.prefixMatchScore(prefix)
+                if score and aliasItem.ident != prefix:
+                    sqlAliases.add(aliasItem)
 
             if ident.is_function:
-                functions = [
-                    fun
-                    for fun in self.allFunctions
-                    if fun.prefixMatchScore(ident.full_name, exactly=True) > 0
-                ]
-                sqlFunctions.update(functions)
-            else:
-                tables = [
-                    table
-                    for table in self.allTables
-                    if table.prefixMatchScore(ident.full_name, exactly=True) > 0
-                ]
-                sqlTables.update(tables)
-                prefixForColumnMatch = ident.name + '.'
-                columns = [
-                    col
-                    for col in self.allColumns
-                    if col.prefixMatchScore(prefixForColumnMatch, exactly=True) > 0
-                ]
-                sqlColumns.update(columns)
+                identFunctions.add(ident.full_name)
+            elif ident.is_table_alias:
+                identTables.add(ident.full_name)
+                identColumns.add(ident.name + '.' + prefix)
 
-        autocompleteList = []
-
-        for condition in joinConditions:
-            if condition.ident.lower().startswith(prefix):
-                autocompleteList.append(CompletionItem(condition.type, condition.ident, 1))
-
-        # first of all list aliases and identifiers related to currently parsed statement
-        for item in sqlAliases:
-            score = item.prefixMatchScore(prefix)
-            if score and item.ident != prefix:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
-
-        for item in sqlColumns:
-            score = item.prefixMatchScore(prefix)
+        for table in self.allTables:
+            score = table.prefixMatchScore(prefix, exactly=False)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                if table.prefixMatchListScore(identTables, exactly=True) > 0:
+                    sqlTables.append(table)
+                else:
+                    otherTables.append(table)
 
-        for item in sqlTables:
-            score = item.prefixMatchScore(prefix)
+        for col in self.allColumns:
+            score = col.prefixMatchScore(prefix, exactly=False)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                if col.prefixMatchListScore(identColumns, exactly=False) > 0:
+                    sqlColumns.append(col)
+                else:
+                    otherColumns.append(col)
 
-        for item in sqlFunctions:
-            score = item.prefixMatchScore(prefix)
+        for fun in self.allFunctions:
+            score = fun.prefixMatchScore(prefix, exactly=False)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                if fun.prefixMatchListScore(identFunctions, exactly=True) > 0:
+                    sqlColumns.append(fun)
+                else:
+                    otherColumns.append(fun)
 
-        # add keywords to auto-complete results
+        # keywords
         for item in self.allKeywords:
             score = item.prefixMatchScore(prefix)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                otherKeywords.append(item)
 
-        # add the rest of the columns, tables and functions that also match the prefix
-        for item in self.allColumns:
-            score = item.prefixMatchScore(prefix)
-            if score:
-                if item not in sqlColumns:
-                    autocompleteList.append(CompletionItem(item.type, item.ident, score))
+        # join conditions
+        if joinAlias:
+            joinConditions = self._joinConditionCompletions(identifiers, joinAlias)
 
-        for item in self.allTables:
-            score = item.prefixMatchScore(prefix)
-            if score:
-                if item not in sqlTables:
-                    autocompleteList.append(CompletionItem(item.type, item.ident, score))
+            for condition in joinConditions:
+                if condition.ident.lower().startswith(prefix):
+                    otherJoinConditions.append(condition)
 
-        for item in self.allFunctions:
-            score = item.prefixMatchScore(prefix)
-            if score:
-                if item not in sqlFunctions:
-                    autocompleteList.append(CompletionItem(item.type, item.ident, score))
+        # collect the results in prefered order
+        autocompleteList = []
+
+        # first of all list join conditions (if applicable)
+        autocompleteList.extend(otherJoinConditions)
+
+        # then aliases and identifiers related to currently parsed statement
+        autocompleteList.extend(sqlAliases)
+
+        # then cols, tables, functions related to current statement
+        autocompleteList.extend(sqlColumns)
+        autocompleteList.extend(sqlTables)
+        autocompleteList.extend(sqlFunctions)
+
+        # then other matching cols, tables, functions
+        autocompleteList.extend(otherKeywords)
+        autocompleteList.extend(otherColumns)
+        autocompleteList.extend(otherTables)
+        autocompleteList.extend(otherFunctions)
 
         return autocompleteList, False
 
@@ -390,7 +399,7 @@ class Completion:
             aliasPrefix = prefixParent + '.'
             if condition.ident.lower().startswith(aliasPrefix):
                 autocompleteList.append(CompletionItem(condition.type,
-                                                       _stripPrefix(condition.ident, aliasPrefix), 1))
+                                                       _stripPrefix(condition.ident, aliasPrefix)))
 
         # first of all expand table aliases to real table names and try
         # to match their columns with prefix of these expanded identifiers
@@ -400,23 +409,23 @@ class Completion:
             for item in self.allColumns:
                 score = item.prefixMatchScore(prefix_to_match)
                 if score:
-                    autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                    autocompleteList.append(item)
 
         # try to match all our other objects (tables, columns, functions) with prefix
         for item in self.allColumns:
             score = item.prefixMatchScore(prefix)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                autocompleteList.append(item)
 
         for item in self.allTables:
             score = item.prefixMatchScore(prefix)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                autocompleteList.append(item)
 
         for item in self.allFunctions:
             score = item.prefixMatchScore(prefix)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                autocompleteList.append(item)
 
         inhibit = len(autocompleteList) > 0
         # in case prefix parent is a query alias we simply don't know what those
@@ -432,7 +441,7 @@ class Completion:
         for item in self.allColumns:
             score = item.prefixMatchScore(prefix)
             if score:
-                autocompleteList.append(CompletionItem(item.type, item.ident, score))
+                autocompleteList.append(item)
 
         if len(autocompleteList) > 0:
             return autocompleteList, True
@@ -450,7 +459,7 @@ class Completion:
 
         for ident in identifiers:
             if ident.has_alias() and not ident.is_function:
-                sqlTableAliases.add(CompletionItem('Alias', ident.alias, 0))
+                sqlTableAliases.add(CompletionItem('Alias', ident.alias))
 
                 prefixForColumnMatch = ident.name + '.'
                 columns = [
@@ -486,7 +495,7 @@ class Completion:
                     sideA = joinAlias + '.' + joinColumn.name
                     sideB = otherAlias + '.' + otherColumn.name
 
-                    joinCandidatesCompletions.append(CompletionItem('Condition', sideA + ' = ' + sideB, 0))
-                    joinCandidatesCompletions.append(CompletionItem('Condition', sideB + ' = ' + sideA, 0))
+                    joinCandidatesCompletions.append(CompletionItem('Condition', sideA + ' = ' + sideB))
+                    joinCandidatesCompletions.append(CompletionItem('Condition', sideB + ' = ' + sideA))
 
         return joinCandidatesCompletions
