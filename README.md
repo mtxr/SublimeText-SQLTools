@@ -5,6 +5,8 @@
 
 Your swiss knife SQL for Sublime Text.
 
+Write your SQL with smart completions and hady table and function definitions, execute SQL and explain queries, format your queries and save them in history.
+
 Project website: [http://mtxr.github.io/SQLTools/](http://mtxr.github.io/SQLTools/)
 
 ## Donate
@@ -26,14 +28,14 @@ These fellows helped SQLTools become better than ever. Thank you so much!
 
 ## Features
 
+* Smart auto completions (for PostgreSQL, MySQL, Oracle, MSSQL, Vertica, Firebird)
+* Run SQL Queries (`CTRL+e, CTRL+e`)
+![Auto complete (PostgreSQL & MySQL) && Run SQL Queries](https://github.com/mtxr/SQLTools/raw/images/execute_auto_complete.gif?raw=true)
 * View table schemas (`CTRL+e, CTRL+d`)
 ![View table schemas](https://github.com/mtxr/SQLTools/raw/images/table_description.gif?raw=true)
 * View Queries history (`CTRL+e, CTRL+h`)
 * Show table records (`CTRL+e, CTRL+s`)
 ![Show table records](https://github.com/mtxr/SQLTools/raw/images/table_records.gif?raw=true)
-* Auto complete (for PostgreSQL & MySQL. Looking for help with other SGDBs)
-* Run SQL Queries (`CTRL+e, CTRL+e`)
-![Auto complete (PostgreSQL & MySQL) && Run SQL Queries](https://github.com/mtxr/SQLTools/raw/images/execute_auto_complete.gif?raw=true)
 * Show explain plan for queries (PostgreSQL, MySQL, Oracle, Vertica, SQLite) (`CTRL+e, CTRL+x`)
 * Formatting SQL Queries (`CTRL+e, CTRL+b`)
 ![Formatting SQL Queries](https://github.com/mtxr/SQLTools/raw/images/format_sql.gif?raw=true)
@@ -43,12 +45,6 @@ These fellows helped SQLTools become better than ever. Thank you so much!
 * Save queries (`CTRL+e, CTRL+q`)
 * List and Run saved queries (`CTRL+e, CTRL+a`)
 * Remove saved queries (`CTRL+e, CTRL+r`)
-
-## Todo
-
-Up coming features:
-
-* Auto complete for Oracle, Vertica, Firebird and SQLite
 
 ## Installing
 
@@ -72,7 +68,7 @@ I strongly recomend you to use Package Control. It helps you to keep the package
 
 ### Using SQLTools with Mac OS X
 
-Sublime Text has its PATH set from launchctl, not by your shell. Binaries installed by packages such as homebrew, for instance `Postgresql`, cannot be found by Sublime Text and results in a null pointer exception thrown by `SQLTools`. Installing the package `Fix Mac Path` resolve this issue. This package can be downloaded [here](https://github.com/int3h/SublimeFixMacPath).
+Sublime Text has it's evironment variable `PATH` set from launchctl, not by your shell. Binaries installed by packages such as homebrew, for instance `psql` DB CLI for `PostgreSQL`, cannot be found by Sublime Text and results in error in Sublime Text console by `SQLTools`. Installing the package `Fix Mac Path` or setting the full path to your DB CLI binary in `SQLTools.sublime-settings` resolves this issue. Package can be downloaded via [PackageControl](https://packagecontrol.io/packages/Fix%20Mac%20Path) or [github](https://github.com/int3h/SublimeFixMacPath).
 
 ## Configuration 
 
