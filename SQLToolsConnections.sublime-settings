@@ -28,8 +28,9 @@
       "port"    :  5432,
       "database": "dbname",
       "username": "anotheruser",
+      // for PostgreSQL "password" is optional (setup "pgpass.conf" file instead)
+      "password": "password",
       "encoding": "utf-8"
-      // for PostgreSQL "password" is not needed, instead setup "pgpass.conf" file
     },
     "Connection Oracle": {
       "type"    : "oracle",
