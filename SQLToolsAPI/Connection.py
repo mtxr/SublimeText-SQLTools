@@ -77,7 +77,9 @@ You might need to restart the editor for settings to be refreshed."""
         def cb(result):
             callback(U.getResultAsList(result))
 
-        self.Command.createAndRun(self.builArgs('desc'),
+        args = self.buildArgs('desc')
+        env = self.buildEnv()
+        self.Command.createAndRun(args, env,
                                   query, cb, silenceErrors=True)
 
     def getColumns(self, callback):
@@ -87,7 +89,9 @@ You might need to restart the editor for settings to be refreshed."""
 
         try:
             query = self.getOptionsForSgdbCli()['queries']['columns']['query']
-            self.Command.createAndRun(self.builArgs('columns'),
+            args = self.buildArgs('columns')
+            env = self.buildEnv()
+            self.Command.createAndRun(args, env,
                                       query, cb, silenceErrors=True)
         except Exception:
             pass
@@ -99,7 +103,9 @@ You might need to restart the editor for settings to be refreshed."""
 
         try:
             query = self.getOptionsForSgdbCli()['queries']['functions']['query']
-            self.Command.createAndRun(self.builArgs('functions'),
+            args = self.buildArgs('functions')
+            env = self.buildEnv()
+            self.Command.createAndRun(args, env,
                                       query, cb, silenceErrors=True)
         except Exception:
             pass
@@ -107,18 +113,24 @@ You might need to restart the editor for settings to be refreshed."""
     def getTableRecords(self, tableName, callback):
         query = self.getOptionsForSgdbCli()['queries']['show records']['query'].format(tableName, self.rowsLimit)
         queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + [query])
-        self.Command.createAndRun(self.builArgs('show records'), queryToRun, callback, timeout=self.timeout)
+        args = self.buildArgs('show records')
+        env = self.buildEnv()
+        self.Command.createAndRun(args, env, queryToRun, callback, timeout=self.timeout)
 
     def getTableDescription(self, tableName, callback):
         query = self.getOptionsForSgdbCli()['queries']['desc table']['query'] % tableName
         queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + [query])
-        self.Command.createAndRun(self.builArgs('desc table'), queryToRun, callback)
+        args = self.buildArgs('desc table')
+        env = self.buildEnv()
+        self.Command.createAndRun(args, env, queryToRun, callback)
 
     def getFunctionDescription(self, functionName, callback):
         query = self.getOptionsForSgdbCli()['queries']['desc function'][
             'query'] % functionName
         queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + [query])
-        self.Command.createAndRun(self.builArgs('desc function'), queryToRun, callback)
+        args = self.buildArgs('desc function')
+        env = self.buildEnv()
+        self.Command.createAndRun(args, env, queryToRun, callback)
 
     def explainPlan(self, queries, callback):
         try:
@@ -132,7 +144,9 @@ You might need to restart the editor for settings to be refreshed."""
             for query in filter(None, sqlparse.split(rawQuery))
         ]
         queryToRun = '\n'.join(self.getOptionsForSgdbCli()['before'] + stripped_queries)
-        self.Command.createAndRun(self.builArgs('explain plan'), queryToRun, callback, timeout=self.timeout)
+        args = self.buildArgs('explain plan')
+        env = self.buildEnv()
+        self.Command.createAndRun(args, env, queryToRun, callback, timeout=self.timeout)
 
     def execute(self, queries, callback, stream=False):
         queryToRun = ''
@@ -165,9 +179,11 @@ You might need to restart the editor for settings to be refreshed."""
         if self.history:
             self.history.add(queryToRun)
 
-        self.Command.createAndRun(self.builArgs(), queryToRun, callback, options={'show_query': self.show_query}, timeout=self.timeout, stream=stream)
+        args = self.buildArgs()
+        env = self.buildEnv()
+        self.Command.createAndRun(args, env, queryToRun, callback, options={'show_query': self.show_query}, timeout=self.timeout, stream=stream)
 
-    def builArgs(self, queryName=None):
+    def buildArgs(self, queryName=None):
         cliOptions = self.getOptionsForSgdbCli()
         args = [self.cli]
 
@@ -205,6 +221,31 @@ You might need to restart the editor for settings to be refreshed."""
 
         Log('Using cli args ' + ' '.join(args))
         return args
+
+    def buildEnv(self):
+        cliOptions = self.getOptionsForSgdbCli()
+        env = dict()
+
+        # append **optional** environment variables dict (if any)
+        optionalEnv = cliOptions.get('env_optional')
+        if optionalEnv:  # only if we have optional args
+            if isinstance(optionalEnv, dict):
+                for var, value in optionalEnv.items():
+                    formattedValue = self.formatOptionalArgument(value, self.options)
+                    if formattedValue:
+                        env.update({var: formattedValue})
+
+        # append environment variables dict (if any)
+        staticEnv = cliOptions.get('env')
+        if staticEnv:  # only if we have optional args
+            if isinstance(staticEnv, dict):
+                for var, value in staticEnv.items():
+                    formattedValue = value.format(**self.options)
+                    if formattedValue:
+                        env.update({var: formattedValue})
+
+        Log('Environment for command: ' + str(env))
+        return env
 
     def getOptionsForSgdbCli(self):
         return self.settings.get('cli_options', {}).get(self.type)

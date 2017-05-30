@@ -61,6 +61,9 @@
             "options": ["--no-password"],
             "before": [],
             "args": "-h {host} -p {port} -U {username} -d {database}",
+            "env_optional": {
+                "PGPASSWORD": "{password}"
+            },
             "queries": {
                 "desc" : {
                     "query": "select '|' || quote_ident(table_schema)||'.'||quote_ident(table_name) ||'|' as tblname from information_schema.tables where table_schema = any(current_schemas(false)) and table_schema not in ('pg_catalog', 'information_schema') order by table_schema = current_schema() desc, table_schema, table_name",
