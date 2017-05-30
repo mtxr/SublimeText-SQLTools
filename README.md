@@ -2,6 +2,7 @@
 ===============
 
 Your swiss knife SQL for Sublime Text.
+Write your SQL with smart completions and hady table and function definitions, execute SQL and explain queries, format your queries and save them in history.
 
 Project website: [http://mtxr.github.io/SQLTools/](http://mtxr.github.io/SQLTools/)
 
@@ -23,14 +24,14 @@ These fellows helped SQLTools become better than ever. Thank you so much!
 
 ## Features
 
+* Smart auto completions (for PostgreSQL, MySQL, Oracle, MSSQL, Vertica, Firebird)
+* Run SQL Queries (`CTRL+e, CTRL+e`)
+![Auto complete (PostgreSQL & MySQL) && Run SQL Queries](https://github.com/mtxr/SQLTools/raw/images/execute_auto_complete.gif?raw=true)
 * View table schemas (`CTRL+e, CTRL+d`)
 ![View table schemas](https://github.com/mtxr/SQLTools/raw/images/table_description.gif?raw=true)
 * View Queries history (`CTRL+e, CTRL+h`)
 * Show table records (`CTRL+e, CTRL+s`)
 ![Show table records](https://github.com/mtxr/SQLTools/raw/images/table_records.gif?raw=true)
-* Auto complete (for PostgreSQL & MySQL. Looking for help with other SGDBs)
-* Run SQL Queries (`CTRL+e, CTRL+e`)
-![Auto complete (PostgreSQL & MySQL) && Run SQL Queries](https://github.com/mtxr/SQLTools/raw/images/execute_auto_complete.gif?raw=true)
 * Show explain plan for queries (PostgreSQL, MySQL, Oracle, Vertica, SQLite) (`CTRL+e, CTRL+x`)
 * Formatting SQL Queries (`CTRL+e, CTRL+b`)
 ![Formatting SQL Queries](https://github.com/mtxr/SQLTools/raw/images/format_sql.gif?raw=true)
@@ -40,11 +41,6 @@ These fellows helped SQLTools become better than ever. Thank you so much!
 * Save queries (`CTRL+e, CTRL+q`)
 * List and Run saved queries (`CTRL+e, CTRL+a`)
 * Remove saved queries (`CTRL+e, CTRL+r`)
-
-## Todo
-
-Up coming features:
-- [ ] Auto complete for Oracle, Vertica, Firebird and SQLite
 
 ## Installing
 
@@ -127,27 +123,31 @@ Below you can see an example of the `SQLToolsConnections.sublime-settings`:
             "type"    : "mysql",
             "host"    : "127.0.0.1",
             "port"    : 3306,
-            "username": "user",
-            "password": "password",
             "database": "dbname",
+            "username": "user",
+            // use of password for MySQL is not recommended (use "defaults-extra-file" or "login-path")
+            "password": "password",  // you will get a security warning in the output
+            // "defaults-extra-file": "/path/to/defaults_file_with_password",  // use [client] or [mysql] section
+            // "login-path": "your_login_path",  // login path in your ".mylogin.cnf"
             "encoding": "utf-8"
         },
         "Connection PostgreSQL": {
             "type"    : "pgsql",
             "host"    : "127.0.0.1",
             "port"    :  5432,
-            "username": "anotheruser",
-            "password" : null  // (if you are using postgresql, you must setup a pgpass file and set password to null)
             "database": "dbname",
+            "username": "anotheruser",
+            // for PostgreSQL "password" is optional (setup "pgpass.conf" file instead)
+            "password": "password",
             "encoding": "utf-8"
         },
         "Connection Oracle": {
             "type"    : "oracle",
             "host"    : "127.0.0.1",
             "port"    :  1522,
+            "database": "dbname",
             "username": "anotheruser",
             "password": "password",
-            "database": "dbname",
             "service" : "servicename",
             "encoding": "utf-8"
         },
@@ -181,3 +181,7 @@ PS: For a better experience, add this line to your sublime settings file
   ]
 }
 ```
+
+## Using SQLTools with Mac OS X
+
+Sublime Text has it's evironment variable `PATH` set from launchctl, not by your shell. Binaries installed by packages such as homebrew, for instance `psql` DB CLI for `PostgreSQL`, cannot be found by Sublime Text and results in error in Sublime Text console by `SQLTools`. Installing the package `Fix Mac Path` or setting the full path to your DB CLI binary in `SQLTools.sublime-settings` resolves this issue. Package can be downloaded via [PackageControl](https://packagecontrol.io/packages/Fix%20Mac%20Path) or [github](https://github.com/int3h/SublimeFixMacPath).
