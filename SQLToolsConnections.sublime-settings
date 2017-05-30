@@ -7,7 +7,7 @@
       "port"     : "PORT",     // DB port
       "database" : "DATABASE", // DB name (for SQLite this is the path to DB file)
       "username" : "USERNAME", // DB username
-      "password" : "PASSWORD", // if you are using PostgreSQL - setup a "pgpass.conf" file and set it to null
+      "password" : "PASSWORD", // DB password (see RDMBS specific comments below)
       "encoding" : "utf-8"     // DB encoding. Default: utf-8
     },
     "Connection MySQL": {
