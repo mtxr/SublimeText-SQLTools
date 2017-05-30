@@ -10,13 +10,14 @@ from .Log import Log
 class Command(object):
     timeout = 15
 
-    def __init__(self, args, callback, query=None, encoding='utf-8',
+    def __init__(self, args, env, callback, query=None, encoding='utf-8',
                  options=None, timeout=15, silenceErrors=False, stream=False):
         if options is None:
             options = {}
 
         self.stream = stream
         self.args = args
+        self.env = env
         self.callback = callback
         self.query = query
         self.encoding = encoding
@@ -43,13 +44,18 @@ class Command(object):
         if self.silenceErrors:
             stderrHandle = subprocess.PIPE
 
+        # set the environment
+        modifiedEnvironment = os.environ.copy()
+        if (self.env):
+            modifiedEnvironment.update(self.env)
+
         queryTimerStart = time.time()
 
         self.process = subprocess.Popen(self.args,
                                         stdout=subprocess.PIPE,
                                         stderr=stderrHandle,
                                         stdin=subprocess.PIPE,
-                                        env=os.environ.copy(),
+                                        env=modifiedEnvironment,
                                         startupinfo=si)
 
         if self.stream:
@@ -103,21 +109,21 @@ class Command(object):
         return resultString
 
     @staticmethod
-    def createAndRun(args, query, callback, options=None, timeout=15, silenceErrors=False, stream=False):
+    def createAndRun(args, env, query, callback, options=None, timeout=15, silenceErrors=False, stream=False):
         if options is None:
             options = {}
-        command = Command(args, callback, query, options=options,
+        command = Command(args, env, callback, query, options=options,
                           timeout=timeout, silenceErrors=silenceErrors)
         command.run()
 
 
 class ThreadCommand(Command, Thread):
-    def __init__(self, args, callback, query=None, encoding='utf-8',
+    def __init__(self, args, env, callback, query=None, encoding='utf-8',
                  options=None, timeout=Command.timeout, silenceErrors=False, stream=False):
         if options is None:
             options = {}
 
-        Command.__init__(self, args, callback, query=query,
+        Command.__init__(self, args, env, callback, query=query,
                          encoding=encoding, options=options,
                          timeout=timeout, silenceErrors=silenceErrors,
                          stream=stream)
@@ -143,13 +149,13 @@ class ThreadCommand(Command, Thread):
             pass
 
     @staticmethod
-    def createAndRun(args, query, callback, options=None,
+    def createAndRun(args, env, query, callback, options=None,
                      timeout=Command.timeout, silenceErrors=False, stream=False):
         # Don't allow empty dicts or lists as defaults in method signature,
         # cfr http://nedbatchelder.com/blog/200806/pylint.html
         if options is None:
             options = {}
-        command = ThreadCommand(args, callback, query, options=options,
+        command = ThreadCommand(args, env, callback, query, options=options,
                                 timeout=timeout, silenceErrors=silenceErrors, stream=stream)
         command.start()
         killTimeout = Timer(command.timeout, command.stop)
