@@ -125,10 +125,10 @@ Below you can see an example of the `SQLToolsConnections.sublime-settings`:
             "port"    : 3306,
             "database": "dbname",
             "username": "user",
-            // use of password for MySQL is not recommended (use "defaults-extra-file" or "login-path")
+            /* use of password for MySQL is not recommended (use "defaults-extra-file" or "login-path") */
             "password": "password",  // you will get a security warning in the output
-            // "defaults-extra-file": "/path/to/defaults_file_with_password",  // use [client] or [mysql] section
-            // "login-path": "your_login_path",  // login path in your ".mylogin.cnf"
+            /* "defaults-extra-file": "/path/to/defaults_file_with_password",  // use [client] or [mysql] section */
+            /* "login-path": "your_login_path",  // login path in your ".mylogin.cnf" */
             "encoding": "utf-8"
         },
         "Connection PostgreSQL": {
@@ -137,7 +137,7 @@ Below you can see an example of the `SQLToolsConnections.sublime-settings`:
             "port"    :  5432,
             "database": "dbname",
             "username": "anotheruser",
-            // for PostgreSQL "password" is optional (setup "pgpass.conf" file instead)
+            /* for PostgreSQL "password" is optional (setup "pgpass.conf" file instead) */
             "password": "password",
             "encoding": "utf-8"
         },
