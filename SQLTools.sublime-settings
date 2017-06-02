@@ -121,11 +121,11 @@
             "args": "{username}/{password}@\"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVICE_NAME={service})))\"",
             "queries": {
                 "desc" : {
-                    "query": "select concat(concat(concat(concat('|', owner), '.'), table_name), '|') as tbls from all_tables where owner = sys_context('USERENV', 'CURRENT_SCHEMA');",
+                    "query": "select concat(concat(concat(concat('|', owner), '.'), table_name), '|') as tbls from all_tables;",
                     "options": ["-S"]
                 },
                 "columns": {
-                    "query": "select concat(concat(concat(concat('|', c.table_name), '.'), c.column_name), '|') as cols from all_tab_columns c inner join all_tables t ON c.owner = t.owner and c.table_name = t.table_name where c.owner = sys_context('USERENV', 'CURRENT_SCHEMA');",
+                    "query": "select concat(concat(concat(concat('|', c.table_name), '.'), c.column_name), '|') as cols from all_tab_columns c inner join all_tables t ON c.owner = t.owner and c.table_name = t.table_name;",
                     "options": ["-S"]
                 },
                 "desc table": {
