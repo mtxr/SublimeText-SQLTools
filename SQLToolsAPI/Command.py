@@ -70,9 +70,10 @@ class Command(object):
             if self.process:
                 self.process.terminate()
 
-            if 'show_query' in self.options and self.options['show_query']:
-                formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
-                self.callback(formattedQueryInfo)
+            if 'show_query' in self.options:
+                if 'enabled' in self.options['show_query'] and self.options['show_query']['enabled']:
+                    formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
+                    self.callback(formattedQueryInfo + '\n')
 
             return
 
@@ -93,13 +94,13 @@ class Command(object):
                                           'replace').replace('\r', '')
 
         if 'show_query' in self.options:
-            queryPlacement = self.options['show_query'].get('placement', 'disabled')
-            if isinstance(queryPlacement, str) and queryPlacement != 'disabled':
+            if 'enabled' in self.options['show_query'] and self.options['show_query']['enabled']:
                 formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
+                queryPlacement = self.options['show_query'].get('placement', 'top')
                 if queryPlacement == 'top':
                     resultString = "{0}\n{1}".format(formattedQueryInfo, resultString)
                 elif queryPlacement == 'bottom':
-                    resultString = "{0}\n{1}".format(resultString, formattedQueryInfo)
+                    resultString = "{0}{1}\n".format(resultString, formattedQueryInfo)
 
         self.callback(resultString)
 

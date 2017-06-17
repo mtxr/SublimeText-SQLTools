@@ -38,7 +38,8 @@
         "limit": 50
     },
     "show_query": {
-        "placement": "disabled"
+        "enabled": true,
+        "placement": "top"
     },
     "format" : {
         "keyword_case"    : "upper",
