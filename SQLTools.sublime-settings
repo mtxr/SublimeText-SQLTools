@@ -8,7 +8,10 @@
     "show_result_on_window" : false,
     "clear_output"          : true,
     "safe_limit"            : false,
-    "show_query"            : false,
+    "show_query"            : {
+        "enabled": false,
+        "placement": "top"
+    },
     "expand_to_paragraph"   : false,
     "use_streams"           : false, // use streams for results
     /**
