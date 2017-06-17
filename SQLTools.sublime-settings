@@ -38,7 +38,7 @@
         "limit": 50
     },
     "show_query": {
-        "enabled": true,
+        "enabled": false,
         "placement": "top"
     },
     "format" : {
