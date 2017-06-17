@@ -8,10 +8,6 @@
     "show_result_on_window" : false,
     "clear_output"          : true,
     "safe_limit"            : false,
-    "show_query"            : {
-        "enabled": false,
-        "placement": "top"
-    },
     "expand_to_paragraph"   : false,
     "use_streams"           : false, // use streams for results
     /**
@@ -38,8 +34,11 @@
         "firebird": "isql",
         "sqlite"  : "sqlite3"
     },
-    "show_records" : {
-        "limit" : 50
+    "show_records": {
+        "limit": 50
+    },
+    "show_query": {
+        "placement": "disabled"
     },
     "format" : {
         "keyword_case"    : "upper",

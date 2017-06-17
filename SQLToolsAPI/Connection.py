@@ -55,7 +55,7 @@ You might need to restart the editor for settings to be refreshed."""
         self.service    = options.get('service', None)
 
         self.safe_limit = settings.get('safe_limit', None)
-        self.show_query = settings.get('show_query', None)
+        self.show_query = settings.get('show_query', {})
         self.rowsLimit  = settings.get('show_records', {}).get('limit', 50)
         self.cli        = settings.get('cli')[options['type']]
 

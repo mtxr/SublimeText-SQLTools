@@ -93,17 +93,13 @@ class Command(object):
                                           'replace').replace('\r', '')
 
         if 'show_query' in self.options:
-            if isinstance(self.options['show_query'], dict):
-                if 'enabled' not in self.options['show_query'] or self.options['show_query']['enabled']:
-                    formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
-                    if ('placement' in self.options['show_query']
-                    and self.options['show_query']['placement'] == "bottom"):
-                        resultString = "{0}\n{1}".format(resultString, formattedQueryInfo)
-                    else: # top, by default
-                        resultString = "{0}\n{1}".format(formattedQueryInfo, resultString)
-            elif isinstance(self.options['show_query'], bool) and self.options['show_query']:
+            queryPlacement = self.options['show_query'].get('placement', 'disabled')
+            if isinstance(queryPlacement, str) and queryPlacement != 'disabled':
                 formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
-                resultString = "{0}\n{1}".format(formattedQueryInfo, resultString)
+                if queryPlacement == 'top':
+                    resultString = "{0}\n{1}".format(formattedQueryInfo, resultString)
+                elif queryPlacement == 'bottom':
+                    resultString = "{0}\n{1}".format(resultString, formattedQueryInfo)
 
         self.callback(resultString)
 
