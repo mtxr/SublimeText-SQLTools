@@ -16,7 +16,8 @@
      */
     "selectors": ["source.sql", "source.pgsql", "source.plpgsql.postgres", "source.plsql.oracle", "source.tsql"],
     /**
-     * Possible values for autocompletion: "basic", "smart" or false (disable)
+     * Possible values for autocompletion: "basic", "smart", true ("smart"),
+     *                                      or false (disable)
      * Completion keywords case is controlled by format.keyword_case (see below)
      */
     "autocompletion": "smart",
