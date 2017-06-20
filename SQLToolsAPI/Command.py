@@ -67,14 +67,20 @@ class Command(object):
         if self.stream:
             self.process.stdin.write(self.query.encode())
             self.process.stdin.close()
+            hasWritten = False
+
             for line in self.process.stdout:
                 self.callback(line.decode(self.encoding,
                     'replace').replace('\r', ''))
+                hasWritten = True
 
             queryTimerEnd = time.time()
             # we are done with the output, terminate the process
             if self.process:
                 self.process.terminate()
+            else:
+                if hasWritten:
+                    self.callback('\n')
 
             if self.options['show_query']:
                 formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
