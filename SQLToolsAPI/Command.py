@@ -98,6 +98,9 @@ class Command(object):
             resultString += errors.decode(self.encoding,
                                           'replace').replace('\r', '')
 
+        if self.process == None and resultString != '':
+            resultString += '\n'
+
         if self.options['show_query']:
             formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
             queryPlacement = self.options['show_query']
