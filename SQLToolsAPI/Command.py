@@ -26,6 +26,12 @@ class Command(object):
         self.silenceErrors = silenceErrors
         self.process = None
 
+        if 'show_query' not in self.options:
+            self.options['show_query'] = False
+        elif self.options['show_query'] not in ['top', 'bottom']:
+            self.options['show_query'] = 'top' if (isinstance(self.options['show_query'], bool)
+                                                    and self.options['show_query']) else False
+
     def run(self):
         if not self.query:
             return
@@ -61,18 +67,24 @@ class Command(object):
         if self.stream:
             self.process.stdin.write(self.query.encode())
             self.process.stdin.close()
+            hasWritten = False
+
             for line in self.process.stdout:
                 self.callback(line.decode(self.encoding,
                     'replace').replace('\r', ''))
+                hasWritten = True
 
             queryTimerEnd = time.time()
             # we are done with the output, terminate the process
             if self.process:
                 self.process.terminate()
+            else:
+                if hasWritten:
+                    self.callback('\n')
 
-            if 'show_query' in self.options and self.options['show_query']:
+            if self.options['show_query']:
                 formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
-                self.callback(formattedQueryInfo)
+                self.callback(formattedQueryInfo + '\n')
 
             return
 
@@ -92,9 +104,16 @@ class Command(object):
             resultString += errors.decode(self.encoding,
                                           'replace').replace('\r', '')
 
-        if 'show_query' in self.options and self.options['show_query']:
+        if self.process == None and resultString != '':
+            resultString += '\n'
+
+        if self.options['show_query']:
             formattedQueryInfo = self._formatShowQuery(self.query, queryTimerStart, queryTimerEnd)
-            resultString = "{0}\n{1}".format(formattedQueryInfo, resultString)
+            queryPlacement = self.options['show_query']
+            if queryPlacement == 'top':
+                resultString = "{0}\n{1}".format(formattedQueryInfo, resultString)
+            elif queryPlacement == 'bottom':
+                resultString = "{0}{1}\n".format(resultString, formattedQueryInfo)
 
         self.callback(resultString)
 
