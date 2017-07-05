@@ -68,7 +68,7 @@ I strongly recomend you to use Package Control. It helps you to keep the package
 | `show_records`          | Resultset settings. You can check more on [Show records options](#show-records-options)                          | `object`  | `{"limit": 50}`   |
 | `format`                | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting)                                 | `object`  |                   |
 | `safe_limit`            | Optionally set a default LIMIT on queries.  Parameter can be an INT or false.                                    | `int`     | `false`           |
-| `show_query`            | Optionally show the executed query above the results.                                                            | `boolean` | `false`           |
+| `show_query`            | Optionally show the executed query alongside the results. (`"top"` or `"bottom"`)                                | `mixed`   | `false`           |
 | `expand_to_paragraph`   | Expand cursor selection to current paragraph upon running an SQL query.                                          | `boolean` | `false`           |
 
 ### <a id="show-records-options"></a>Show records options
