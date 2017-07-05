@@ -8,7 +8,6 @@
     "show_result_on_window" : false,
     "clear_output"          : true,
     "safe_limit"            : false,
-    "show_query"            : false,
     "expand_to_paragraph"   : false,
     "use_streams"           : false, // use streams for results
     /**
@@ -17,10 +16,18 @@
      */
     "selectors": ["source.sql", "source.pgsql", "source.plpgsql.postgres", "source.plsql.oracle", "source.tsql"],
     /**
-     * Possible values for autocompletion: "basic", "smart" or false (disable)
+     * Possible values for autocompletion: "basic", "smart", true ("smart"),
+     *                                      or false (disable)
      * Completion keywords case is controlled by format.keyword_case (see below)
      */
     "autocompletion": "smart",
+    /**
+     * Possible values for show_query: "top", "bottom", true ("top"), or false (disable)
+     * When using regular output, this will determine where query details is displayed.
+     * In stream output mode, any option that isn't false will print query details at
+     * the bottom of result.
+     */
+    "show_query": false,
     /**
      * If DB cli binary is not in PATH, set the full path in "cli" section.
      * Note: forward slashes ("/") should be used in path. Example:
@@ -35,8 +42,8 @@
         "firebird": "isql",
         "sqlite"  : "sqlite3"
     },
-    "show_records" : {
-        "limit" : 50
+    "show_records": {
+        "limit": 50
     },
     "format" : {
         "keyword_case"    : "upper",
