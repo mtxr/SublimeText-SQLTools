@@ -128,11 +128,11 @@
             "args": "{username}/{password}@\"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVICE_NAME={service})))\"",
             "queries": {
                 "desc" : {
-                    "query": "select concat(concat(concat(concat('|', owner), '.'), table_name), '|') as tbls from all_tables;",
+                    "query": "select concat(concat(concat(concat('|', owner), '.'), table_name), '|') as tbls from all_tables UNION ALL select concat(concat(concat(concat('|', owner), '.'), view_name), '|') as tbls from all_views;",
                     "options": ["-S"]
                 },
                 "columns": {
-                    "query": "select concat(concat(concat(concat('|', c.table_name), '.'), c.column_name), '|') as cols from all_tab_columns c inner join all_tables t ON c.owner = t.owner and c.table_name = t.table_name;",
+                    "query": "SELECT concat(concat(concat(concat('|', c.table_name), '.'), c.column_name), '|') AS cols FROM all_tab_columns c INNER JOIN all_tables t ON c.owner = t.owner AND c.table_name = t.table_name UNION ALL SELECT concat(concat(concat(concat('|', c.table_name), '.'), c.column_name), '|') AS cols FROM all_tab_columns c INNER JOIN all_views t ON c.owner = t.owner AND c.table_name = t.view_name;",
                     "options": ["-S"]
                 },
                 "desc table": {
