@@ -1,6 +1,7 @@
 [
     { "keys": ["ctrl+alt+e"], "command": "st_select_connection" },
     { "keys": ["ctrl+e", "ctrl+e"], "command": "st_execute" },
+    { "keys": ["ctrl+e", "ctrl+a"], "command": "st_execute_all" },
     { "keys": ["ctrl+e", "ctrl+x"], "command": "st_explain_plan" },
     { "keys": ["ctrl+e", "ctrl+h"], "command": "st_history" },
     { "keys": ["ctrl+e", "ctrl+s"], "command": "st_show_records" },
@@ -9,6 +10,6 @@
     { "keys": ["ctrl+e", "ctrl+b"], "command": "st_format" },
     { "keys": ["ctrl+e", "ctrl+q"], "command": "st_save_query" },
     { "keys": ["ctrl+e", "ctrl+r"], "command": "st_remove_saved_query" },
-    { "keys": ["ctrl+e", "ctrl+a"], "command": "st_list_queries"},
+    { "keys": ["ctrl+e", "ctrl+l"], "command": "st_list_queries"},
     { "keys": ["ctrl+e", "ctrl+o"], "command": "st_list_queries", "args": {"mode" : "open"}}
 ]
