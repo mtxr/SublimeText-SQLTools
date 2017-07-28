@@ -8,6 +8,10 @@
     "command": "st_execute"
   },
   {
+    "caption": "ST: Execute All File",
+    "command": "st_execute_all"
+  },
+  {
     "caption": "ST: Explain Plan",
     "command": "st_explain_plan"
   },

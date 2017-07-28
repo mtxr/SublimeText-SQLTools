@@ -473,6 +473,18 @@ class StExecute(WindowCommand):
         ST.conn.execute(getSelection(), createOutput(), stream=settings.get('use_streams', False))
 
 
+class StExecuteAll(WindowCommand):
+    @staticmethod
+    def run():
+        if not ST.conn:
+            ST.selectConnection(tablesCallback=lambda: Window().run_command('st_execute_all'))
+            return
+
+        Window().status_message(MESSAGE_RUNNING_CMD)
+        allText = View().substr(sublime.Region(0, View().size()))
+        ST.conn.execute(allText, createOutput(), stream=settings.get('use_streams', False))
+
+
 class StFormat(TextCommand):
     @staticmethod
     def run(edit):
