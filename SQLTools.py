@@ -536,8 +536,9 @@ class StSaveQuery(WindowCommand):
 class StListQueries(WindowCommand):
     @staticmethod
     def run(mode="run"):
-        if not ST.conn:
-            ST.selectConnection(functionsCallback=lambda: Window().run_command('st_list_queries'))
+        if mode == "run" and not ST.conn:
+            ST.selectConnection(functionsCallback=lambda: Window().run_command('st_list_queries',
+                                                                               {'mode': mode}))
             return
 
         queriesList = queries.all()
