@@ -115,14 +115,15 @@ def loadDefaultConnection():
 
 
 def createOutput(panel=None, syntax=None, prependText=None):
-    # hide previously set command running message (if any)
-    Window().status_message('')
     if not panel:
         panel = getOutputPlace(syntax)
     if prependText:
         panel.run_command('append', {'characters': str(prependText)})
 
     def append(outputContent):
+        # hide previously set command running message (if any)
+        Window().status_message('')
+        # append content
         panel.set_read_only(False)
         panel.run_command('append', {'characters': outputContent})
         panel.set_read_only(True)
