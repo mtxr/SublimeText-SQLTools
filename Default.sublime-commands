@@ -54,6 +54,11 @@
     "args"   :  {"mode": "open"}
   },
   {
+    "caption": "ST: List and Insert Saved Queries",
+    "command": "st_list_queries",
+    "args"   :  {"mode": "insert"}
+  },
+  {
     "caption": "ST: Format Current SQL File",
     "command": "st_format"
   },
