@@ -139,6 +139,11 @@ def toNewTab(content, name="", suffix="SQLTools Saved Query"):
     resultContainer.run_command('append', {'characters': content})
 
 
+def insertContent(content):
+    currentView = View()
+    currentView.run_command('insert', {'characters': content})
+
+
 def getOutputPlace(syntax=None, name="SQLTools Result"):
     if not settings.get('show_result_on_window', True):
         resultContainer = Window().find_output_panel(name)
@@ -559,6 +564,8 @@ class StListQueries(WindowCommand):
             if mode == "run":
                 ST.conn.execute(query, createOutput(),
                                 stream=settings.get('use_streams', False))
+            elif mode == "insert":
+                insertContent(query);
             else:
                 toNewTab(query, alias)
 
