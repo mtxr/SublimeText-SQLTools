@@ -140,8 +140,12 @@ def toNewTab(content, name="", suffix="SQLTools Saved Query"):
 
 
 def insertContent(content):
-    currentView = View()
-    currentView.run_command('insert', {'characters': content})
+    view = View()
+    settings = view.settings()
+    autoIndent = settings.get('auto_indent', True)
+    settings.set('auto_indent', False)
+    view.run_command('insert', {'characters': content})
+    settings.set('auto_indent', autoIndent)
 
 
 def getOutputPlace(syntax=None, name="SQLTools Result"):
@@ -565,7 +569,7 @@ class StListQueries(WindowCommand):
                 ST.conn.execute(query, createOutput(),
                                 stream=settings.get('use_streams', False))
             elif mode == "insert":
-                insertContent(query);
+                insertContent(query)
             else:
                 toNewTab(query, alias)
 
