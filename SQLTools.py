@@ -141,10 +141,15 @@ def toNewTab(content, name="", suffix="SQLTools Saved Query"):
 
 def insertContent(content):
     view = View()
+    # getting the settings local to this view/tab
     settings = view.settings()
+    # saving the original settings for "auto_indent", or True if none set
     autoIndent = settings.get('auto_indent', True)
+    # turn off automatic indenting otherwise the tabbing of the original
+    # string is not respected after a newline is encountered
     settings.set('auto_indent', False)
     view.run_command('insert', {'characters': content})
+    # restore "auto_indent" setting
     settings.set('auto_indent', autoIndent)
 
 
