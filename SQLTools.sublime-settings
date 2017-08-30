@@ -37,6 +37,7 @@
         "mysql"   : "mysql",
         "pgsql"   : "psql",
         "oracle"  : "sqlplus",
+        "mssql"   : "sqlcmd",
         "vertica" : "vsql",
         "sqsh"    : "sqsh",
         "firebird": "isql",
@@ -182,6 +183,30 @@
                 "explain plan": {
                     "query": "explain {0};",
                     "options": ["-f", "--table"]
+                }
+            }
+        },
+        "mssql": {
+            "options": [],
+            "before": [],
+            "args": "-d \"{database}\"",
+            "args_optional": ["-S \"{host},{port}\"", "-S \"{host}\\{instance}\"", "-U \"{username}\"", "-P \"{password}\""],
+            "queries": {
+                "desc": {
+                    "query": "set nocount on; select concat(table_schema, '.', table_name) from information_schema.tables order by table_name;",
+                    "options": ["-h", "-1"]
+                },
+                "columns": {
+                    "query": "set nocount on; select concat(table_name, '.', column_name) from information_schema.columns order by table_name, ordinal_position;",
+                    "options": ["-h", "-1"]
+                },
+                "desc table": {
+                    "query": "exec sp_help \"%s\";",
+                    "options": []
+                },
+                "show records": {
+                    "query": "select top {1} * from {0};",
+                    "options": []
                 }
             }
         },

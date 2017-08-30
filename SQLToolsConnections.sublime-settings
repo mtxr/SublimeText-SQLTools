@@ -42,6 +42,19 @@
       "service" : "servicename",
       "encoding": "utf-8"
     },
+    "Connection MSSQL": {
+      "type"    : "mssql",
+      // use either ("host", "port") and remove "instance"
+      // or ("host", "instance") and remove "port"
+      "host"    : "localhost",
+      "instance": "SQLEXPRESS",
+      // "port"    :  1433,
+      // "username" and "password" are optional (remove if not needed)
+      "username": "sa",
+      "password": "password",
+      "database": "sample",
+      "encoding": "utf-8"
+    }
     "Connection SQLite": {
       "type"    : "sqlite",
       "database": "d:/sqlite/sample_db/chinook.db", // note the forward slashes in path
