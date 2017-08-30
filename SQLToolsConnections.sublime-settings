@@ -54,7 +54,7 @@
       "password": "password",
       "database": "sample",
       "encoding": "utf-8"
-    }
+    },
     "Connection SQLite": {
       "type"    : "sqlite",
       "database": "d:/sqlite/sample_db/chinook.db", // note the forward slashes in path
