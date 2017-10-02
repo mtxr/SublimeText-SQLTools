@@ -381,7 +381,7 @@ class Completion:
 
         # we use set, as we are interested only in unique identifiers
         for ident in identifiers:
-            if ident.has_alias() and ident.alias == prefixParent:
+            if ident.has_alias() and ident.alias.lower() == prefixParent:
                 if ident.is_query_alias:
                     sqlQueryAliases.add(ident.alias)
 
