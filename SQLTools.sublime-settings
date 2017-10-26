@@ -73,7 +73,7 @@
             },
             "queries": {
                 "desc" : {
-                    "query": "select '|' || quote_ident(table_schema)||'.'||quote_ident(table_name) ||'|' as tblname from information_schema.tables where table_schema = any(current_schemas(false)) and table_schema not in ('pg_catalog', 'information_schema') order by table_schema = current_schema() desc, table_schema, table_name",
+                    "query": "select '|' || quote_ident(table_schema)||'.'||quote_ident(table_name) ||'|' as tblname from information_schema.tables where table_schema not in ('pg_catalog', 'information_schema') order by table_schema = current_schema() desc, table_schema, table_name",
                     "options": ["--tuples-only", "--no-psqlrc"]
                 },
                 "desc table": {
@@ -85,11 +85,11 @@
                     "options": ["--no-password"]
                 },
                 "columns": {
-                    "query": "select '|' || quote_ident(table_name) || '.' || quote_ident(column_name) || '|' from information_schema.columns where table_schema = any(current_schemas(false)) and table_schema not in ('pg_catalog', 'information_schema') order by table_name, ordinal_position",
+                    "query": "select '|' || quote_ident(table_name) || '.' || quote_ident(column_name) || '|' from information_schema.columns where table_schema not in ('pg_catalog', 'information_schema') order by table_name, ordinal_position",
                     "options": ["--no-password", "--tuples-only", "--no-psqlrc"]
                 },
                 "functions": {
-                    "query": "select '|' || quote_ident(n.nspname)||'.'||quote_ident(f.proname) || '(' || pg_get_function_identity_arguments(f.oid) || ')' || '|' as funname from pg_catalog.pg_proc as f inner join pg_catalog.pg_namespace as n on n.oid = f.pronamespace where f.proisagg = false and n.nspname = any(current_schemas(false)) and n.nspname not in ('pg_catalog', 'information_schema')",
+                    "query": "select '|' || quote_ident(n.nspname)||'.'||quote_ident(f.proname) || '(' || pg_get_function_identity_arguments(f.oid) || ')' || '|' as funname from pg_catalog.pg_proc as f inner join pg_catalog.pg_namespace as n on n.oid = f.pronamespace where f.proisagg = false and n.nspname not in ('pg_catalog', 'information_schema')",
                     "options": ["--no-password", "--tuples-only", "--no-psqlrc"]
                 },
                 "desc function": {
@@ -156,7 +156,7 @@
             "args_optional": ["--login-path=\"{login-path}\"", "--defaults-extra-file=\"{defaults-extra-file}\"", "-p\"{password}\""],
             "queries": {
                 "desc" : {
-                    "query": "select concat('|', table_schema, '.', table_name, '|') from information_schema.tables where table_schema = database() order by table_name;",
+                    "query": "select concat('|', case when table_schema REGEXP '[^0-9a-zA-Z$_]' then concat('`',table_schema,'`') else table_schema end, '.', case when table_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',table_name,'`') else table_name end, '|') from information_schema.tables where table_schema = database() order by table_name;",
                     "options": ["-f", "--silent", "--raw"]
                 },
                 "desc table": {
@@ -168,15 +168,15 @@
                     "options": ["-f", "--table"]
                 },
                 "columns": {
-                    "query": "select concat('|',  table_name, '.', column_name, '|') from information_schema.columns where table_schema = database() order by table_name, ordinal_position;",
+                    "query": "select concat('|',  case when table_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',table_name,'`') else table_name end, '.', case when column_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',column_name,'`') else column_name end, '|') from information_schema.columns where table_schema = database() order by table_name, ordinal_position;",
                     "options": ["-f", "--silent", "--raw"]
                 },
                 "functions": {
-                    "query": "select concat('|', routine_schema, '.', routine_name, '()', '|') from information_schema.routines where routine_schema = database();",
+                    "query": "select concat('|', case when routine_schema REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_schema,'`') else routine_schema end, '.', case when routine_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_name,'`') else routine_name end, '()', '|') from information_schema.routines where routine_schema = database();",
                     "options": ["-f", "--silent", "--raw"]
                 },
                 "desc function": {
-                    "query": "select routine_definition from information_schema.routines where concat(routine_schema, '.', routine_name) = '%s';",
+                    "query": "select routine_definition from information_schema.routines where concat(case when routine_schema REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_schema,'`') else routine_schema end, '.', case when routine_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_name,'`') else routine_name end) = '%s';",
                     "options": ["-f", "--silent", "--raw"]
                 },
                 "explain plan": {
