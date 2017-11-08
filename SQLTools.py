@@ -368,7 +368,7 @@ class ST(EventListener):
         lineStartToLocation = sublime.Region(lineStartPoint, currentPoint)
         try:
             lineStr = view.substr(lineStartToLocation)
-            prefix = re.split('[^`\"\w.]+', lineStr).pop()
+            prefix = re.split('[^`\"\w.\$]+', lineStr).pop()
         except Exception as e:
             Log(e)
 
