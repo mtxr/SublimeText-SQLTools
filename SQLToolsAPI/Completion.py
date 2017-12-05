@@ -39,6 +39,11 @@ def _stripPrefix(text, prefix):
     return text
 
 
+# escape $ sign when formatting output
+def _escapeDollarSign(ident):
+    return ident.replace("$", "\$")
+
+
 class CompletionItem(namedtuple('CompletionItem', ['type', 'ident'])):
     """
     Represents a potential or actual completion item.
@@ -149,10 +154,10 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident'])):
         part = self.ident.split('.')
         if len(part) > 1:
             return ("{0}\t({1} {2})".format(part[1], part[0], typeDisplay),
-                    _stripQuotesOnDemand(part[1], stripQuotes))
+                    _stripQuotesOnDemand(_escapeDollarSign(part[1]), stripQuotes))
 
         return ("{0}\t({1})".format(self.ident, typeDisplay),
-                _stripQuotesOnDemand(self.ident, stripQuotes))
+                _stripQuotesOnDemand(_escapeDollarSign(self.ident), stripQuotes))
 
 
 class Completion:
@@ -381,7 +386,7 @@ class Completion:
 
         # we use set, as we are interested only in unique identifiers
         for ident in identifiers:
-            if ident.has_alias() and ident.alias == prefixParent:
+            if ident.has_alias() and ident.alias.lower() == prefixParent:
                 if ident.is_query_alias:
                     sqlQueryAliases.add(ident.alias)
 

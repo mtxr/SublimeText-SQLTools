@@ -1,23 +1,30 @@
-> This is a guideline to help us to understand SQLTools Issues. 
+> This issue template helps us understand your SQLTools issues better. 
+>
+> You don't need to stick to this template, but please try to guide us to reproduce the errors or understand your feature requests. 
 > 
-> You don't need to stick to this, but please try to guide us to reproduce the errors or understand your feature requests.
+> Before submitting an issue, please consider these things first: 
+> * Are you running the latest version? If not, try to upgrade.
+> * Did you check the [Setup Guide](http://mtxr.github.io/SQLTools/)?
+> * Did you check the logs in console (``Ctrl+` `` or select *View → Show Console*)?
 
 ### Issue Type
 
-* [ ] Feature Request
-* [ ] Bugfix/Errors
-* [ ] Questions
-* [ ] Other
-
-### Prerequisites (For bugfixes)
-
-* [ ] Are you running the latest version?
-* [ ] Did you check the logs?
-* [ ] Did you check the Setup?
+Feature Request |
+Bug/Error |
+Question |
+Other
 
 ### Description
 
-[Description of the bug or feature]
+[Description of the bug / feature / question]
+
+### Version
+
+- *SQLTools Version*: vX.Y.Z
+- *OS*: (Windows, Mac, Linux)
+- *RDBMS*: (MySQL, PostgreSQL, Oracle, MSSQL, SQLite, Vertica, ...)
+
+> You can get this information by executing `ST: About` from Sublime `Command Palette`.
 
 ### Steps to Reproduce (For bugfixes)
 
@@ -28,11 +35,3 @@
 **Expected behavior:** [What you expected to happen]
 
 **Actual behavior:** [What actually happened]
-
-### Versions
-
-- *Version*: vX.Y.Z
-- *OS*: ...
-- *RDBMS*: (MySQL, PostgreSQL, Oracle, MSSQL, SQLite, Vertica, ...)
-
-You can get this information from executing `ST: About` from Sublime `Command Palette`.

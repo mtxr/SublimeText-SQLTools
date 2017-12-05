@@ -1,4 +1,4 @@
-__version__ = "v0.9.4"
+__version__ = "v0.9.7"
 
 import sys
 import os
@@ -57,9 +57,21 @@ def startPlugin():
     QUERIES_FILENAME             = os.path.join(USER_FOLDER, SQLTOOLS_QUERIES_FILE)
     QUERIES_FILENAME_DEFAULT     = os.path.join(DEFAULT_FOLDER, SQLTOOLS_QUERIES_FILE)
 
-    settings    = Settings(SETTINGS_FILENAME, default=SETTINGS_FILENAME_DEFAULT)
+    try:
+        settings    = Settings(SETTINGS_FILENAME, default=SETTINGS_FILENAME_DEFAULT)
+    except Exception as e:
+        msg = __package__ + ": Failed to parse " + SQLTOOLS_SETTINGS_FILE + " file"
+        print(msg + "\nError: " + str(e))
+        Window().status_message(msg)
+
+    try:
+        connections = Settings(CONNECTIONS_FILENAME, default=CONNECTIONS_FILENAME_DEFAULT)
+    except Exception as e:
+        msg = __package__ + ": Failed to parse " + SQLTOOLS_CONNECTIONS_FILE + " file"
+        print(msg + "\nError: " + str(e))
+        Window().status_message(msg)
+
     queries     = Storage(QUERIES_FILENAME, default=QUERIES_FILENAME_DEFAULT)
-    connections = Settings(CONNECTIONS_FILENAME, default=CONNECTIONS_FILENAME_DEFAULT)
     history     = History(settings.get('history_size', 100))
 
     Logger.setPackageVersion(__version__)
@@ -356,7 +368,7 @@ class ST(EventListener):
         lineStartToLocation = sublime.Region(lineStartPoint, currentPoint)
         try:
             lineStr = view.substr(lineStartToLocation)
-            prefix = re.split('[^`\"\w.]+', lineStr).pop()
+            prefix = re.split('[^`\"\w.\$]+', lineStr).pop()
         except Exception as e:
             Log(e)
 
