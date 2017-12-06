@@ -150,38 +150,38 @@
             }
         },
         "mysql": {
-            "options": ["-f", "--table"],
+            "options": ["-f", "--table", "--default-character-set=utf8"],
             "before": [],
             "args": "-h{host} -P{port} -u\"{username}\" -D\"{database}\"",
             "args_optional": ["--login-path=\"{login-path}\"", "--defaults-extra-file=\"{defaults-extra-file}\"", "-p\"{password}\""],
             "queries": {
                 "desc" : {
                     "query": "select concat('|', case when table_schema REGEXP '[^0-9a-zA-Z$_]' then concat('`',table_schema,'`') else table_schema end, '.', case when table_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',table_name,'`') else table_name end, '|') from information_schema.tables where table_schema = database() order by table_name;",
-                    "options": ["-f", "--silent", "--raw"]
+                    "options": ["-f", "--silent", "--raw", "--default-character-set=utf8"]
                 },
                 "desc table": {
                     "query": "desc %s",
-                    "options": ["-f", "--table"]
+                    "options": ["-f", "--table", "--default-character-set=utf8"]
                 },
                 "show records": {
                     "query": "select * from {0} limit {1}",
-                    "options": ["-f", "--table"]
+                    "options": ["-f", "--table", "--default-character-set=utf8"]
                 },
                 "columns": {
                     "query": "select concat('|',  case when table_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',table_name,'`') else table_name end, '.', case when column_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',column_name,'`') else column_name end, '|') from information_schema.columns where table_schema = database() order by table_name, ordinal_position;",
-                    "options": ["-f", "--silent", "--raw"]
+                    "options": ["-f", "--silent", "--raw", "--default-character-set=utf8"]
                 },
                 "functions": {
                     "query": "select concat('|', case when routine_schema REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_schema,'`') else routine_schema end, '.', case when routine_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_name,'`') else routine_name end, '()', '|') from information_schema.routines where routine_schema = database();",
-                    "options": ["-f", "--silent", "--raw"]
+                    "options": ["-f", "--silent", "--raw", "--default-character-set=utf8"]
                 },
                 "desc function": {
                     "query": "select routine_definition from information_schema.routines where concat(case when routine_schema REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_schema,'`') else routine_schema end, '.', case when routine_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_name,'`') else routine_name end) = '%s';",
-                    "options": ["-f", "--silent", "--raw"]
+                    "options": ["-f", "--silent", "--raw", "--default-character-set=utf8"]
                 },
                 "explain plan": {
                     "query": "explain {0};",
-                    "options": ["-f", "--table"]
+                    "options": ["-f", "--table", "--default-character-set=utf8"]
                 }
             }
         },
