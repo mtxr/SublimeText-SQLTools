@@ -5,6 +5,8 @@
 
 Your swiss knife SQL for Sublime Text.
 
+> If you are looking for VSCode version go to [https://github.com/mtxr/vscode-sqltools](https://github.com/mtxr/vscode-sqltools).
+
 Write your SQL with smart completions and hady table and function definitions, execute SQL and explain queries, format your queries and save them in history.
 
 Project website: [http://mtxr.github.io/SQLTools/](http://mtxr.github.io/SQLTools/)
