@@ -5,6 +5,8 @@
 
 Your swiss knife SQL for Sublime Text.
 
+> If you are looking for VSCode version go to [https://github.com/mtxr/vscode-sqltools](https://github.com/mtxr/vscode-sqltools).
+
 Write your SQL with smart completions and hady table and function definitions, execute SQL and explain queries, format your queries and save them in history.
 
 Project website: [http://mtxr.github.io/SQLTools/](http://mtxr.github.io/SQLTools/)
@@ -29,22 +31,22 @@ These fellows helped SQLTools become better than ever. Thank you so much!
 ## Features
 
 * Smart auto completions (for PostgreSQL, MySQL, Oracle, MSSQL, Vertica, Firebird)
-* Run SQL Queries (`CTRL+e, CTRL+e`)
+* Run SQL Queries (<kbd>CTRL+e</kbd>, <kbd>CTRL+e</kbd>)
 ![Auto complete (PostgreSQL & MySQL) && Run SQL Queries](https://github.com/mtxr/SQLTools/raw/images/execute_auto_complete.gif?raw=true)
-* View table schemas (`CTRL+e, CTRL+d`)
+* View table schemas (<kbd>CTRL+e</kbd>, <kbd>CTRL+d</kbd>)
 ![View table schemas](https://github.com/mtxr/SQLTools/raw/images/table_description.gif?raw=true)
-* View Queries history (`CTRL+e, CTRL+h`)
-* Show table records (`CTRL+e, CTRL+s`)
+* View Queries history (<kbd>CTRL+e</kbd>, <kbd>CTRL+h</kbd>)
+* Show table records (<kbd>CTRL+e</kbd>, <kbd>CTRL+s</kbd>)
 ![Show table records](https://github.com/mtxr/SQLTools/raw/images/table_records.gif?raw=true)
-* Show explain plan for queries (PostgreSQL, MySQL, Oracle, Vertica, SQLite) (`CTRL+e, CTRL+x`)
-* Formatting SQL Queries (`CTRL+e, CTRL+b`)
+* Show explain plan for queries (PostgreSQL, MySQL, Oracle, Vertica, SQLite) (<kbd>CTRL+e</kbd>, <kbd>CTRL+x</kbd>)
+* Formatting SQL Queries (<kbd>CTRL+e</kbd>, <kbd>CTRL+b</kbd>)
 ![Formatting SQL Queries](https://github.com/mtxr/SQLTools/raw/images/format_sql.gif?raw=true)
 * Threading Support (prevent ST lockups)
 * Query timeout (Kill thread if query takes too long)
 * Unescape chars for languages (PHP \" is replace by ")
-* Save queries (`CTRL+e, CTRL+q`)
-* List and Run saved queries (`CTRL+e, CTRL+a`)
-* Remove saved queries (`CTRL+e, CTRL+r`)
+* Save queries (<kbd>CTRL+e</kbd>, <kbd>CTRL+q</kbd>)
+* List and Run saved queries (<kbd>CTRL+e</kbd>, <kbd>CTRL+a</kbd>)
+* Remove saved queries (<kbd>CTRL+e</kbd>, <kbd>CTRL+r</kbd>)
 
 ## Installing
 
