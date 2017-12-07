@@ -1,7 +1,8 @@
 ![SQLTools v0.5.4](https://github.com/mtxr/SQLTools/raw/images/icon.png?raw=true) SQLTools
 ===============
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/9f52b6f590af41c0bce2897d68a60fb6)](https://www.codacy.com/app/matheus-mtxr/SQLTools?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mtxr/SQLTools&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/69521948934940d289f82405d16926bb)](https://www.codacy.com/app/SQLTools/SQLTools?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mtxr/SQLTools&amp;utm_campaign=Badge_Grade)
+<span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RSMB6DGK238V8" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
 
 Your swiss knife SQL for Sublime Text.
 
