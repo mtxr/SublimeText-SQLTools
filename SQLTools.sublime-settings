@@ -68,6 +68,7 @@
         "pgsql": {
             "options": ["--no-password"],
             "before": [],
+            "after": [],
             "args": "-h {host} -p {port} -U {username} -d {database}",
             "env_optional": {
                 "PGPASSWORD": "{password}"
@@ -126,6 +127,7 @@
                 "SET VERIFY         OFF ",
                 "SET WRAP           OFF"
             ],
+            "after": [],
             "args": "{username}/{password}@\"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVICE_NAME={service})))\"",
             "queries": {
                 "desc" : {
@@ -153,6 +155,7 @@
         "mysql": {
             "options": ["-f", "--table", "--default-character-set=utf8"],
             "before": [],
+            "after": [],
             "args": "-h{host} -P{port} -u\"{username}\" -D\"{database}\"",
             "args_optional": ["--login-path=\"{login-path}\"", "--defaults-extra-file=\"{defaults-extra-file}\"", "-p\"{password}\""],
             "queries": {
@@ -189,6 +192,7 @@
         "mssql": {
             "options": [],
             "before": [],
+            "after": ["GO", "QUIT"],
             "args": "-d \"{database}\"",
             "args_optional": ["-S \"{host},{port}\"", "-S \"{host}\\{instance}\"", "-U \"{username}\"", "-P \"{password}\""],
             "queries": {
@@ -213,6 +217,7 @@
         "vertica": {
             "options": [],
             "before" : [],
+            "after": [],
             "args": "-h {host} -p {port} -U \"{username}\" -w \"{password}\" -d \"{database}\"",
             "queries": {
                 "desc" : {
@@ -240,6 +245,7 @@
         "sqsh": {
             "options": [],
             "before": ["\\set semicolon_cmd=\"\\go -mpretty -l\""],
+            "after": [],
             "args": "-S {host}:{port} -U\"{username}\" -P\"{password}\" -D{database}",
             "queries": {
                 "desc": {
@@ -267,6 +273,7 @@
         "sqlite": {
             "options": ["-column", "-header"],
             "before": [],
+            "after": [],
             "args": "\"{database}\"",
             "queries": {
                 "desc" : {
@@ -290,6 +297,7 @@
         "firebird": {
             "options": [],
             "before": [],
+            "after": [],
             "args": "-u \"{username}\" -p \"{password}\" \"{host}/{port}:{database}\"",
             "queries": {
                 "desc" : {
