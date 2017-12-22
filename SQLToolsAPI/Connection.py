@@ -196,8 +196,8 @@ You might need to restart the editor for settings to be refreshed."""
 
         cliOptions = self.getOptionsForSgdbCli()
         beforeCli = cliOptions.get('before')
-        beforeQuery = cliOptions.get('queries', {}).get(queryName, {}).get('before')
         afterCli = cliOptions.get('after')
+        beforeQuery = cliOptions.get('queries', {}).get(queryName, {}).get('before')
         afterQuery = cliOptions.get('queries', {}).get(queryName, {}).get('after')
 
         # sometimes we preprocess the raw queries from user, in that case we already have a list
@@ -216,7 +216,8 @@ You might need to restart the editor for settings to be refreshed."""
         if afterQuery is not None:
             builtQueries.extend(afterQuery)
 
-        print(builtQueries)
+        # remove empty list items
+        builtQueries = list(filter(None, builtQueries))
 
         return '\n'.join(builtQueries)
 
@@ -238,28 +239,16 @@ You might need to restart the editor for settings to be refreshed."""
                     args = args + shlex.split(formattedItem)
 
         # append generic options
-        # options = cliOptions.get('options', None)
-        # if options:
-        #     args = args + options
+        options = cliOptions.get('options', None)
+        if options:
+            args = args + options
 
         # append query specific options (if present)
-        # if queryName:
-        #     queryOptions = cliOptions.get('queries', {}).get(queryName, {}).get.('options')
-        #     if queryOptions:
-        #         if len(queryOptions) > 0:
-        #             args = args + queryOptions
-
-        # append query specific options
         if queryName:
             queryOptions = cliOptions.get('queries', {}).get(queryName, {}).get('options')
             if queryOptions:
                 if len(queryOptions) > 0:
                     args = args + queryOptions
-        else:
-            # append generic options (only if not custom query)
-            options = cliOptions.get('options', None)
-            if options:
-                args = args + options
 
         # append main args - could be a single value or a list
         mainArgs = cliOptions['args']

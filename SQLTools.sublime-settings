@@ -74,33 +74,36 @@
                 "PGPASSWORD": "{password}"
             },
             "queries": {
-                "desc" : {
+                "exec": {
+                    "options": []
+                },
+                "desc": {
                     "query": "select '|' || quote_ident(table_schema)||'.'||quote_ident(table_name) ||'|' as tblname from information_schema.tables where table_schema not in ('pg_catalog', 'information_schema') order by table_schema = current_schema() desc, table_schema, table_name",
                     "options": ["--tuples-only", "--no-psqlrc"]
                 },
                 "desc table": {
-                    "query": "\\d+ %s",
-                    "options": ["--no-password"]
+                    "query": "\\d+ {0}",
+                    "options": []
                 },
                 "show records": {
                     "query": "select * from {0} limit {1}",
-                    "options": ["--no-password"]
+                    "options": []
                 },
                 "columns": {
                     "query": "select '|' || quote_ident(table_name) || '.' || quote_ident(column_name) || '|' from information_schema.columns where table_schema not in ('pg_catalog', 'information_schema') order by table_name, ordinal_position",
-                    "options": ["--no-password", "--tuples-only", "--no-psqlrc"]
+                    "options": ["--tuples-only", "--no-psqlrc"]
                 },
                 "functions": {
                     "query": "select '|' || quote_ident(n.nspname)||'.'||quote_ident(f.proname) || '(' || pg_get_function_identity_arguments(f.oid) || ')' || '|' as funname from pg_catalog.pg_proc as f inner join pg_catalog.pg_namespace as n on n.oid = f.pronamespace where f.proisagg = false and n.nspname not in ('pg_catalog', 'information_schema')",
-                    "options": ["--no-password", "--tuples-only", "--no-psqlrc"]
+                    "options": ["--tuples-only", "--no-psqlrc"]
                 },
                 "desc function": {
-                    "query": "\\sf %s",
-                    "options": ["--no-password"]
+                    "query": "\\sf {0}",
+                    "options": []
                 },
                 "explain plan": {
                     "query": "explain {0};",
-                    "options": ["--no-password"]
+                    "options": []
                 }
             }
         },
@@ -130,62 +133,68 @@
             "after": [],
             "args": "{username}/{password}@\"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVICE_NAME={service})))\"",
             "queries": {
+                "exec": {
+                    "options": []
+                },
                 "desc" : {
                     "query": "select concat(concat(concat(concat('|', owner), '.'), table_name), '|') as tbls from all_tables UNION ALL select concat(concat(concat(concat('|', owner), '.'), view_name), '|') as tbls from all_views;",
-                    "options": ["-S"]
+                    "options": []
                 },
                 "columns": {
                     "query": "SELECT concat(concat(concat(concat('|', c.table_name), '.'), c.column_name), '|') AS cols FROM all_tab_columns c INNER JOIN all_tables t ON c.owner = t.owner AND c.table_name = t.table_name UNION ALL SELECT concat(concat(concat(concat('|', c.table_name), '.'), c.column_name), '|') AS cols FROM all_tab_columns c INNER JOIN all_views t ON c.owner = t.owner AND c.table_name = t.view_name;",
-                    "options": ["-S"]
+                    "options": []
                 },
                 "desc table": {
-                    "query": "desc %s;",
-                    "options": ["-S"]
+                    "query": "desc {0};",
+                    "options": []
                 },
                 "show records": {
                     "query": "select * from {0} WHERE ROWNUM <= {1};",
-                    "options": ["-S"]
+                    "options": []
                 },
                 "explain plan": {
                     "query": "explain plan for {0};\nselect plan_table_output from table(dbms_xplan.display());",
-                    "options": ["-S"]
+                    "options": []
                 }
             }
         },
         "mysql": {
-            "options": ["-f", "--table", "--default-character-set=utf8"],
+            "options": ["--default-character-set=utf8"],
             "before": [],
             "after": [],
             "args": "-h{host} -P{port} -u\"{username}\" -D\"{database}\"",
             "args_optional": ["--login-path=\"{login-path}\"", "--defaults-extra-file=\"{defaults-extra-file}\"", "-p\"{password}\""],
             "queries": {
+                "exec": {
+                    "options": ["--table", "-f"]
+                },
                 "desc" : {
                     "query": "select concat('|', case when table_schema REGEXP '[^0-9a-zA-Z$_]' then concat('`',table_schema,'`') else table_schema end, '.', case when table_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',table_name,'`') else table_name end, '|') from information_schema.tables where table_schema = database() order by table_name;",
-                    "options": ["-f", "--silent", "--raw", "--default-character-set=utf8"]
+                    "options": ["--silent", "--raw"]
                 },
                 "desc table": {
-                    "query": "desc %s",
-                    "options": ["-f", "--table", "--default-character-set=utf8"]
+                    "query": "desc {0}",
+                    "options": ["--table"]
                 },
                 "show records": {
                     "query": "select * from {0} limit {1}",
-                    "options": ["-f", "--table", "--default-character-set=utf8"]
+                    "options": ["--table"]
                 },
                 "columns": {
                     "query": "select concat('|',  case when table_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',table_name,'`') else table_name end, '.', case when column_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',column_name,'`') else column_name end, '|') from information_schema.columns where table_schema = database() order by table_name, ordinal_position;",
-                    "options": ["-f", "--silent", "--raw", "--default-character-set=utf8"]
+                    "options": ["--silent", "--raw"]
                 },
                 "functions": {
                     "query": "select concat('|', case when routine_schema REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_schema,'`') else routine_schema end, '.', case when routine_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_name,'`') else routine_name end, '()', '|') from information_schema.routines where routine_schema = database();",
-                    "options": ["-f", "--silent", "--raw", "--default-character-set=utf8"]
+                    "options": ["--silent", "--raw"]
                 },
                 "desc function": {
-                    "query": "select routine_definition from information_schema.routines where concat(case when routine_schema REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_schema,'`') else routine_schema end, '.', case when routine_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_name,'`') else routine_name end) = '%s';",
-                    "options": ["-f", "--silent", "--raw", "--default-character-set=utf8"]
+                    "query": "select routine_definition from information_schema.routines where concat(case when routine_schema REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_schema,'`') else routine_schema end, '.', case when routine_name REGEXP '[^0-9a-zA-Z$_]' then concat('`',routine_name,'`') else routine_name end) = '{0}';",
+                    "options": ["--silent", "--raw"]
                 },
                 "explain plan": {
                     "query": "explain {0};",
-                    "options": ["-f", "--table", "--default-character-set=utf8"]
+                    "options": ["--table"]
                 }
             }
         },
@@ -196,6 +205,9 @@
             "args": "-d \"{database}\"",
             "args_optional": ["-S \"{host},{port}\"", "-S \"{host}\\{instance}\"", "-U \"{username}\"", "-P \"{password}\""],
             "queries": {
+                "exec": {
+                    "options": []
+                },
                 "desc": {
                     "query": "set nocount on; select concat(table_schema, '.', table_name) from information_schema.tables order by table_name;",
                     "options": ["-h", "-1"]
@@ -205,7 +217,7 @@
                     "options": ["-h", "-1"]
                 },
                 "desc table": {
-                    "query": "exec sp_help \"%s\";",
+                    "query": "exec sp_help \"{0}\";",
                     "options": []
                 },
                 "show records": {
@@ -220,6 +232,9 @@
             "after": [],
             "args": "-h {host} -p {port} -U \"{username}\" -w \"{password}\" -d \"{database}\"",
             "queries": {
+                "exec": {
+                    "options": []
+                },
                 "desc" : {
                     "query": "select '|' || table_schema || '.' || table_name || '|' as tblname from v_catalog.tables where is_system_table = false",
                     "options": ["--tuples-only", "--no-vsqlrc"]
@@ -229,7 +244,7 @@
                     "options": ["--tuples-only", "--no-vsqlrc"]
                 },
                 "desc table": {
-                    "query": "\\d %s",
+                    "query": "\\d {0}",
                     "options": []
                 },
                 "show records": {
@@ -244,10 +259,14 @@
         },
         "sqsh": {
             "options": [],
-            "before": ["\\set semicolon_cmd=\"\\go -mpretty -l\""],
+            "before": [],
             "after": [],
             "args": "-S {host}:{port} -U\"{username}\" -P\"{password}\" -D{database}",
             "queries": {
+                "exec": {
+                    "options": [],
+                    "before": ["\\set semicolon_cmd=\"\\go -mpretty -l\""]
+                },
                 "desc": {
                     "query": "select concat(table_schema, '.', table_name) from information_schema.tables order by table_name;",
                     "options": [],
@@ -259,29 +278,32 @@
                     "before" :["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""]
                 },
                 "desc table": {
-                    "query": "exec sp_columns \"%s\";",
+                    "query": "exec sp_columns \"{0}\";",
                     "options": [],
                     "before": ["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""]
                 },
                 "show records": {
                     "query": "select top {1} * from \"{0}\";",
                     "options": [],
-                    "before": ["\\set semicolon_cmd=\"\\go -mpretty -l -h -f\""]
+                    "before": ["\\set semicolon_cmd=\"\\go -mpretty -l\""]
                 }
             }
         },
         "sqlite": {
-            "options": ["-column", "-header"],
+            "options": [],
             "before": [],
             "after": [],
             "args": "\"{database}\"",
             "queries": {
+                "exec": {
+                    "options": ["-column", "-header"]
+                },
                 "desc" : {
                     "query": ".headers off\nSELECT '|' || name || '|' FROM sqlite_master WHERE type='table';",
                     "options": ["-noheader"]
                 },
                 "desc table": {
-                    "query": ".schema \"%s\"",
+                    "query": ".schema \"{0}\"",
                     "options": ["-column", "-header"]
                 },
                 "show records": {
@@ -300,16 +322,19 @@
             "after": [],
             "args": "-u \"{username}\" -p \"{password}\" \"{host}/{port}:{database}\"",
             "queries": {
+                "exec": {
+                    "options": []
+                },
                 "desc" : {
                     "query": "select '|' || rdb$relation_name || '|' from rdb$relations where rdb$view_blr is null and (rdb$system_flag is null or rdb$system_flag = 0);",
                     "options": []
                 },
                 "desc table": {
-                    "query": "show table \"%s\";",
+                    "query": "show table \"{0}\";",
                     "options": []
                 },
                 "show records": {
-                    "query": "select first 100 * from \"%s\";",
+                    "query": "select first {1} * from \"{0}\";",
                     "options": []
                 }
             }
