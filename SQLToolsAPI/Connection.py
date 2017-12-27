@@ -51,12 +51,13 @@ You might need to restart the editor for settings to be refreshed."""
         self.database   = options.get('database', None)
         self.username   = options.get('username', None)
         self.password   = options.get('password', None)
-        self.encoding   = options.get('encoding', None)
+        self.encoding   = options.get('encoding', 'utf-8')
         self.service    = options.get('service', None)
 
         self.safe_limit = settings.get('safe_limit', None)
         self.show_query = settings.get('show_query', False)
         self.rowsLimit  = settings.get('show_records', {}).get('limit', 50)
+        self.useStreams = settings.get('use_streams', False)
         self.cli        = settings.get('cli')[options['type']]
 
         cli_path = shutil.which(self.cli)
@@ -76,15 +77,20 @@ You might need to restart the editor for settings to be refreshed."""
         if not query:
             return
 
+        queryToRun = self.buildNamedQuery(queryName, query)
         args = self.buildArgs(queryName)
         env = self.buildEnv()
 
         def cb(result):
             callback(U.getResultAsList(result))
 
-        self.Command.createAndRun(args, env,
-                                  query, cb,
-                                  silenceErrors=True)
+        self.Command.createAndRun(args=args,
+                                  env=env,
+                                  callback=cb,
+                                  query=queryToRun,
+                                  encoding=self.encoding,
+                                  silenceErrors=True,
+                                  stream=False)
 
     def getTables(self, callback):
         self.runInternalNamedQueryCommand('desc', callback)
@@ -112,7 +118,14 @@ You might need to restart the editor for settings to be refreshed."""
         queryToRun = self.buildNamedQuery(queryName, query)
         args = self.buildArgs(queryName)
         env = self.buildEnv()
-        self.Command.createAndRun(args, env, queryToRun, callback, timeout=self.timeout)
+        self.Command.createAndRun(args=args,
+                                  env=env,
+                                  callback=callback,
+                                  query=queryToRun,
+                                  encoding=self.encoding,
+                                  timeout=self.timeout,
+                                  silenceErrors=False,
+                                  stream=False)
 
     def getTableRecords(self, tableName, callback):
         # in case we expect multiple values pack them into tuple
@@ -139,10 +152,21 @@ You might need to restart the editor for settings to be refreshed."""
         queryToRun = self.buildNamedQuery(queryName, strippedQueries)
         args = self.buildArgs(queryName)
         env = self.buildEnv()
-        self.Command.createAndRun(args, env, queryToRun, callback, timeout=self.timeout)
+        self.Command.createAndRun(args=args,
+                                  env=env,
+                                  callback=callback,
+                                  query=queryToRun,
+                                  encoding=self.encoding,
+                                  timeout=self.timeout,
+                                  silenceErrors=False,
+                                  stream=self.useStreams)
 
-    def execute(self, queries, callback, stream=False):
+    def execute(self, queries, callback, stream=None):
         queryName = 'execute'
+
+        # if not explicitly overriden, use the value from settings
+        if stream is None:
+            stream = self.useStreams
 
         if isinstance(queries, str):
             queries = [queries]
@@ -175,9 +199,14 @@ You might need to restart the editor for settings to be refreshed."""
 
         Log("Query: " + queryToRun)
 
-        self.Command.createAndRun(args, env, queryToRun, callback,
+        self.Command.createAndRun(args=args,
+                                  env=env,
+                                  callback=callback,
+                                  query=queryToRun,
+                                  encoding=self.encoding,
                                   options={'show_query': self.show_query},
                                   timeout=self.timeout,
+                                  silenceErrors=False,
                                   stream=stream)
 
     def getNamedQuery(self, queryName):
@@ -211,14 +240,15 @@ You might need to restart the editor for settings to be refreshed."""
             builtQueries.extend(beforeQuery)
         if queries is not None:
             builtQueries.extend(queries)
-        if afterCli is not None:
-            builtQueries.extend(afterCli)
         if afterQuery is not None:
             builtQueries.extend(afterQuery)
+        if afterCli is not None:
+            builtQueries.extend(afterCli)
 
         # remove empty list items
         builtQueries = list(filter(None, builtQueries))
 
+        print('\n'.join(builtQueries))
         return '\n'.join(builtQueries)
 
     def buildArgs(self, queryName=None):

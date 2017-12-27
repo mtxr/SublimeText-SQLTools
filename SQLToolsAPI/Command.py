@@ -15,7 +15,6 @@ class Command(object):
         if options is None:
             options = {}
 
-        self.stream = stream
         self.args = args
         self.env = env
         self.callback = callback
@@ -24,13 +23,14 @@ class Command(object):
         self.options = options
         self.timeout = timeout
         self.silenceErrors = silenceErrors
+        self.stream = stream
         self.process = None
 
         if 'show_query' not in self.options:
             self.options['show_query'] = False
         elif self.options['show_query'] not in ['top', 'bottom']:
-            self.options['show_query'] = 'top' if (isinstance(self.options['show_query'], bool)
-                                                    and self.options['show_query']) else False
+            self.options['show_query'] = 'top' if (isinstance(self.options['show_query'], bool) and
+                                                   self.options['show_query']) else False
 
     def run(self):
         if not self.query:
@@ -65,13 +65,12 @@ class Command(object):
                                         startupinfo=si)
 
         if self.stream:
-            self.process.stdin.write(self.query.encode())
+            self.process.stdin.write(self.query.encode(self.encoding))
             self.process.stdin.close()
             hasWritten = False
 
             for line in self.process.stdout:
-                self.callback(line.decode(self.encoding,
-                    'replace').replace('\r', ''))
+                self.callback(line.decode(self.encoding, 'replace').replace('\r', ''))
                 hasWritten = True
 
             queryTimerEnd = time.time()
@@ -90,7 +89,7 @@ class Command(object):
 
         # regular mode is handled with more reliable Popen.communicate
         # which also terminates the process afterwards
-        results, errors = self.process.communicate(input=self.query.encode())
+        results, errors = self.process.communicate(input=self.query.encode(self.encoding))
 
         queryTimerEnd = time.time()
 
@@ -104,7 +103,7 @@ class Command(object):
             resultString += errors.decode(self.encoding,
                                           'replace').replace('\r', '')
 
-        if self.process == None and resultString != '':
+        if self.process is None and resultString != '':
             resultString += '\n'
 
         if self.options['show_query']:
@@ -128,11 +127,19 @@ class Command(object):
         return resultString
 
     @staticmethod
-    def createAndRun(args, env, query, callback, options=None, timeout=15, silenceErrors=False, stream=False):
+    def createAndRun(args, env, callback, query=None, encoding='utf-8',
+                     options=None, timeout=15, silenceErrors=False, stream=False):
         if options is None:
             options = {}
-        command = Command(args, env, callback, query, options=options,
-                          timeout=timeout, silenceErrors=silenceErrors)
+        command = Command(args=args,
+                          env=env,
+                          callback=callback,
+                          query=query,
+                          encoding=encoding,
+                          options=options,
+                          timeout=timeout,
+                          silenceErrors=silenceErrors,
+                          stream=stream)
         command.run()
 
 
@@ -142,9 +149,15 @@ class ThreadCommand(Command, Thread):
         if options is None:
             options = {}
 
-        Command.__init__(self, args, env, callback, query=query,
-                         encoding=encoding, options=options,
-                         timeout=timeout, silenceErrors=silenceErrors,
+        Command.__init__(self,
+                         args=args,
+                         env=env,
+                         callback=callback,
+                         query=query,
+                         encoding=encoding,
+                         options=options,
+                         timeout=timeout,
+                         silenceErrors=silenceErrors,
                          stream=stream)
         Thread.__init__(self)
 
@@ -168,14 +181,21 @@ class ThreadCommand(Command, Thread):
             pass
 
     @staticmethod
-    def createAndRun(args, env, query, callback, options=None,
-                     timeout=Command.timeout, silenceErrors=False, stream=False):
+    def createAndRun(args, env, callback, query=None, encoding='utf-8',
+                     options=None, timeout=Command.timeout, silenceErrors=False, stream=False):
         # Don't allow empty dicts or lists as defaults in method signature,
         # cfr http://nedbatchelder.com/blog/200806/pylint.html
         if options is None:
             options = {}
-        command = ThreadCommand(args, env, callback, query, options=options,
-                                timeout=timeout, silenceErrors=silenceErrors, stream=stream)
+        command = ThreadCommand(args=args,
+                                env=env,
+                                callback=callback,
+                                query=query,
+                                encoding=encoding,
+                                options=options,
+                                timeout=timeout,
+                                silenceErrors=silenceErrors,
+                                stream=stream)
         command.start()
         killTimeout = Timer(command.timeout, command.stop)
         killTimeout.start()

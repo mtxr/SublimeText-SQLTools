@@ -74,7 +74,7 @@
                 "PGPASSWORD": "{password}"
             },
             "queries": {
-                "exec": {
+                "execute": {
                     "options": []
                 },
                 "desc": {
@@ -109,52 +109,123 @@
         },
         "oracle": {
             "options": ["-S"],
-            "before": [
-                "SET AUTO           OFF",
-                "SET COLSEP         '|'",
-                "SET FEED           ON",
-                "SET FEEDBACK       ON",
-                "SET HEADING        ON",
-                "SET LINESIZE       32767",
-                "SET LONG           100",
-                "SET NULL           @",
-                "SET PAGESIZE       0 EMBEDDED ON",
-                "SET SERVEROUTPUT   ON",
-                "SET SQLBLANKLINES  ON",
-                "SET SQLPROMPT      ''",
-                "SET TAB            OFF",
-                "SET TI             ON",
-                "SET TIMI           OFF",
-                "SET TRIMSPOOL      OFF",
-                "SET UND            '-'",
-                "SET VERIFY         OFF ",
-                "SET WRAP           OFF"
-            ],
+            "before": [],
             "after": [],
+            "env_optional": {
+                "NLS_LANG": "{nls_lang}"
+            },
             "args": "{username}/{password}@\"(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port})))(CONNECT_DATA=(SERVICE_NAME={service})))\"",
             "queries": {
-                "exec": {
-                    "options": []
+                "execute": {
+                    "options": [],
+                    "before": [
+                        // "SET TIMING     ON",
+                        "SET LINESIZE   32767",
+                        "SET PAGESIZE   0",
+                        "SET EMBEDDED   ON",
+                        "SET WRAP       OFF",
+                        "SET TAB        OFF",
+                        "SET TRIMOUT    ON",
+                        "SET TRIMSPOOL  ON",
+                        "SET NULL       '@'",
+                        "SET COLSEP     '|'",
+                        "SET FEEDBACK   ON",
+                        "SET SERVEROUT  ON",
+                        "SET SQLBLANKLINES ON"
+                    ]
                 },
                 "desc" : {
-                    "query": "select concat(concat(concat(concat('|', owner), '.'), table_name), '|') as tbls from all_tables UNION ALL select concat(concat(concat(concat('|', owner), '.'), view_name), '|') as tbls from all_views;",
-                    "options": []
+                    "query": "select owner || '.' || name as obj from (select owner, table_name as name from all_tables union all select owner, view_name as name from all_views) o where owner not in ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','EXFSYS', 'LBACSYS', 'MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORDPLUGINS', 'ORDSYS','OUTLN', 'SI_INFORMTN_SCHEMA','SYS','SYSMAN','SYSTEM', 'TSMSYS','WK_TEST','WKSYS', 'WKPROXY','WMSYS','XDB','APEX_040000', 'APEX_PUBLIC_USER','DIP', 'FLOWS_30000','FLOWS_FILES','MDDATA', 'ORACLE_OCM','SPATIAL_CSW_ADMIN_USR', 'SPATIAL_WFS_ADMIN_USR', 'XS$NULL','PUBLIC');",
+                    "options": [],
+                    "before": [
+                        "SET LINESIZE  32767",
+                        "SET PAGESIZE  0",
+                        "SET EMBEDDED  ON",
+                        "SET WRAP      OFF",
+                        "SET HEADING   OFF",
+                        "SET FEEDBACK  OFF",
+                        "SET TRIMOUT   ON"
+                    ]
                 },
                 "columns": {
-                    "query": "SELECT concat(concat(concat(concat('|', c.table_name), '.'), c.column_name), '|') AS cols FROM all_tab_columns c INNER JOIN all_tables t ON c.owner = t.owner AND c.table_name = t.table_name UNION ALL SELECT concat(concat(concat(concat('|', c.table_name), '.'), c.column_name), '|') AS cols FROM all_tab_columns c INNER JOIN all_views t ON c.owner = t.owner AND c.table_name = t.view_name;",
-                    "options": []
+                    "query": "select table_name || '.' || column_name as obj from (select c.table_name, c.column_name, t.owner from all_tab_columns c inner join all_tables t on c.owner = t.owner and c.table_name = t.table_name union all select c.table_name, c.column_name, t.owner from all_tab_columns c inner join all_views t on c.owner = t.owner and c.table_name = t.view_name) o where owner not in ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','EXFSYS', 'LBACSYS', 'MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORDPLUGINS', 'ORDSYS','OUTLN', 'SI_INFORMTN_SCHEMA','SYS','SYSMAN','SYSTEM', 'TSMSYS','WK_TEST','WKSYS', 'WKPROXY','WMSYS','XDB','APEX_040000', 'APEX_PUBLIC_USER','DIP', 'FLOWS_30000','FLOWS_FILES','MDDATA', 'ORACLE_OCM','SPATIAL_CSW_ADMIN_USR', 'SPATIAL_WFS_ADMIN_USR', 'XS$NULL','PUBLIC');",
+                    "options": [],
+                    "before": [
+                        "SET LINESIZE  32767",
+                        "SET PAGESIZE  0",
+                        "SET EMBEDDED  ON",
+                        "SET WRAP      OFF",
+                        "SET HEADING   OFF",
+                        "SET FEEDBACK  OFF",
+                        "SET TRIMOUT   ON"
+                    ]
+                },
+                "functions": {
+                    "query": "select case when object_type = 'PACKAGE' then object_name||'.'||procedure_name else owner || '.' || object_name end || '()' as obj from all_procedures where object_type in ('FUNCTION','PROCEDURE','PACKAGE') and owner = sys_context('USERENV', 'CURRENT_SCHEMA');",
+                    "options": [],
+                    "before": [
+                        "SET LINESIZE  32767",
+                        "SET PAGESIZE  0",
+                        "SET EMBEDDED  ON",
+                        "SET WRAP      OFF",
+                        "SET HEADING   OFF",
+                        "SET FEEDBACK  OFF",
+                        "SET TRIMOUT   ON"
+                    ]
                 },
                 "desc table": {
                     "query": "desc {0};",
-                    "options": []
+                    "options": [],
+                    "before": [
+                        "SET LINESIZE   80",  // altered for readability
+                        "SET PAGESIZE   0",
+                        "SET EMBEDDED   ON",
+                        "SET WRAP       OFF",
+                        "SET TAB        OFF",
+                        "SET TRIMOUT    ON",
+                        "SET TRIMSPOOL  ON",
+                        "SET NULL       '@'",
+                        "SET COLSEP     '|'",
+                        "SET FEEDBACK   ON",
+                        "SET SERVEROUT  ON",
+                        "SET SQLBLANKLINES ON"
+                    ]
                 },
                 "show records": {
                     "query": "select * from {0} WHERE ROWNUM <= {1};",
-                    "options": []
+                    "options": [],
+                    "before": [
+                        "SET LINESIZE   32767",
+                        "SET PAGESIZE   0",
+                        "SET EMBEDDED   ON",
+                        "SET WRAP       OFF",
+                        "SET TAB        OFF",
+                        "SET TRIMOUT    ON",
+                        "SET TRIMSPOOL  ON",
+                        "SET NULL       '@'",
+                        "SET COLSEP     '|'",
+                        "SET FEEDBACK   ON",
+                        "SET SERVEROUT  ON",
+                        "SET SQLBLANKLINES ON"
+                    ]
                 },
                 "explain plan": {
                     "query": "explain plan for {0};\nselect plan_table_output from table(dbms_xplan.display());",
-                    "options": []
+                    "options": [],
+                    "before": [
+                        "SET LINESIZE   32767",
+                        "SET PAGESIZE   0",
+                        "SET EMBEDDED   ON",
+                        "SET WRAP       OFF",
+                        "SET TAB        OFF",
+                        "SET TRIMOUT    ON",
+                        "SET TRIMSPOOL  ON",
+                        "SET NULL       '@'",
+                        "SET COLSEP     '|'",
+                        "SET FEEDBACK   ON",
+                        "SET SERVEROUT  ON",
+                        "SET SQLBLANKLINES ON"
+                    ]
                 }
             }
         },
@@ -165,7 +236,7 @@
             "args": "-h{host} -P{port} -u\"{username}\" -D\"{database}\"",
             "args_optional": ["--login-path=\"{login-path}\"", "--defaults-extra-file=\"{defaults-extra-file}\"", "-p\"{password}\""],
             "queries": {
-                "exec": {
+                "execute": {
                     "options": ["--table", "-f"]
                 },
                 "desc" : {
@@ -201,28 +272,45 @@
         "mssql": {
             "options": [],
             "before": [],
-            "after": ["GO", "QUIT"],
+            "after": ["go", "quit"],
             "args": "-d \"{database}\"",
             "args_optional": ["-S \"{host},{port}\"", "-S \"{host}\\{instance}\"", "-U \"{username}\"", "-P \"{password}\""],
             "queries": {
-                "exec": {
-                    "options": []
-                },
-                "desc": {
-                    "query": "set nocount on; select concat(table_schema, '.', table_name) from information_schema.tables order by table_name;",
-                    "options": ["-h", "-1"]
-                },
-                "columns": {
-                    "query": "set nocount on; select concat(table_name, '.', column_name) from information_schema.columns order by table_name, ordinal_position;",
-                    "options": ["-h", "-1"]
-                },
-                "desc table": {
-                    "query": "exec sp_help \"{0}\";",
-                    "options": []
+                "execute": {
+                    "options": ["-k"]
                 },
                 "show records": {
                     "query": "select top {1} * from {0};",
                     "options": []
+                },
+                "desc table": {
+                    "query": "exec sp_help N'{0}';",
+                    "options": ["-y30", "-Y30"]
+                },
+                "desc function": {
+                    "query": "exec sp_helptext N'{0}';",
+                    "options": ["-h-1"]
+                },
+                "desc": {
+                    "query": "set nocount on; select concat(table_schema, '.', table_name) as obj from information_schema.tables order by table_schema, table_name;",
+                    "options": ["-h-1"]
+                },
+                "columns": {
+                    "query": "set nocount on; select distinct concat(table_name, '.', column_name) as obj from information_schema.columns;",
+                    "options": ["-h-1"]
+                },
+                "functions": {
+                    "query": "set nocount on; select concat(routine_schema, '.', routine_name) as obj from information_schema.routines order by routine_schema, routine_name;",
+                    "options": ["-h-1"]
+                },
+                 "explain plan": {
+                    "query": "{0};",
+                    "options": ["-k"],
+                    "before": [
+                        "SET STATISTICS PROFILE ON",
+                        "SET STATISTICS IO ON",
+                        "SET STATISTICS TIME ON"
+                    ]
                 }
             }
         },
@@ -232,7 +320,7 @@
             "after": [],
             "args": "-h {host} -p {port} -U \"{username}\" -w \"{password}\" -d \"{database}\"",
             "queries": {
-                "exec": {
+                "execute": {
                     "options": []
                 },
                 "desc" : {
@@ -263,7 +351,7 @@
             "after": [],
             "args": "-S {host}:{port} -U\"{username}\" -P\"{password}\" -D{database}",
             "queries": {
-                "exec": {
+                "execute": {
                     "options": [],
                     "before": ["\\set semicolon_cmd=\"\\go -mpretty -l\""]
                 },
@@ -295,7 +383,7 @@
             "after": [],
             "args": "\"{database}\"",
             "queries": {
-                "exec": {
+                "execute": {
                     "options": ["-column", "-header"]
                 },
                 "desc" : {
@@ -322,7 +410,7 @@
             "after": [],
             "args": "-u \"{username}\" -p \"{password}\" \"{host}/{port}:{database}\"",
             "queries": {
-                "exec": {
+                "execute": {
                     "options": []
                 },
                 "desc" : {
