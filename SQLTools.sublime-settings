@@ -77,39 +77,51 @@
                 "execute": {
                     "options": []
                 },
-                "desc": {
-                    "query": "select '|' || quote_ident(table_schema)||'.'||quote_ident(table_name) ||'|' as tblname from information_schema.tables where table_schema not in ('pg_catalog', 'information_schema') order by table_schema = current_schema() desc, table_schema, table_name",
-                    "options": ["--tuples-only", "--no-psqlrc"]
+                "show records": {
+                    "query": "select * from {0} limit {1};",
+                    "options": []
                 },
                 "desc table": {
                     "query": "\\d+ {0}",
                     "options": []
-                },
-                "show records": {
-                    "query": "select * from {0} limit {1}",
-                    "options": []
-                },
-                "columns": {
-                    "query": "select '|' || quote_ident(table_name) || '.' || quote_ident(column_name) || '|' from information_schema.columns where table_schema not in ('pg_catalog', 'information_schema') order by table_name, ordinal_position",
-                    "options": ["--tuples-only", "--no-psqlrc"]
-                },
-                "functions": {
-                    "query": "select '|' || quote_ident(n.nspname)||'.'||quote_ident(f.proname) || '(' || pg_get_function_identity_arguments(f.oid) || ')' || '|' as funname from pg_catalog.pg_proc as f inner join pg_catalog.pg_namespace as n on n.oid = f.pronamespace where f.proisagg = false and n.nspname not in ('pg_catalog', 'information_schema')",
-                    "options": ["--tuples-only", "--no-psqlrc"]
                 },
                 "desc function": {
                     "query": "\\sf {0}",
                     "options": []
                 },
                 "explain plan": {
-                    "query": "explain {0};",
+                    "query": "explain analyze {0};",
                     "options": []
+                },
+                "desc": {
+                    "query": "select '|' || quote_ident(table_schema)||'.'||quote_ident(table_name) ||'|' as tblname from information_schema.tables where table_schema not in ('pg_catalog', 'information_schema') order by table_schema = current_schema() desc, table_schema, table_name;",
+                    "options": ["--tuples-only", "--no-psqlrc"]
+                },
+                "columns": {
+                    "query": "select '|' || quote_ident(table_name) || '.' || quote_ident(column_name) || '|' from information_schema.columns where table_schema not in ('pg_catalog', 'information_schema') order by table_name, ordinal_position;",
+                    "options": ["--tuples-only", "--no-psqlrc"]
+                },
+                "functions": {
+                    "query": "select '|' || quote_ident(n.nspname)||'.'||quote_ident(f.proname) || '(' || pg_get_function_identity_arguments(f.oid) || ')' || '|' as funname from pg_catalog.pg_proc as f inner join pg_catalog.pg_namespace as n on n.oid = f.pronamespace where f.proisagg = false and n.nspname not in ('pg_catalog', 'information_schema');",
+                    "options": ["--tuples-only", "--no-psqlrc"]
                 }
             }
         },
         "oracle": {
             "options": ["-S"],
-            "before": [],
+            "before": [
+                "SET LINESIZE   32767",
+                "SET WRAP       OFF",
+                "SET PAGESIZE   0",
+                "SET EMBEDDED   ON",
+                "SET TRIMOUT    ON",
+                "SET TRIMSPOOL  ON",
+                "SET TAB        OFF",
+                "SET SERVEROUT  ON",
+                "SET NULL       '@'",
+                "SET COLSEP     '|'",
+                "SET SQLBLANKLINES ON"
+            ],
             "after": [],
             "env_optional": {
                 "NLS_LANG": "{nls_lang}"
@@ -120,111 +132,70 @@
                     "options": [],
                     "before": [
                         // "SET TIMING     ON",
-                        "SET LINESIZE   32767",
-                        "SET PAGESIZE   0",
-                        "SET EMBEDDED   ON",
-                        "SET WRAP       OFF",
-                        "SET TAB        OFF",
-                        "SET TRIMOUT    ON",
-                        "SET TRIMSPOOL  ON",
-                        "SET NULL       '@'",
-                        "SET COLSEP     '|'",
-                        "SET FEEDBACK   ON",
-                        "SET SERVEROUT  ON",
-                        "SET SQLBLANKLINES ON"
+                        "SET FEEDBACK   ON"
                     ]
                 },
-                "desc" : {
-                    "query": "select owner || '.' || name as obj from (select owner, table_name as name from all_tables union all select owner, view_name as name from all_views) o where owner not in ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','EXFSYS', 'LBACSYS', 'MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORDPLUGINS', 'ORDSYS','OUTLN', 'SI_INFORMTN_SCHEMA','SYS','SYSMAN','SYSTEM', 'TSMSYS','WK_TEST','WKSYS', 'WKPROXY','WMSYS','XDB','APEX_040000', 'APEX_PUBLIC_USER','DIP', 'FLOWS_30000','FLOWS_FILES','MDDATA', 'ORACLE_OCM','SPATIAL_CSW_ADMIN_USR', 'SPATIAL_WFS_ADMIN_USR', 'XS$NULL','PUBLIC');",
+                "show records": {
+                    "query": "select * from {0} where rownum <= {1};",
                     "options": [],
                     "before": [
-                        "SET LINESIZE  32767",
-                        "SET PAGESIZE  0",
-                        "SET EMBEDDED  ON",
-                        "SET WRAP      OFF",
-                        "SET HEADING   OFF",
-                        "SET FEEDBACK  OFF",
-                        "SET TRIMOUT   ON"
-                    ]
-                },
-                "columns": {
-                    "query": "select table_name || '.' || column_name as obj from (select c.table_name, c.column_name, t.owner from all_tab_columns c inner join all_tables t on c.owner = t.owner and c.table_name = t.table_name union all select c.table_name, c.column_name, t.owner from all_tab_columns c inner join all_views t on c.owner = t.owner and c.table_name = t.view_name) o where owner not in ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','EXFSYS', 'LBACSYS', 'MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORDPLUGINS', 'ORDSYS','OUTLN', 'SI_INFORMTN_SCHEMA','SYS','SYSMAN','SYSTEM', 'TSMSYS','WK_TEST','WKSYS', 'WKPROXY','WMSYS','XDB','APEX_040000', 'APEX_PUBLIC_USER','DIP', 'FLOWS_30000','FLOWS_FILES','MDDATA', 'ORACLE_OCM','SPATIAL_CSW_ADMIN_USR', 'SPATIAL_WFS_ADMIN_USR', 'XS$NULL','PUBLIC');",
-                    "options": [],
-                    "before": [
-                        "SET LINESIZE  32767",
-                        "SET PAGESIZE  0",
-                        "SET EMBEDDED  ON",
-                        "SET WRAP      OFF",
-                        "SET HEADING   OFF",
-                        "SET FEEDBACK  OFF",
-                        "SET TRIMOUT   ON"
-                    ]
-                },
-                "functions": {
-                    "query": "select case when object_type = 'PACKAGE' then object_name||'.'||procedure_name else owner || '.' || object_name end || '()' as obj from all_procedures where object_type in ('FUNCTION','PROCEDURE','PACKAGE') and owner = sys_context('USERENV', 'CURRENT_SCHEMA');",
-                    "options": [],
-                    "before": [
-                        "SET LINESIZE  32767",
-                        "SET PAGESIZE  0",
-                        "SET EMBEDDED  ON",
-                        "SET WRAP      OFF",
-                        "SET HEADING   OFF",
-                        "SET FEEDBACK  OFF",
-                        "SET TRIMOUT   ON"
+                        "SET FEEDBACK   ON"
                     ]
                 },
                 "desc table": {
                     "query": "desc {0};",
                     "options": [],
                     "before": [
-                        "SET LINESIZE   80",  // altered for readability
-                        "SET PAGESIZE   0",
-                        "SET EMBEDDED   ON",
-                        "SET WRAP       OFF",
-                        "SET TAB        OFF",
-                        "SET TRIMOUT    ON",
-                        "SET TRIMSPOOL  ON",
-                        "SET NULL       '@'",
-                        "SET COLSEP     '|'",
-                        "SET FEEDBACK   ON",
-                        "SET SERVEROUT  ON",
-                        "SET SQLBLANKLINES ON"
-                    ]
-                },
-                "show records": {
-                    "query": "select * from {0} WHERE ROWNUM <= {1};",
-                    "options": [],
-                    "before": [
-                        "SET LINESIZE   32767",
-                        "SET PAGESIZE   0",
-                        "SET EMBEDDED   ON",
-                        "SET WRAP       OFF",
-                        "SET TAB        OFF",
-                        "SET TRIMOUT    ON",
-                        "SET TRIMSPOOL  ON",
-                        "SET NULL       '@'",
-                        "SET COLSEP     '|'",
-                        "SET FEEDBACK   ON",
-                        "SET SERVEROUT  ON",
-                        "SET SQLBLANKLINES ON"
+                        "SET LINESIZE   80",  // override for readability
+                        "SET WRAP       ON",  // override for readability
+                        "SET FEEDBACK   ON"
                     ]
                 },
                 "explain plan": {
                     "query": "explain plan for {0};\nselect plan_table_output from table(dbms_xplan.display());",
                     "options": [],
                     "before": [
-                        "SET LINESIZE   32767",
-                        "SET PAGESIZE   0",
-                        "SET EMBEDDED   ON",
-                        "SET WRAP       OFF",
-                        "SET TAB        OFF",
-                        "SET TRIMOUT    ON",
-                        "SET TRIMSPOOL  ON",
-                        "SET NULL       '@'",
-                        "SET COLSEP     '|'",
-                        "SET FEEDBACK   ON",
-                        "SET SERVEROUT  ON",
-                        "SET SQLBLANKLINES ON"
+                        "SET FEEDBACK   ON"
+                    ]
+                },
+                "desc function": {
+                    "query": "select text from all_source where type in ('FUNCTION', 'PROCEDURE', 'PACKAGE', 'PACKAGE BODY') and name = nvl(substr(ltrim('{0}', sys_context('USERENV', 'CURRENT_SCHEMA') || '.' ), 0, instr(ltrim('{0}', sys_context('USERENV', 'CURRENT_SCHEMA') || '.' ), '.')-1), ltrim('{0}', sys_context('USERENV', 'CURRENT_SCHEMA') || '.' )) and owner = sys_context('USERENV', 'CURRENT_SCHEMA') order by type, line;",
+                    "options": [],
+                    "before": [
+                        "SET SERVEROUT  OFF",  // override
+                        "SET NULL       ''",   // override
+                        "SET HEADING    OFF",
+                        "SET FEEDBACK   OFF"
+                    ]
+                },
+                "desc" : {
+                    "query": "select owner || '.' || name as obj from (select owner, table_name as name from all_tables union all select owner, view_name as name from all_views) o where owner not in ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','EXFSYS', 'LBACSYS', 'MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORDPLUGINS', 'ORDSYS','OUTLN', 'SI_INFORMTN_SCHEMA','SYS','SYSMAN','SYSTEM', 'TSMSYS','WK_TEST','WKSYS', 'WKPROXY','WMSYS','XDB','APEX_040000', 'APEX_PUBLIC_USER','DIP', 'FLOWS_30000','FLOWS_FILES','MDDATA', 'ORACLE_OCM','SPATIAL_CSW_ADMIN_USR', 'SPATIAL_WFS_ADMIN_USR', 'XS$NULL','PUBLIC');",
+                    "options": [],
+                    "before": [
+                        "SET SERVEROUT  OFF",  // override
+                        "SET NULL       ''",   // override
+                        "SET HEADING    OFF",
+                        "SET FEEDBACK   OFF"
+                    ]
+                },
+                "columns": {
+                    "query": "select table_name || '.' || column_name as obj from (select c.table_name, c.column_name, t.owner from all_tab_columns c inner join all_tables t on c.owner = t.owner and c.table_name = t.table_name union all select c.table_name, c.column_name, t.owner from all_tab_columns c inner join all_views t on c.owner = t.owner and c.table_name = t.view_name) o where owner not in ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','EXFSYS', 'LBACSYS', 'MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORDPLUGINS', 'ORDSYS','OUTLN', 'SI_INFORMTN_SCHEMA','SYS','SYSMAN','SYSTEM', 'TSMSYS','WK_TEST','WKSYS', 'WKPROXY','WMSYS','XDB','APEX_040000', 'APEX_PUBLIC_USER','DIP', 'FLOWS_30000','FLOWS_FILES','MDDATA', 'ORACLE_OCM','SPATIAL_CSW_ADMIN_USR', 'SPATIAL_WFS_ADMIN_USR', 'XS$NULL','PUBLIC');",
+                    "options": [],
+                    "before": [
+                        "SET SERVEROUT  OFF",  // override
+                        "SET NULL       ''",   // override
+                        "SET HEADING    OFF",
+                        "SET FEEDBACK   OFF"
+                    ]
+                },
+                "functions": {
+                    "query": "select case when object_type = 'PACKAGE' then object_name||'.'||procedure_name else owner || '.' || object_name end || '()' as obj from all_procedures where object_type in ('FUNCTION','PROCEDURE','PACKAGE') and not (object_type = 'PACKAGE' and procedure_name is null) and owner = sys_context('USERENV', 'CURRENT_SCHEMA');",
+                    "options": [],
+                    "before": [
+                        "SET SERVEROUT  OFF",  // override
+                        "SET NULL       ''",   // override
+                        "SET HEADING    OFF",
+                        "SET FEEDBACK   OFF"
                     ]
                 }
             }
