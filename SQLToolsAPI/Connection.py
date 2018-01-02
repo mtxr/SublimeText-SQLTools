@@ -248,7 +248,6 @@ You might need to restart the editor for settings to be refreshed."""
         # remove empty list items
         builtQueries = list(filter(None, builtQueries))
 
-        print('\n'.join(builtQueries))
         return '\n'.join(builtQueries)
 
     def buildArgs(self, queryName=None):
