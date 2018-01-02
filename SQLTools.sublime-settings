@@ -169,7 +169,7 @@
                     ]
                 },
                 "desc" : {
-                    "query": "select owner || '.' || name as obj from (select owner, table_name as name from all_tables union all select owner, view_name as name from all_views) o where owner not in ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','EXFSYS', 'LBACSYS', 'MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORDPLUGINS', 'ORDSYS','OUTLN', 'SI_INFORMTN_SCHEMA','SYS','SYSMAN','SYSTEM', 'TSMSYS','WK_TEST','WKSYS', 'WKPROXY','WMSYS','XDB','APEX_040000', 'APEX_PUBLIC_USER','DIP', 'FLOWS_30000','FLOWS_FILES','MDDATA', 'ORACLE_OCM','SPATIAL_CSW_ADMIN_USR', 'SPATIAL_WFS_ADMIN_USR', 'XS$NULL','PUBLIC');",
+                    "query": "select owner || '.' || case when UPPER(name) = name then name else chr(34) || name || chr(34) end as obj from (select owner, table_name as name from all_tables union all select owner, view_name as name from all_views) o where owner not in ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','EXFSYS', 'LBACSYS', 'MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORDPLUGINS', 'ORDSYS','OUTLN', 'SI_INFORMTN_SCHEMA','SYS','SYSMAN','SYSTEM', 'TSMSYS','WK_TEST','WKSYS', 'WKPROXY','WMSYS','XDB','APEX_040000', 'APEX_PUBLIC_USER','DIP', 'FLOWS_30000','FLOWS_FILES','MDDATA', 'ORACLE_OCM','SPATIAL_CSW_ADMIN_USR', 'SPATIAL_WFS_ADMIN_USR', 'XS$NULL','PUBLIC');",
                     "options": [],
                     "before": [
                         "SET SERVEROUT  OFF",  // override
@@ -179,7 +179,7 @@
                     ]
                 },
                 "columns": {
-                    "query": "select table_name || '.' || column_name as obj from (select c.table_name, c.column_name, t.owner from all_tab_columns c inner join all_tables t on c.owner = t.owner and c.table_name = t.table_name union all select c.table_name, c.column_name, t.owner from all_tab_columns c inner join all_views t on c.owner = t.owner and c.table_name = t.view_name) o where owner not in ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','EXFSYS', 'LBACSYS', 'MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORDPLUGINS', 'ORDSYS','OUTLN', 'SI_INFORMTN_SCHEMA','SYS','SYSMAN','SYSTEM', 'TSMSYS','WK_TEST','WKSYS', 'WKPROXY','WMSYS','XDB','APEX_040000', 'APEX_PUBLIC_USER','DIP', 'FLOWS_30000','FLOWS_FILES','MDDATA', 'ORACLE_OCM','SPATIAL_CSW_ADMIN_USR', 'SPATIAL_WFS_ADMIN_USR', 'XS$NULL','PUBLIC');",
+                    "query": "select case when UPPER(table_name) = table_name then table_name else chr(34) || table_name || chr(34) end || '.' || case when UPPER(column_name) = column_name then column_name else chr(34) || column_name || chr(34) end as obj from (select c.table_name, c.column_name, t.owner from all_tab_columns c inner join all_tables t on c.owner = t.owner and c.table_name = t.table_name union all select c.table_name, c.column_name, t.owner from all_tab_columns c inner join all_views t on c.owner = t.owner and c.table_name = t.view_name) o where owner not in ('ANONYMOUS','APPQOSSYS','CTXSYS','DBSNMP','EXFSYS', 'LBACSYS', 'MDSYS','MGMT_VIEW','OLAPSYS','OWBSYS','ORDPLUGINS', 'ORDSYS','OUTLN', 'SI_INFORMTN_SCHEMA','SYS','SYSMAN','SYSTEM', 'TSMSYS','WK_TEST','WKSYS', 'WKPROXY','WMSYS','XDB','APEX_040000', 'APEX_PUBLIC_USER','DIP', 'FLOWS_30000','FLOWS_FILES','MDDATA', 'ORACLE_OCM','SPATIAL_CSW_ADMIN_USR', 'SPATIAL_WFS_ADMIN_USR', 'XS$NULL','PUBLIC');",
                     "options": [],
                     "before": [
                         "SET SERVEROUT  OFF",  // override
