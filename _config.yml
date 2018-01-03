@@ -3,6 +3,9 @@ description: SQLTools for Sublime Text 3
 google_analytics: 
 show_downloads: true
 theme: jekyll-theme-modernist
+github:
+  zip_url: https://github.com/mtxr/SQLTools/zipball/master
+  tar_url: https://github.com/mtxr/SQLTools/tarball/master
 
 gems:
   - jekyll-mentions
