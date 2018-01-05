@@ -4,7 +4,7 @@
     "Generic Template": {      // Connection name, used in menu (Display name)
       "type"     : "pgsql",    // DB type: (mysql, pgsql, oracle, vertica, sqlite, firebird, sqsh)
       "host"     : "HOSTNAME", // DB host to connect to
-      "port"     : "PORT",     // DB port
+      "port"     :  PORT,      // DB port
       "database" : "DATABASE", // DB name (for SQLite this is the path to DB file)
       "username" : "USERNAME", // DB username
       "password" : "PASSWORD", // DB password (see RDMBS specific comments below)
@@ -60,7 +60,26 @@
     "Connection SQLite": {
       "type"    : "sqlite",
       // note the forward slashes in path
-      "database": "d:/sqlite/sample_db/chinook.db",
+      "database": "c:/sqlite/sample_db/chinook.db",
+      "encoding": "utf-8"
+    },
+    "Connection Vertica": {
+      "type"    : "vertica",
+      "host"    : "localhost",
+      "port"    :  5433,
+      "username": "anotheruser",
+      "password": "password",
+      "database": "dbname",
+      "encoding": "utf-8"
+    },
+    "Connection Firebird": {
+      "type"    : "firebird",
+      "host"    : "localhost",
+      "port"    :  3050,
+      "username": "sysdba",
+      "password": "password",
+      // note the forward slashes (if path is used)
+      "database": "c:/firebird/examples/empbuild/employee.fdb",
       "encoding": "utf-8"
     }
   */
