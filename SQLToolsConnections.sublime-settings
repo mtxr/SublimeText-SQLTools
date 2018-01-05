@@ -28,18 +28,20 @@
       "port"    :  5432,
       "database": "dbname",
       "username": "anotheruser",
-      // for PostgreSQL "password" is optional (setup "pgpass.conf" file instead)
+      // password is optional (setup "pgpass.conf" file instead)
       "password": "password",
       "encoding": "utf-8"
     },
     "Connection Oracle": {
       "type"    : "oracle",
       "host"    : "127.0.0.1",
-      "port"    :  1522,
+      "port"    :  1521,
       "database": "dbname",
       "username": "anotheruser",
       "password": "password",
       "service" : "servicename",
+      // nls_lang is optional
+      "nls_lang": "american_america.al32utf8",
       "encoding": "utf-8"
     },
     "Connection MSSQL": {
@@ -57,7 +59,8 @@
     },
     "Connection SQLite": {
       "type"    : "sqlite",
-      "database": "d:/sqlite/sample_db/chinook.db", // note the forward slashes in path
+      // note the forward slashes in path
+      "database": "d:/sqlite/sample_db/chinook.db",
       "encoding": "utf-8"
     }
   */

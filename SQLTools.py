@@ -497,7 +497,7 @@ class StExecute(WindowCommand):
             return
 
         Window().status_message(MESSAGE_RUNNING_CMD)
-        ST.conn.execute(getSelection(), createOutput(), stream=settings.get('use_streams', False))
+        ST.conn.execute(getSelection(), createOutput())
 
 
 class StExecuteAll(WindowCommand):
@@ -509,7 +509,7 @@ class StExecuteAll(WindowCommand):
 
         Window().status_message(MESSAGE_RUNNING_CMD)
         allText = View().substr(sublime.Region(0, View().size()))
-        ST.conn.execute(allText, createOutput(), stream=settings.get('use_streams', False))
+        ST.conn.execute(allText, createOutput())
 
 
 class StFormat(TextCommand):
@@ -543,8 +543,7 @@ class StHistory(WindowCommand):
         def cb(index):
             if index < 0:
                 return None
-            return ST.conn.execute(history.get(index), createOutput(),
-                                   stream=settings.get('use_streams', False))
+            return ST.conn.execute(history.get(index), createOutput())
 
         Window().show_quick_panel(history.all(), cb)
 
@@ -583,8 +582,7 @@ class StListQueries(WindowCommand):
 
             alias, query = options[index]
             if mode == "run":
-                ST.conn.execute(query, createOutput(),
-                                stream=settings.get('use_streams', False))
+                ST.conn.execute(query, createOutput())
             elif mode == "insert":
                 insertContent(query)
             else:
