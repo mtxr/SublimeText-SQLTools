@@ -96,12 +96,9 @@ def getConnections():
         connectionsObj[name] = createConnection(name, config, settings=settings.all())
 
     # project settings
-    try:
-        options = Window().project_data().get('connections', {})
-        for name, config in options.items():
-            connectionsObj[name] = createConnection(name, config, settings=settings.all())
-    except Exception:
-        pass
+    options = Window().project_data().get('connections', {})
+    for name, config in options.items():
+        connectionsObj[name] = createConnection(name, config, settings=settings.all())
 
     return connectionsObj
 
