@@ -2,6 +2,8 @@
 // that you wish to change in your Users/SQLTools.sublime-settings.
 // Don't copy-paste the entire config.
 {
+    "debug" : false,
+
     /**
      * If DB cli binary is not in PATH, set the full path in "cli" section.
      * Note: forward slashes ("/") should be used in path. Example:
@@ -15,17 +17,38 @@
         "sqlite"  : "sqlite3",
         "vertica" : "vsql",
         "firebird": "isql",
-        "sqsh"    : "sqsh"
+        "sqsh"    : "sqsh",
     },
-    "expand_to_paragraph"   : false,  // use paragraph (text between newlines), if selection is empty
-    "show_result_on_window" : false,  // puts results either in output pannel or new window
-    "clear_output"          : true,   // clears the output of prev. query
-    "thread_timeout"        : 15,     // query timeout in seconds
-    "use_streams"           : false,  // stream the output line by line
-    "history_size"          : 100,    // number of queries to save in the history
+
+    // use paragraph (text between newlines), if selection is empty
+    "expand_to_paragraph" : false,
+
+    // puts results either in output panel or new window
+    "show_result_on_window" : false,
+
+    // clears the output of prev. query
+    "clear_output" : true,
+
+    // query timeout in seconds
+    "thread_timeout" : 15,
+
+    // stream the output line by line
+    "use_streams" : false,
+
+    // number of queries to save in the history
+    "history_size" : 100,
+
+    // unless false, appends LIMIT clause to SELECT statements (not compatible with all DB's)
+    "safe_limit": false,
+
+    "unescape_quotes" : [
+        "php",
+    ],
+
     "show_records": {
-        "limit": 50
+        "limit": 50,
     },
+
     /**
      * Print the queries that were executed to the output.
      * Possible values for show_query: "top", "bottom", true ("top"), or false (disable)
@@ -34,37 +57,50 @@
      * the bottom of result.
      */
     "show_query": false,
+
     /**
      * Possible values for autocompletion: "basic", "smart", true ("smart"),
      *                                      or false (disable)
      * Completion keywords case is controlled by format.keyword_case (see below)
      */
     "autocompletion": "smart",
+
     // Settings used for formatting the queries and autocompletions
+    //
+    // "keyword_case"   , "upper", "lower", "capitalize" and null (leaves case intact)
+    // "identifier_case", "upper", "lower", "capitalize" and null (leaves case intact)
+    // "strip_comments" , formatting removes comments
+    // "indent_tabs"    , use tabs instead of spaces
+    // "indent_width"   , indentation width
+    // "reindent"       , reindent code
     "format" : {
-        "keyword_case"    : "upper",  // "upper", "lower", "capitalize" and null (leaves case intact)
-        "identifier_case" : null,     // "upper", "lower", "capitalize" and null (leaves case intact)
-        "strip_comments"  : false,    // formatting removes comments
-        "indent_tabs"     : false,    // use tabs instead of spaces
-        "indent_width"    : 4,        // indentation width
-        "reindent"        : true      // reindent code
+        "keyword_case"    : "upper",
+        "identifier_case" : null,
+        "strip_comments"  : false,
+        "indent_tabs"     : false,
+        "indent_width"    : 4,
+        "reindent"        : true
     },
-    "debug": false,
-    "safe_limit": false,  // unless false, appends LIMIT clause to SELECT statements (not compatible with all DB's)
-    "unescape_quotes" : [
-        "php"
-    ],
+
     /**
      * The list of syntax selectors for which the plugin autocompletion will be active.
      * An empty list means autocompletion always active.
      */
-    "selectors": ["source.sql", "source.pgsql", "source.plpgsql.postgres", "source.plsql.oracle", "source.tsql"],
+    "selectors": [
+        "source.sql",
+        "source.pgsql",
+        "source.plpgsql.postgres",
+        "source.plsql.oracle",
+        "source.tsql",
+    ],
+
     /**
      * Command line interface options for each RDBMS.
-     * In this file, the section `cli` above has the names you can use here. E.g.: "mysql", "pgsql", "oracle"
+     * In this file, the section `cli` above has the names you can use here.
+     * E.g.: "mysql", "pgsql", "oracle"
      *
-     * Names in the curly brackets (e.g. `{host}`) in sections `args`, `args_optional`, `env`, `env_optional`
-     * are replaced by the values specified in the connetion.
+     * Names in the curly brackets (e.g. `{host}`) in sections `args`, `args_optional`,
+     * `env`, `env_optional` are replaced by the values specified in the connection.
      */
     "cli_options": {
         "pgsql": {
@@ -109,6 +145,7 @@
                 }
             }
         },
+
         "mysql": {
             "options": ["--default-character-set=utf8"],
             "before": [],
@@ -149,6 +186,7 @@
                 }
             }
         },
+
         "mssql": {
             "options": [],
             "before": [],
@@ -194,6 +232,7 @@
                 }
             }
         },
+
         "oracle": {
             "options": ["-S"],
             "before": [
@@ -287,6 +326,7 @@
                 }
             }
         },
+
         "sqlite": {
             "options": [],
             "before": [],
@@ -317,6 +357,7 @@
                 }
             }
         },
+
         "vertica": {
             "options": [],
             "before" : [],
@@ -348,6 +389,7 @@
                 }
             }
         },
+
         "firebird": {
             "options": [],
             "before": [],
@@ -419,6 +461,7 @@
                 }
             }
         },
+
         "sqsh": {
             "options": [],
             "before": [],
