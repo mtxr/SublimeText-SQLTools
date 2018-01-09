@@ -203,18 +203,58 @@ def getOutputPlace(syntax=None, name="SQLTools Result"):
     return resultContainer
 
 
-def getSelection():
+def getSelectionText():
     text = []
-    if View().sel():
-        for region in View().sel():
-            if region.empty():
-                if not settings.get('expand_to_paragraph', False):
-                    text.append(View().substr(View().line(region)))
-                else:
-                    text.append(View().substr(expand_to_paragraph(View(), region.b)))
-            else:
-                text.append(View().substr(region))
+
+    selectionRegions = getSelectionRegions()
+
+    if not selectionRegions:
+        return text
+
+    for region in selectionRegions:
+        text.append(View().substr(region))
+
     return text
+
+
+def getSelectionRegions():
+    selectedRegions = []
+
+    if not View().sel():
+        return None
+
+    # If we would need to expand the empty selection, then which type:
+    #   'file', 'view' = use text of current view
+    #   'paragraph' =  paragraph(s) (text between newlines)
+    #   'line' = current line(s)
+    expandTo = settings.get('expand_to', 'file')
+    if not expandTo:
+        expandTo = 'file'
+
+    # keep compatibility with previous settings
+    expandToParagraph = settings.get('expand_to_paragraph')
+    if expandToParagraph is True:
+        expandTo = 'paragraph'
+
+    expandTo = str(expandTo).strip()
+    if expandTo not in ['file', 'view', 'paragraph', 'line']:
+        expandTo = 'file'
+
+    for region in View().sel():
+        if region.empty():
+            if expandTo in ['file', 'view']:
+                # no point in further iterating over selections, just use entire file
+                return [sublime.Region(0, View().size())]
+            elif expandTo == 'paragraph':
+                selectedRegions.append(expand_to_paragraph(View(), region.b))
+            else:
+                # expand to line
+                selectedRegions.append(View().line(region))
+        else:
+            # use the user selected text
+            selectedRegions.append(region)
+
+    return selectedRegions
 
 
 def getCurrentSyntax():
@@ -485,7 +525,7 @@ class StExplainPlan(WindowCommand):
             return
 
         Window().status_message(MESSAGE_RUNNING_CMD)
-        ST.conn.explainPlan(getSelection(), createOutput())
+        ST.conn.explainPlan(getSelectionText(), createOutput())
 
 
 class StExecute(WindowCommand):
@@ -496,7 +536,7 @@ class StExecute(WindowCommand):
             return
 
         Window().status_message(MESSAGE_RUNNING_CMD)
-        ST.conn.execute(getSelection(), createOutput())
+        ST.conn.execute(getSelectionText(), createOutput())
 
 
 class StExecuteAll(WindowCommand):
@@ -514,10 +554,12 @@ class StExecuteAll(WindowCommand):
 class StFormat(TextCommand):
     @staticmethod
     def run(edit):
-        for region in View().sel():
-            # if selection region is empty, use whole file as region
-            if region.empty():
-                region = sublime.Region(0, View().size())
+        selectionRegions = getSelectionRegions()
+
+        if not selectionRegions:
+            return
+
+        for region in selectionRegions:
             textToFormat = View().substr(region)
             View().replace(edit, region, Utils.formatSql(textToFormat, settings.get('format', {})))
 
@@ -550,7 +592,7 @@ class StHistory(WindowCommand):
 class StSaveQuery(WindowCommand):
     @staticmethod
     def run():
-        query = getSelection()
+        query = getSelectionText()
 
         def cb(alias):
             queries.add(alias, query)
