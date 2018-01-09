@@ -2,8 +2,6 @@
 // that you wish to change in your Users/SQLTools.sublime-settings.
 // Don't copy-paste the entire config.
 {
-    "debug" : false,
-
     /**
      * If DB cli binary is not in PATH, set the full path in "cli" section.
      * Note: forward slashes ("/") should be used in path. Example:
@@ -48,6 +46,8 @@
     "show_records": {
         "limit": 50
     },
+
+    "debug" : false,
 
     /**
      * Print the queries that were executed to the output.
