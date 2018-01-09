@@ -17,7 +17,7 @@
         "sqlite"  : "sqlite3",
         "vertica" : "vsql",
         "firebird": "isql",
-        "sqsh"    : "sqsh",
+        "sqsh"    : "sqsh"
     },
 
     // use paragraph (text between newlines), if selection is empty
@@ -42,11 +42,11 @@
     "safe_limit": false,
 
     "unescape_quotes" : [
-        "php",
+        "php"
     ],
 
     "show_records": {
-        "limit": 50,
+        "limit": 50
     },
 
     /**
@@ -91,7 +91,7 @@
         "source.pgsql",
         "source.plpgsql.postgres",
         "source.plsql.oracle",
-        "source.tsql",
+        "source.tsql"
     ],
 
     /**
