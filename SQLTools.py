@@ -126,14 +126,21 @@ def loadDefaultConnection():
 
 
 def createOutput(panel=None, syntax=None, prependText=None):
+    onInitialOutput = None
     if not panel:
-        panel = getOutputPlace(syntax)
+        panel, onInitialOutput = getOutputPlace(syntax)
     if prependText:
         panel.run_command('append', {'characters': str(prependText)})
 
+    initial = True
+
     def append(outputContent):
-        # hide previously set command running message (if any)
-        Window().status_message('')
+        nonlocal initial
+        if initial:
+            initial = False
+            if onInitialOutput:
+                onInitialOutput()
+
         # append content
         panel.set_read_only(False)
         panel.run_command('append', {'characters': outputContent})
@@ -165,42 +172,54 @@ def insertContent(content):
 
 
 def getOutputPlace(syntax=None, name="SQLTools Result"):
-    if not settings.get('show_result_on_window', True):
+    showResultOnWindow = settings.get('show_result_on_window', False)
+    if not showResultOnWindow:
         resultContainer = Window().find_output_panel(name)
         if resultContainer is None:
             resultContainer = Window().create_output_panel(name)
-        Window().run_command("show_panel", {"panel": "output." + name})
     else:
         resultContainer = None
         views = Window().views()
         for view in views:
             if view.name() == name:
                 resultContainer = view
-                Window().focus_view(resultContainer)
                 break
         if not resultContainer:
             resultContainer = Window().new_file()
             resultContainer.set_name(name)
 
     resultContainer.set_scratch(True)  # avoids prompting to save
+    resultContainer.set_read_only(True)
     resultContainer.settings().set("word_wrap", "false")
-    resultContainer.set_read_only(False)
-    # set custom syntax highlight, only if one was passed explicitly,
-    # otherwise use Plain Text syntax
-    if syntax:
-        # if custom and SQL related, use that, otherwise defaults to SQL
-        if 'sql' in syntax.lower():
-            resultContainer.set_syntax_file(syntax)
+
+    def onInitialOutputCallback():
+        if settings.get('clear_output', False):
+            resultContainer.set_read_only(False)
+            resultContainer.run_command('select_all')
+            resultContainer.run_command('left_delete')
+            resultContainer.set_read_only(True)
+
+        # set custom syntax highlight, only if one was passed explicitly,
+        # otherwise use Plain Text syntax
+        if syntax:
+            # if custom and SQL related, use that, otherwise defaults to SQL
+            if 'sql' in syntax.lower():
+                resultContainer.set_syntax_file(syntax)
+            else:
+                resultContainer.set_syntax_file(SYNTAX_SQL)
         else:
-            resultContainer.set_syntax_file(SYNTAX_SQL)
-    else:
-        resultContainer.set_syntax_file(SYNTAX_PLAIN_TEXT)
+            resultContainer.set_syntax_file(SYNTAX_PLAIN_TEXT)
 
-    if settings.get('clear_output', False):
-        resultContainer.run_command('select_all')
-        resultContainer.run_command('left_delete')
+        # hide previously set command running message (if any)
+        Window().status_message('')
 
-    return resultContainer
+        if not showResultOnWindow:
+            # if case this is an output pannel, show it
+            Window().run_command("show_panel", {"panel": "output." + name})
+
+        Window().focus_view(resultContainer)
+
+    return resultContainer, onInitialOutputCallback
 
 
 def getSelectionText():
@@ -218,7 +237,7 @@ def getSelectionText():
 
 
 def getSelectionRegions():
-    selectedRegions = []
+    expandedRegions = []
 
     if not View().sel():
         return None
@@ -241,20 +260,24 @@ def getSelectionRegions():
         expandTo = 'file'
 
     for region in View().sel():
+        # if user did not select anything - expand selection,
+        # otherwise use the currently selected region
         if region.empty():
             if expandTo in ['file', 'view']:
+                region = sublime.Region(0, View().size())
                 # no point in further iterating over selections, just use entire file
-                return [sublime.Region(0, View().size())]
+                return [region]
             elif expandTo == 'paragraph':
-                selectedRegions.append(expand_to_paragraph(View(), region.b))
+                region = expand_to_paragraph(View(), region.b)
             else:
                 # expand to line
-                selectedRegions.append(View().line(region))
-        else:
-            # use the user selected text
-            selectedRegions.append(region)
+                region = View().line(region)
 
-    return selectedRegions
+        # even if we could not expand, avoid adding empty regions
+        if not region.empty():
+            expandedRegions.append(region)
+
+    return expandedRegions
 
 
 def getCurrentSyntax():
@@ -512,7 +535,7 @@ class StDescFunction(WindowCommand):
             functionName = ST.functions[index].split('(', 1)[0]
             return ST.conn.getFunctionDescription(functionName, createOutput(syntax=currentSyntax))
 
-        # get everything until first occurence of "(", e.g. get "function_name"
+        # get everything until first occurrence of "(", e.g. get "function_name"
         # from "function_name(int)"
         ST.selectFunction(cb)
 
@@ -698,7 +721,7 @@ def plugin_loaded():
     # this ensures we have empty settings file in 'User' directory during first start
     # otherwise sublime will copy entire contents of 'SQLTools.sublime-settings'
     # which is not desirable and prevents future changes to queries and other
-    # sensible defaults defined in settings file, as those would be overriden by content
+    # sensible defaults defined in settings file, as those would be overridden by content
     # from older versions of SQLTools in 'User\SQLTools.sublime-settings'
     sublimeUserFolder = getSublimeUserFolder()
     userSettingFile = os.path.join(sublimeUserFolder, SQLTOOLS_SETTINGS_FILE)
