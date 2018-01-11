@@ -18,13 +18,17 @@
         "sqsh"    : "sqsh"
     },
 
-    // use paragraph (text between newlines), if selection is empty
-    "expand_to_paragraph" : false,
+    // If there is no SQL selected, use "expanded" region.
+    // Possible options:
+    //  "file"      - entire file contents
+    //  "paragraph" - text between newlines relative to cursor(s)
+    //  "line"      - current line of cursor(s)
+    "expand_to": "file",
 
     // puts results either in output panel or new window
     "show_result_on_window" : false,
 
-    // clears the output of prev. query
+    // clears the output of previous query
     "clear_output" : true,
 
     // query timeout in seconds

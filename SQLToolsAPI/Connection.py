@@ -197,7 +197,7 @@ You might need to restart the editor for settings to be refreshed."""
         args = self.buildArgs(queryName)
         env = self.buildEnv()
 
-        Log("Query: " + queryToRun)
+        Log("Query: " + str(queryToRun))
 
         self.Command.createAndRun(args=args,
                                   env=env,
