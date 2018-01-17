@@ -40,16 +40,12 @@
     // number of queries to save in the history
     "history_size": 100,
 
-    // unless false, appends LIMIT clause to SELECT statements (not compatible with all DB's)
-    "safe_limit": false,
-
-    "unescape_quotes": [
-        // "php"
-    ],
-
     "show_records": {
         "limit": 50
     },
+
+    // unless false, appends LIMIT clause to SELECT statements (not compatible with all DB's)
+    "safe_limit": false,
 
     "debug": false,
 
