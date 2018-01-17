@@ -20,6 +20,7 @@
       "password": "password",  // you will get a security warning in the output
       // "defaults-extra-file": "/path/to/defaults_file_with_password",  // use [client] or [mysql] section
       // "login-path": "your_login_path",  // login path in your ".mylogin.cnf"
+      "default-character-set": "utf8",
       "encoding": "utf-8"
     },
     "Connection PostgreSQL": {
