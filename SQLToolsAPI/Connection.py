@@ -1,10 +1,19 @@
 import shutil
 import shlex
+import codecs
 import sqlparse
 
 from .Log import Log
 from . import Utils as U
 from . import Command as C
+
+
+def _encoding_exists(enc):
+    try:
+        codecs.lookup(enc)
+    except LookupError:
+        return False
+    return True
 
 
 class Connection(object):
@@ -28,7 +37,6 @@ You might need to restart the editor for settings to be refreshed."""
     username = None
     password = None
     encoding = None
-    service = None
     safe_limit = None
     show_query = None
     rowsLimit = None
@@ -52,7 +60,9 @@ You might need to restart the editor for settings to be refreshed."""
         self.username   = options.get('username', None)
         self.password   = options.get('password', None)
         self.encoding   = options.get('encoding', 'utf-8')
-        self.service    = options.get('service', None)
+        self.encoding   = self.encoding or 'utf-8'  # defaults to utf-8
+        if not _encoding_exists(self.encoding):
+            self.encoding = 'utf-8'
 
         self.safe_limit = settings.get('safe_limit', None)
         self.show_query = settings.get('show_query', False)
