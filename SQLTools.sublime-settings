@@ -28,6 +28,9 @@
     // puts results either in output panel or new window
     "show_result_on_window": false,
 
+    // focus on result panel
+    "focus_on_result": false,
+
     // clears the output of previous query
     "clear_output": true,
 
