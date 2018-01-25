@@ -217,7 +217,8 @@ def getOutputPlace(syntax=None, name="SQLTools Result"):
             # if case this is an output pannel, show it
             Window().run_command("show_panel", {"panel": "output." + name})
 
-        Window().focus_view(resultContainer)
+        if settings.get('focus_on_result', False):
+            Window().focus_view(resultContainer)
 
     return resultContainer, onInitialOutputCallback
 
