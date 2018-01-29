@@ -588,6 +588,14 @@ class StFormat(TextCommand):
             View().replace(edit, region, Utils.formatSql(textToFormat, settings.get('format', {})))
 
 
+class StFormatAll(TextCommand):
+    @staticmethod
+    def run(edit):
+        region = sublime.Region(0, View().size())
+        textToFormat = View().substr(region)
+        View().replace(edit, region, Utils.formatSql(textToFormat, settings.get('format', {})))
+
+
 class StVersion(WindowCommand):
     @staticmethod
     def run():

@@ -20,10 +20,6 @@
     "command": "st_history"
   },
   {
-    "caption": "ST: Type Query",
-    "command": "st_query"
-  },
-  {
     "caption": "ST: Show Table Records",
     "command": "st_show_records"
   },
@@ -59,8 +55,12 @@
     "args"   :  {"mode": "insert"}
   },
   {
-    "caption": "ST: Format Current SQL File",
+    "caption": "ST: Format SQL",
     "command": "st_format"
+  },
+  {
+    "caption": "ST: Format SQL All File",
+    "command": "st_format_all"
   },
   {
     "caption": "ST: About",

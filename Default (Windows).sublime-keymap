@@ -10,7 +10,7 @@
     { "keys": ["ctrl+e", "ctrl+b"], "command": "st_format" },
     { "keys": ["ctrl+e", "ctrl+q"], "command": "st_save_query" },
     { "keys": ["ctrl+e", "ctrl+r"], "command": "st_remove_saved_query" },
-    { "keys": ["ctrl+e", "ctrl+l"], "command": "st_list_queries"},
+    { "keys": ["ctrl+e", "ctrl+l"], "command": "st_list_queries", "args": {"mode" : "run"}},
     { "keys": ["ctrl+e", "ctrl+o"], "command": "st_list_queries", "args": {"mode" : "open"}},
     { "keys": ["ctrl+e", "ctrl+i"], "command": "st_list_queries", "args": {"mode" : "insert"}}
 ]
