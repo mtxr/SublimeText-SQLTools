@@ -321,6 +321,7 @@ class ST(EventListener):
         ST.columns = []
         ST.functions = []
         ST.completion = None
+        callbacksRun = 0
 
         if not ST.conn:
             return
@@ -358,7 +359,6 @@ class ST(EventListener):
             if functionsCallback:
                 functionsCallback()
 
-        callbacksRun = 0
         ST.conn.getTables(tbCallback)
         ST.conn.getColumns(colCallback)
         ST.conn.getFunctions(funcCallback)
@@ -371,9 +371,7 @@ class ST(EventListener):
         connListNames = list(ST.connectionList.keys())
         connListNames.sort()
         ST.conn = ST.connectionList.get(connListNames[index])
-
         ST.loadConnectionData(tablesCallback, columnsCallback, functionsCallback)
-
         Log('Connection {0} selected'.format(ST.conn))
 
     @staticmethod
@@ -552,6 +550,12 @@ class StDescFunction(WindowCommand):
         # from "function_name(int)"
         ST.selectFunction(cb)
 
+class StRefreshConnectionData(WindowCommand):
+    @staticmethod
+    def run():
+        if not ST.conn:
+            return
+        ST.loadConnectionData()
 
 class StExplainPlan(WindowCommand):
     @staticmethod

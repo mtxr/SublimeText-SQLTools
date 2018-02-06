@@ -32,6 +32,10 @@
     "command": "st_desc_function"
   },
   {
+    "caption": "ST: Refresh Connection Data",
+    "command": "st_refresh_connection_data"
+  },
+  {
     "caption": "ST: Save Query",
     "command": "st_save_query"
   },
