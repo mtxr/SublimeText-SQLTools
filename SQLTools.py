@@ -345,14 +345,18 @@ class ST(EventListener):
         connListNames = list(ST.connectionList.keys())
         connListNames.sort()
         ST.conn = ST.connectionList.get(connListNames[index])
+        ST.reset_cache(tablesCallback, columnsCallback, functionsCallback)
+
+        Log('Connection {0} selected'.format(ST.conn))
+
+    @staticmethod
+    def reset_cache(tablesCallback=None, columnsCallback=None, functionsCallback=None):
         # clear list of identifiers in case connection is changed
         ST.tables = []
         ST.columns = []
         ST.functions = []
 
         ST.loadConnectionData(tablesCallback, columnsCallback, functionsCallback)
-
-        Log('Connection {0} selected'.format(ST.conn))
 
     @staticmethod
     def selectConnection(tablesCallback=None, columnsCallback=None, functionsCallback=None):
@@ -540,6 +544,12 @@ class StDescFunction(WindowCommand):
         # from "function_name(int)"
         ST.selectFunction(cb)
 
+class StClearCache(WindowCommand):
+    @staticmethod
+    def run():
+        if not ST.conn:
+            return
+        ST.reset_cache()
 
 class StExplainPlan(WindowCommand):
     @staticmethod
