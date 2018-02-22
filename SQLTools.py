@@ -550,12 +550,14 @@ class StDescFunction(WindowCommand):
         # from "function_name(int)"
         ST.selectFunction(cb)
 
+
 class StRefreshConnectionData(WindowCommand):
     @staticmethod
     def run():
         if not ST.conn:
             return
         ST.loadConnectionData()
+
 
 class StExplainPlan(WindowCommand):
     @staticmethod
