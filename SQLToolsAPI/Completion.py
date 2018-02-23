@@ -161,10 +161,31 @@ class CompletionItem(namedtuple('CompletionItem', ['type', 'ident'])):
 
 
 class Completion:
-    def __init__(self, uppercaseKeywords, allTables, allColumns, allFunctions):
+    def __init__(self, allTables, allColumns, allFunctions, settings=None):
         self.allTables = [CompletionItem('Table', table) for table in allTables]
         self.allColumns = [CompletionItem('Column', column) for column in allColumns]
         self.allFunctions = [CompletionItem('Function', func) for func in allFunctions]
+
+        # we don't save the settings (we don't need them after init)
+        if settings is None:
+            settings = {}
+
+        # get completion selectors from settings
+        self.selectors = settings.get('selectors', [])
+
+        # determine type of completions
+        self.completionType = settings.get('autocompletion', 'smart')
+        if not self.completionType:
+            self.completionType = None  # autocompletion disabled
+        else:
+            self.completionType = str(self.completionType).strip()
+            if self.completionType not in ['basic', 'smart']:
+                self.completionType = 'smart'
+
+        # determine desired keywords case from settings
+        formatSettings = settings.get('format', {})
+        keywordCase = formatSettings.get('keyword_case', 'upper')
+        uppercaseKeywords = keywordCase.lower().startswith('upper')
 
         self.allKeywords = []
         for keyword in keywords_list:
@@ -175,7 +196,34 @@ class Completion:
 
             self.allKeywords.append(CompletionItem('Keyword', keyword))
 
-    def getBasicAutoCompleteList(self, prefix):
+    def getSelectors(self):
+        return self.selectors
+
+    def isDisabled(self):
+        return self.completionType is None
+
+    def getAutoCompleteList(self, prefix, sql, sqlToCursor):
+        if self.isDisabled():
+            return None
+
+        autocompleteList = []
+        inhibit = False
+        if self.completionType == 'smart':
+            autocompleteList, inhibit = self._getAutoCompleteListSmart(prefix, sql, sqlToCursor)
+        else:
+            autocompleteList = self._getAutoCompleteListBasic(prefix)
+
+        if not autocompleteList:
+            return None, False
+
+        # return completions with or without quotes?
+        # determined based on ident after last dot
+        startsWithQuote = _startsWithQuote(prefix.split(".").pop())
+        autocompleteList = [item.format(startsWithQuote) for item in autocompleteList]
+
+        return autocompleteList, inhibit
+
+    def _getAutoCompleteListBasic(self, prefix):
         prefix = prefix.lower()
         autocompleteList = []
 
@@ -198,13 +246,9 @@ class Completion:
         if len(autocompleteList) == 0:
             return None
 
-        # return completions with or without quotes?
-        # determined based on ident after last dot
-        startsWithQuote = _startsWithQuote(prefix.split(".").pop())
-        autocompleteList = [item.format(startsWithQuote) for item in autocompleteList]
         return autocompleteList
 
-    def getAutoCompleteList(self, prefix, sql, sqlToCursor):
+    def _getAutoCompleteListSmart(self, prefix, sql, sqlToCursor):
         """
         Generally, we recognize 3 different variations in prefix:
           * ident|           // no dots (.) in prefix
@@ -262,10 +306,6 @@ class Completion:
         if not autocompleteList:
             return None, False
 
-        # return completions with or without quotes?
-        # determined based on ident after last dot
-        startsWithQuote = _startsWithQuote(prefix.split(".").pop())
-        autocompleteList = [item.format(startsWithQuote) for item in autocompleteList]
         return autocompleteList, inhibit
 
     def _noDotsCompletions(self, prefix, identifiers, joinAlias=None):

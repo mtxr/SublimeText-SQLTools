@@ -32,8 +32,8 @@
     "command": "st_desc_function"
   },
   {
-    "caption": "ST: Remove Table and Functions cache",
-    "command": "st_clear_cache"
+    "caption": "ST: Refresh Connection Data",
+    "command": "st_refresh_connection_data"
   },
   {
     "caption": "ST: Save Query",

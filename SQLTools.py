@@ -91,16 +91,17 @@ def getConnections():
         startPlugin()
 
     options = connections.get('connections', {})
+    allSettings = settings.all()
 
     for name, config in options.items():
-        connectionsObj[name] = createConnection(name, config, settings=settings.all())
+        connectionsObj[name] = createConnection(name, config, settings=allSettings)
 
     # project settings
     projectData = Window().project_data()
     if projectData:
         options = projectData.get('connections', {})
         for name, config in options.items():
-            connectionsObj[name] = createConnection(name, config, settings=settings.all())
+            connectionsObj[name] = createConnection(name, config, settings=allSettings)
 
     return connectionsObj
 
@@ -290,12 +291,12 @@ def getCurrentSyntax():
 
 
 class ST(EventListener):
+    connectionList   = None
     conn             = None
     tables           = []
     columns          = []
     functions        = []
-    connectionList   = None
-    autoCompleteList = []
+    completion       = None
 
     @staticmethod
     def bootstrap():
@@ -315,21 +316,46 @@ class ST(EventListener):
 
     @staticmethod
     def loadConnectionData(tablesCallback=None, columnsCallback=None, functionsCallback=None):
+        # clear the list of identifiers (in case connection is changed)
+        ST.tables = []
+        ST.columns = []
+        ST.functions = []
+        ST.completion = None
+        callbacksRun = 0
+
         if not ST.conn:
             return
 
         def tbCallback(tables):
-            setattr(ST, 'tables', tables)
+            ST.tables = tables
+
+            nonlocal callbacksRun
+            callbacksRun += 1
+            if callbacksRun == 3:
+                ST.completion = Completion(ST.tables, ST.columns, ST.functions, settings=settings)
+
             if tablesCallback:
                 tablesCallback()
 
         def colCallback(columns):
-            setattr(ST, 'columns', columns)
+            ST.columns = columns
+
+            nonlocal callbacksRun
+            callbacksRun += 1
+            if callbacksRun == 3:
+                ST.completion = Completion(ST.tables, ST.columns, ST.functions, settings=settings)
+
             if columnsCallback:
                 columnsCallback()
 
         def funcCallback(functions):
-            setattr(ST, 'functions', functions)
+            ST.functions = functions
+
+            nonlocal callbacksRun
+            callbacksRun += 1
+            if callbacksRun == 3:
+                ST.completion = Completion(ST.tables, ST.columns, ST.functions, settings=settings)
+
             if functionsCallback:
                 functionsCallback()
 
@@ -345,18 +371,8 @@ class ST(EventListener):
         connListNames = list(ST.connectionList.keys())
         connListNames.sort()
         ST.conn = ST.connectionList.get(connListNames[index])
-        ST.reset_cache(tablesCallback, columnsCallback, functionsCallback)
-
-        Log('Connection {0} selected'.format(ST.conn))
-
-    @staticmethod
-    def reset_cache(tablesCallback=None, columnsCallback=None, functionsCallback=None):
-        # clear list of identifiers in case connection is changed
-        ST.tables = []
-        ST.columns = []
-        ST.functions = []
-
         ST.loadConnectionData(tablesCallback, columnsCallback, functionsCallback)
+        Log('Connection {0} selected'.format(ST.conn))
 
     @staticmethod
     def selectConnection(tablesCallback=None, columnsCallback=None, functionsCallback=None):
@@ -393,10 +409,21 @@ class ST(EventListener):
         if ST.conn is None:
             return None
 
+        if ST.completion is None:
+            return None
+
+        if ST.completion.isDisabled():
+            return None
+
         if not len(locations):
             return None
 
-        selectors = settings.get('selectors', [])
+        # disable completions inside strings
+        if view.match_selector(locations[0], 'string'):
+            return None
+
+        # show completions only for specific selectors
+        selectors = ST.completion.getSelectors()
         selectorMatched = False
         if selectors:
             for selector in selectors:
@@ -405,18 +432,6 @@ class ST(EventListener):
                     break
 
         if not selectorMatched:
-            return None
-
-        # completions enabled? if yes, determine which type
-        completionType = settings.get('autocompletion', 'smart')
-        if not completionType:
-            return None         # autocompletion disabled
-        completionType = str(completionType).strip()
-        if completionType not in ['basic', 'smart']:
-            completionType = 'smart'
-
-        # no completions inside strings
-        if view.match_selector(locations[0], 'string'):
             return None
 
         # sublimePrefix = prefix
@@ -439,33 +454,24 @@ class ST(EventListener):
         except Exception as e:
             Log(e)
 
-        # determine desired keywords case from settings
-        formatSettings = settings.get('format', {})
-        keywordCase = formatSettings.get('keyword_case', 'upper')
-        uppercaseKeywords = keywordCase.lower().startswith('upper')
+        # use current paragraph as sql text to parse
+        sqlRegion = expand_to_paragraph(view, currentPoint)
+        sql = view.substr(sqlRegion)
+        sqlToCursorRegion = sublime.Region(sqlRegion.begin(), currentPoint)
+        sqlToCursor = view.substr(sqlToCursorRegion)
 
-        inhibit = False
-        completion = Completion(uppercaseKeywords, ST.tables, ST.columns, ST.functions)
-
-        if completionType == 'basic':
-            ST.autoCompleteList = completion.getBasicAutoCompleteList(prefix)
-        else:
-            # use current paragraph as sql text to parse
-            sqlRegion = expand_to_paragraph(view, currentPoint)
-            sql = view.substr(sqlRegion)
-            sqlToCursorRegion = sublime.Region(sqlRegion.begin(), currentPoint)
-            sqlToCursor = view.substr(sqlToCursorRegion)
-            ST.autoCompleteList, inhibit = completion.getAutoCompleteList(prefix, sql, sqlToCursor)
+        # get completions
+        autoCompleteList, inhibit = ST.completion.getAutoCompleteList(prefix, sql, sqlToCursor)
 
         # safe check here, so even if we return empty completions and inhibit is true
         # we return empty completions to show default sublime completions
-        if ST.autoCompleteList is None or len(ST.autoCompleteList) == 0:
+        if autoCompleteList is None or len(autoCompleteList) == 0:
             return None
 
         if inhibit:
-            return (ST.autoCompleteList, sublime.INHIBIT_WORD_COMPLETIONS)
+            return (autoCompleteList, sublime.INHIBIT_WORD_COMPLETIONS)
 
-        return ST.autoCompleteList
+        return autoCompleteList
 
 
 # #
@@ -544,12 +550,14 @@ class StDescFunction(WindowCommand):
         # from "function_name(int)"
         ST.selectFunction(cb)
 
-class StClearCache(WindowCommand):
+
+class StRefreshConnectionData(WindowCommand):
     @staticmethod
     def run():
         if not ST.conn:
             return
-        ST.reset_cache()
+        ST.loadConnectionData()
+
 
 class StExplainPlan(WindowCommand):
     @staticmethod
