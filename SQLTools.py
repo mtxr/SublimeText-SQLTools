@@ -3,13 +3,13 @@ __version__ = "v0.9.9"
 import sys
 import os
 import re
+import logging
 
 import sublime
 from sublime_plugin import WindowCommand, EventListener, TextCommand
 from Default.paragraph import expand_to_paragraph
 
 from .SQLToolsAPI import Utils
-from .SQLToolsAPI.Log import Log, Logger
 from .SQLToolsAPI.Storage import Storage, Settings
 from .SQLToolsAPI.Connection import Connection
 from .SQLToolsAPI.History import History
@@ -34,6 +34,19 @@ settings                     = None
 queries                      = None
 connections                  = None
 history                      = None
+
+# create pluggin logger
+DEFAULT_LOG_LEVEL = logging.WARNING
+plugin_logger = logging.getLogger(__package__)
+# some plugins are not playing by the rules and configure the root loger
+plugin_logger.propagate = False
+if not plugin_logger.handlers:
+    plugin_logger_handler = logging.StreamHandler()
+    plugin_logger_formatter = logging.Formatter("[{name}] {levelname}: {message}", style='{')
+    plugin_logger_handler.setFormatter(plugin_logger_formatter)
+    plugin_logger.addHandler(plugin_logger_handler)
+plugin_logger.setLevel(DEFAULT_LOG_LEVEL)
+logger = logging.getLogger(__name__)
 
 
 def getSublimeUserFolder():
@@ -74,13 +87,17 @@ def startPlugin():
     queries     = Storage(QUERIES_FILENAME, default=QUERIES_FILENAME_DEFAULT)
     history     = History(settings.get('history_size', 100))
 
-    Logger.setPackageVersion(__version__)
-    Logger.setPackageName(__package__)
-    Logger.setLogging(settings.get('debug', True))
+    if settings.get('debug', False):
+        plugin_logger.setLevel(logging.DEBUG)
+    else:
+        plugin_logger.setLevel(DEFAULT_LOG_LEVEL)
+
     Connection.setTimeout(settings.get('thread_timeout', 15))
     Connection.setHistoryManager(history)
 
-    Log(__package__ + " Loaded!")
+    logger.info('plugin (re)loaded')
+    logger.info('version %s', __version__)
+
 
 
 def getConnections():
@@ -122,7 +139,6 @@ def loadDefaultConnection():
     default = connections.get('default', False)
     if not default:
         return
-    Log('Default database set to ' + default + '. Loading options and auto complete.')
     return default
 
 
@@ -308,11 +324,15 @@ class ST(EventListener):
         default = loadDefaultConnection()
         if not default:
             return
+
+        logger.info('default connection is set to "%s"', default)
+
         try:
-            ST.conn = ST.connectionList.get(default)
+            ST.conn = ST.connectionList[default]
+        except KeyError as e:
+            logger.error('connection "%s" set as default, but it does not exists', default)
+        else:
             ST.loadConnectionData()
-        except Exception:
-            Log("Invalid connection setted")
 
     @staticmethod
     def loadConnectionData(tablesCallback=None, columnsCallback=None, functionsCallback=None):
@@ -372,7 +392,7 @@ class ST(EventListener):
         connListNames.sort()
         ST.conn = ST.connectionList.get(connListNames[index])
         ST.loadConnectionData(tablesCallback, columnsCallback, functionsCallback)
-        Log('Connection {0} selected'.format(ST.conn))
+        logger.info('Connection "{0}" selected'.format(ST.conn))
 
     @staticmethod
     def selectConnection(tablesCallback=None, columnsCallback=None, functionsCallback=None):
@@ -452,7 +472,7 @@ class ST(EventListener):
             lineStr = view.substr(lineStartToLocation)
             prefix = re.split('[^`\"\w.\$]+', lineStr).pop()
         except Exception as e:
-            Log(e)
+            logger.debug(e)
 
         # use current paragraph as sql text to parse
         sqlRegion = expand_to_paragraph(view, currentPoint)
@@ -732,7 +752,6 @@ def reload():
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Completion"])
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Storage"])
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.History"])
-        imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Log"])
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Command"])
         imp.reload(sys.modules[__package__ + ".SQLToolsAPI.Connection"])
     except Exception as e:
@@ -760,9 +779,9 @@ def plugin_loaded():
         from package_control import events
 
         if events.install(__name__):
-            Log('Installed %s!' % events.install(__name__))
+            logger.info('Installed %s!' % events.install(__name__))
         elif events.post_upgrade(__name__):
-            Log('Upgraded to %s!' % events.post_upgrade(__name__))
+            logger.info('Upgraded to %s!' % events.post_upgrade(__name__))
             sublime.message_dialog(('{0} was upgraded.' +
                                     'If you have any problem,' +
                                     'just restart your Sublime Text.'
@@ -774,3 +793,8 @@ def plugin_loaded():
 
     startPlugin()
     reload()
+
+
+def plugin_unloaded():
+    if plugin_logger.handlers:
+        plugin_logger.handlers.pop()
