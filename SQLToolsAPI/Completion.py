@@ -1,10 +1,11 @@
 import re
+import logging
 from collections import namedtuple
 
 from .ParseUtils import extractTables
 
-_join_cond_regex_pattern = r"\s+?JOIN\s+?[\w\.`\"]+\s+?(?:AS\s+)?(\w+)\s+?ON\s+?(?:[\w\.]+)?$"
-JOIN_COND_REGEX = re.compile(_join_cond_regex_pattern, re.IGNORECASE)
+JOIN_COND_PATTERN = r"\s+?JOIN\s+?[\w\.`\"]+\s+?(?:AS\s+)?(\w+)\s+?ON\s+?(?:[\w\.]+)?$"
+JOIN_COND_REGEX = re.compile(JOIN_COND_PATTERN, re.IGNORECASE)
 
 keywords_list = [
     'SELECT', 'UPDATE', 'DELETE', 'INSERT', 'INTO', 'FROM',
@@ -12,6 +13,8 @@ keywords_list = [
     'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN', 'USING',
     'LIMIT', 'DISTINCT', 'SET'
 ]
+
+logger = logging.getLogger(__name__)
 
 
 # this function is generously used in completions code to get rid
@@ -28,7 +31,7 @@ def _stripQuotesOnDemand(ident, doStrip=True):
 
 
 def _startsWithQuote(ident):
-    # str.startswith can be matched against a tuple
+    # ident is matched against any of the possible ident quotes
     quotes = ('`', '"')
     return ident.startswith(quotes)
 
@@ -45,24 +48,23 @@ def _escapeDollarSign(ident):
 
 
 class CompletionItem(namedtuple('CompletionItem', ['type', 'ident'])):
-    """
-    Represents a potential or actual completion item.
-      * type - Type of item e.g. (Table, Function, Column)
-      * ident - identifier e.g. ("tablename.column", "database.table", "alias")
+    """Represents a potential or actual completion item.
+      * type - type of item (Table, Function, Column)
+      * ident - identifier (table.column, schema.table, alias)
     """
     __slots__ = ()
 
-    # parent of identifier, e.g. "table" from "table.column"
     @property
     def parent(self):
+        """Parent of identifier, e.g. "table" from "table.column" """
         if self.ident.count('.') == 0:
             return None
         else:
             return self.ident.partition('.')[0]
 
-    # name of identifier, e.g. "column" from "table.column"
     @property
     def name(self):
+        """Name of identifier, e.g. "column" from "table.column" """
         return self.ident.split('.').pop()
 
     # for functions - strip open bracket "(" and everything after that
@@ -281,7 +283,8 @@ class Completion:
         try:
             identifiers = extractTables(sql)
         except Exception as e:
-            print(e)
+            logger.debug('Failed to extact the list identifiers from SQL:\n {}'.format(sql),
+                         exc_info=True)
 
         # joinAlias is set only if user is editing join condition with alias. E.g.
         # SELECT a.* from tbl_a a inner join tbl_b b ON |
@@ -292,7 +295,8 @@ class Completion:
                 if joinCondMatch:
                     joinAlias = joinCondMatch.group(1)
             except Exception as e:
-                print(e)
+                logger.debug('Failed search of join condition, SQL:\n {}'.format(sqlToCursor),
+                             exc_info=True)
 
         autocompleteList = []
         inhibit = False

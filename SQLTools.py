@@ -73,15 +73,15 @@ def startPlugin():
     try:
         settings    = Settings(SETTINGS_FILENAME, default=SETTINGS_FILENAME_DEFAULT)
     except Exception as e:
-        msg = __package__ + ": Failed to parse " + SQLTOOLS_SETTINGS_FILE + " file"
-        print(msg + "\nError: " + str(e))
+        msg = '{0}: Failed to parse {1} file'.format(__package__, SQLTOOLS_SETTINGS_FILE)
+        logging.error(msg + "\nError: " + str(e))
         Window().status_message(msg)
 
     try:
         connections = Settings(CONNECTIONS_FILENAME, default=CONNECTIONS_FILENAME_DEFAULT)
     except Exception as e:
-        msg = __package__ + ": Failed to parse " + SQLTOOLS_CONNECTIONS_FILE + " file"
-        print(msg + "\nError: " + str(e))
+        msg = '{0}: Failed to parse {1} file'.format(__package__, SQLTOOLS_CONNECTIONS_FILE)
+        logging.error(msg + "\nError: " + str(e))
         Window().status_message(msg)
 
     queries     = Storage(QUERIES_FILENAME, default=QUERIES_FILENAME_DEFAULT)
@@ -97,7 +97,6 @@ def startPlugin():
 
     logger.info('plugin (re)loaded')
     logger.info('version %s', __version__)
-
 
 
 def getConnections():
