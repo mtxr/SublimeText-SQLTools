@@ -64,7 +64,7 @@ Sublime Text has it's environment variable `PATH` set from launchctl, not by you
 ## Contributors
 
 This project exists thanks to all the people who contribute.
-<a href="graphs/contributors"><img src="https://opencollective.com/SQLTools/contributors.svg?width=890&button=false" /></a>
+<a href="https://github.com/mtxr/SQLTools/graphs/contributors"><img src="https://opencollective.com/SQLTools/contributors.svg?width=890&button=false" /></a>
 
 
 ## Backers
