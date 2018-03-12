@@ -1,8 +1,7 @@
-__version__ = "v0.2.5"
+__version__ = "v0.3.0"
 
 
 __all__ = [
-    'Log',
     'Utils',
     'Completion',
     'Command',
