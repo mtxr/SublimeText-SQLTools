@@ -1,6 +1,8 @@
 ![SQLTools](https://github.com/mtxr/SQLTools/raw/images/icon.png?raw=true) SQLTools
 ===============
 
+[![Join the chat at https://gitter.im/SQLTools/Lobby](https://badges.gitter.im/SQLTools/Lobby.svg)](https://gitter.im/SQLTools/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Your swiss knife SQL for Sublime Text.
 
 Write your SQL with smart completions and handy table and function definitions, execute SQL and explain queries, format your queries and save them in history.
