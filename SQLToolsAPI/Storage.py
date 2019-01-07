@@ -12,13 +12,18 @@ class Storage:
         self.items = {}
 
         # copy entire file, to keep comments
-        if not os.path.isfile(filename) and default and os.path.isfile(default):
-            shutil.copyfile(default, filename)
+        # if not os.path.isfile(filename) and default and os.path.isfile(default):
+        #     shutil.copyfile(default, filename)
 
         self.all()
 
     def all(self):
-        self.items = U.parseJson(self.getFilename())
+        userFile = self.getFilename()
+
+        if os.path.exists(userFile):
+            self.items = U.parseJson(self.getFilename())
+        else:
+            self.items = {}
 
         return U.merge(self.items, self.defaults())
 
