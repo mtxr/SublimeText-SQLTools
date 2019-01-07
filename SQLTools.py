@@ -74,14 +74,14 @@ def startPlugin():
         settings    = Settings(SETTINGS_FILENAME, default=SETTINGS_FILENAME_DEFAULT)
     except Exception as e:
         msg = '{0}: Failed to parse {1} file'.format(__package__, SQLTOOLS_SETTINGS_FILE)
-        logging.error(msg + "\nError: " + str(e))
+        logging.exception(msg)
         Window().status_message(msg)
 
     try:
         connections = Settings(CONNECTIONS_FILENAME, default=CONNECTIONS_FILENAME_DEFAULT)
     except Exception as e:
         msg = '{0}: Failed to parse {1} file'.format(__package__, SQLTOOLS_CONNECTIONS_FILE)
-        logging.error(msg + "\nError: " + str(e))
+        logging.exception(msg)
         Window().status_message(msg)
 
     queries     = Storage(QUERIES_FILENAME, default=QUERIES_FILENAME_DEFAULT)
