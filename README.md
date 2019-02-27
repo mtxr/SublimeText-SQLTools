@@ -21,7 +21,7 @@ SQLTools will save you (for sure) a lot of time and help you to increase your pr
 
 ## Features
 
-* Works with PostgreSQL, MySQL, Oracle, MSSQL, SQLite, Vertica, Firebird
+* Works with PostgreSQL, MySQL, Oracle, MSSQL, SQLite, Vertica, Firebird, and Snowflake
 * Smart completions (except SQLite)
 * Run SQL Queries &nbsp; <kbd>CTRL+e</kbd>, <kbd>CTRL+e</kbd>
 ![Auto complete and run SQL queries](https://github.com/mtxr/SQLTools/raw/images/execute_auto_complete.gif?raw=true)
