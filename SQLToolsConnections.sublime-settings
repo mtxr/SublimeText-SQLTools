@@ -88,10 +88,12 @@
       "database": "database",
       // for possible authentication configurations see
       // https://docs.snowflake.net/manuals/user-guide/snowsql-start.html#authenticator
-      // if using "snowflake", need to set SNOWSQL_PWD environment variable
       "user"    : "user@example.com",
       "account" : "account_name",
       "auth":   : "snowflake | externalbrowser | <okta-url>"
+      // if using "auth": "snowflake", provide a password
+      // if using "auth": "externalbrowser" or "<okta-url>", no password needed
+      "password": "pwd"
     }
   */
   },

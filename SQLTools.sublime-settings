@@ -516,6 +516,9 @@
 
         "snowsql": {
             "options": [],
+            "env_optional": {
+                "SNOWSQL_PWD": "{password}"
+            },
             "args": "-u {user} -a {account} -d {database} --authenticator {auth} -K",
             "queries": {
                 "execute": {
