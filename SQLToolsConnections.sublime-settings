@@ -92,6 +92,7 @@
       "account" : "account_name",
       "auth":   : "snowflake | externalbrowser | <okta-url>"
       // if using "auth": "snowflake", provide a password
+      // you can alternatively set SNOWSQL_PWD in you environment instead
       // if using "auth": "externalbrowser" or "<okta-url>", no password needed
       "password": "pwd"
     }
