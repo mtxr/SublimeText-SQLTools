@@ -15,7 +15,8 @@
         "sqlite"  : "sqlite3",
         "vertica" : "vsql",
         "firebird": "isql",
-        "sqsh"    : "sqsh"
+        "sqsh"    : "sqsh",
+        "snowsql" : "snowsql"
     },
 
     // If there is no SQL selected, use "expanded" region.
@@ -509,6 +510,36 @@
                     "query": "select top {1} * from \"{0}\";",
                     "options": [],
                     "before": ["\\set semicolon_cmd=\"\\go -mpretty -l\""]
+                }
+            }
+        },
+
+        "snowsql": {
+            "options": [],
+            "args": "-u {user} -a {account} -d {database} --authenticator {auth} -K",
+            "queries": {
+                "execute": {
+                    "options": [],
+                },
+                "show records": {
+                    "query": "SELECT * FROM {0} LIMIT {1};"
+                },
+                "desc table": {
+                    "query": "DESC TABLE {0};",
+                    "options": ["-o", "output_format=plain", 
+                                "-o", "timing=False"]
+                },
+                "desc": {
+                    "query": "SELECT TABLE_SCHEMA || '.' || TABLE_NAME AS tbl FROM INFORMATION_SCHEMA.TABLES;",
+                    "options": ["-o", "output_format=plain", 
+                                "-o", "header=False", 
+                                "-o", "timing=False"]
+                },
+                "columns": {
+                    "query": "SELECT TABLE_NAME || '.' || COLUMN_NAME AS col FROM INFORMATION_SCHEMA.COLUMNS",
+                    "options": ["-o", "output_format=plain", 
+                                "-o", "header=False", 
+                                "-o", "timing=False"]
                 }
             }
         }
