@@ -82,6 +82,16 @@
       // note the forward slashes (if path is used)
       "database": "c:/firebird/examples/empbuild/employee.fdb",
       "encoding": "utf-8"
+    },
+    "Connection Snowflake": {
+      "type"    : "snowsql",
+      "database": "database",
+      // for possible authentication configurations see
+      // https://docs.snowflake.net/manuals/user-guide/snowsql-start.html#authenticator
+      // if using "snowflake", need to set SNOWSQL_PWD environment variable
+      "user"    : "user@example.com",
+      "account" : "account_name",
+      "auth":   : "snowflake | externalbrowser | <okta-url>"
     }
   */
   },
