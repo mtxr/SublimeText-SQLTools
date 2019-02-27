@@ -530,13 +530,13 @@
                                 "-o", "timing=False"]
                 },
                 "desc": {
-                    "query": "SELECT TABLE_SCHEMA || '.' || TABLE_NAME AS tbl FROM INFORMATION_SCHEMA.TABLES;",
+                    "query": "SELECT TABLE_SCHEMA || '.' || TABLE_NAME AS tbl FROM INFORMATION_SCHEMA.TABLES ORDER BY tbl;",
                     "options": ["-o", "output_format=plain", 
                                 "-o", "header=False", 
                                 "-o", "timing=False"]
                 },
                 "columns": {
-                    "query": "SELECT TABLE_NAME || '.' || COLUMN_NAME AS col FROM INFORMATION_SCHEMA.COLUMNS",
+                    "query": "SELECT TABLE_NAME || '.' || COLUMN_NAME AS col FROM INFORMATION_SCHEMA.COLUMNS ORDER BY col;",
                     "options": ["-o", "output_format=plain", 
                                 "-o", "header=False", 
                                 "-o", "timing=False"]
