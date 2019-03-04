@@ -412,7 +412,12 @@ class ST(EventListener):
             sublime.message_dialog('Your database has no tables.')
             return
 
-        Window().show_quick_panel(ST.tables, callback)
+        w = Window();
+        view = w.active_view()
+        text = view.substr(view.sel()[0])
+        w.show_quick_panel(ST.tables, callback)
+        w.run_command('insert', {'characters': text})
+        w.run_command("select_all")
 
     @staticmethod
     def selectFunction(callback):
