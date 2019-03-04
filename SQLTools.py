@@ -74,14 +74,14 @@ def startPlugin():
         settings    = Settings(SETTINGS_FILENAME, default=SETTINGS_FILENAME_DEFAULT)
     except Exception as e:
         msg = '{0}: Failed to parse {1} file'.format(__package__, SQLTOOLS_SETTINGS_FILE)
-        logging.error(msg + "\nError: " + str(e))
+        logging.exception(msg)
         Window().status_message(msg)
 
     try:
         connections = Settings(CONNECTIONS_FILENAME, default=CONNECTIONS_FILENAME_DEFAULT)
     except Exception as e:
         msg = '{0}: Failed to parse {1} file'.format(__package__, SQLTOOLS_CONNECTIONS_FILE)
-        logging.error(msg + "\nError: " + str(e))
+        logging.exception(msg)
         Window().status_message(msg)
 
     queries     = Storage(QUERIES_FILENAME, default=QUERIES_FILENAME_DEFAULT)
@@ -763,16 +763,6 @@ def reload():
 
 
 def plugin_loaded():
-    # this ensures we have empty settings file in 'User' directory during first start
-    # otherwise sublime will copy entire contents of 'SQLTools.sublime-settings'
-    # which is not desirable and prevents future changes to queries and other
-    # sensible defaults defined in settings file, as those would be overridden by content
-    # from older versions of SQLTools in 'User\SQLTools.sublime-settings'
-    sublimeUserFolder = getSublimeUserFolder()
-    userSettingFile = os.path.join(sublimeUserFolder, SQLTOOLS_SETTINGS_FILE)
-    if not os.path.isfile(userSettingFile):
-        # create empty settings file in 'User' folder
-        sublime.save_settings(SQLTOOLS_SETTINGS_FILE)
 
     try:
         from package_control import events
