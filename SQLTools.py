@@ -437,24 +437,18 @@ class ST(EventListener):
         if not len(locations):
             return None
 
-        # disable completions for specific selectors
-        # disabled_for_selectors = ST.completion.selectors()
-        disabled_for_selectors = ['string.quoted.single.sql', 'string.quoted.single.pgsql']
-        if disabled_for_selectors:
-            for selector in disabled_for_selectors:
+        ignoreSelectors = ST.completion.getIgnoreSelectors()
+        if ignoreSelectors:
+            for selector in ignoreSelectors:
                 if view.match_selector(locations[0], selector):
                     return None
 
-        # show completions only for specific selectors
-        selectors = ST.completion.getSelectors()
-        selectorMatched = False
-        if selectors:
-            for selector in selectors:
+        activeSelectors = ST.completion.getActiveSelectors()
+        if activeSelectors:
+            for selector in activeSelectors:
                 if view.match_selector(locations[0], selector):
-                    selectorMatched = True
                     break
-
-            if not selectorMatched:
+            else:
                 return None
 
         # sublimePrefix = prefix

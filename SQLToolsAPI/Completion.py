@@ -172,8 +172,17 @@ class Completion:
         if settings is None:
             settings = {}
 
-        # get completion selectors from settings
-        self.selectors = settings.get('selectors', [])
+        # check old setting name ('selectors') first for compatibility
+        activeSelectors = settings.get('selectors', None)
+        if not activeSelectors:
+            activeSelectors = settings.get(
+                'autocomplete_selectors_active',
+                ['source.sql'])
+        self.activeSelectors = activeSelectors
+
+        self.ignoreSelectors = settings.get(
+            'autocomplete_selectors_ignore',
+            ['string.quoted.single.sql'])
 
         # determine type of completions
         self.completionType = settings.get('autocompletion', 'smart')
@@ -198,8 +207,11 @@ class Completion:
 
             self.allKeywords.append(CompletionItem('Keyword', keyword))
 
-    def getSelectors(self):
-        return self.selectors
+    def getActiveSelectors(self):
+        return self.activeSelectors
+
+    def getIgnoreSelectors(self):
+        return self.ignoreSelectors
 
     def isDisabled(self):
         return self.completionType is None
