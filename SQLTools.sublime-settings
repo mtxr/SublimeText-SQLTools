@@ -87,15 +87,26 @@
     },
 
     /**
-     * The list of syntax selectors for which the plugin autocompletion will be active.
+     * The list of syntax selectors for which the autocompletion will be active.
      * An empty list means autocompletion always active.
      */
-    "selectors": [
+    "autocomplete_selectors_active": [
         "source.sql",
         "source.pgsql",
         "source.plpgsql.postgres",
         "source.plsql.oracle",
         "source.tsql"
+    ],
+
+    /**
+     * The list of syntax selectors for which the autocompletion will be disabled.
+     */
+    "autocomplete_selectors_ignore": [
+        "string.quoted.single.sql",
+        "string.quoted.single.pgsql",
+        "string.quoted.single.postgres",
+        "string.quoted.single.oracle",
+        "string.group.quote.oracle"
     ],
 
     /**

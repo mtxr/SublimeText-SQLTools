@@ -456,21 +456,19 @@ class ST(EventListener):
         if not len(locations):
             return None
 
-        # disable completions inside strings
-        if view.match_selector(locations[0], 'string'):
-            return None
-
-        # show completions only for specific selectors
-        selectors = ST.completion.getSelectors()
-        selectorMatched = False
-        if selectors:
-            for selector in selectors:
+        ignoreSelectors = ST.completion.getIgnoreSelectors()
+        if ignoreSelectors:
+            for selector in ignoreSelectors:
                 if view.match_selector(locations[0], selector):
-                    selectorMatched = True
-                    break
+                    return None
 
-        if not selectorMatched:
-            return None
+        activeSelectors = ST.completion.getActiveSelectors()
+        if activeSelectors:
+            for selector in activeSelectors:
+                if view.match_selector(locations[0], selector):
+                    break
+            else:
+                return None
 
         # sublimePrefix = prefix
         # sublimeCompletions = view.extract_completions(sublimePrefix, locations[0])
