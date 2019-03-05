@@ -412,7 +412,7 @@ class ST(EventListener):
             sublime.message_dialog('Your database has no tables.')
             return
 
-        Window().show_quick_panel(ST.tables, callback)
+        ST.show_quick_panel_with_selection(ST.tables, callback)
 
     @staticmethod
     def selectFunction(callback):
@@ -420,7 +420,26 @@ class ST(EventListener):
             sublime.message_dialog('Your database has no functions.')
             return
 
-        Window().show_quick_panel(ST.functions, callback)
+        ST.show_quick_panel_with_selection(ST.functions, callback)
+
+    @staticmethod
+    def show_quick_panel_with_selection(arrayOfValues, callback):
+        w = Window();
+        view = w.active_view()
+        selection = view.sel()[0]
+
+        initialText = ''
+        # ignore obvious non-identifier selections
+        if selection.size() <= 128:
+            (row_begin,_) = view.rowcol(selection.begin())
+            (row_end,_) = view.rowcol(selection.end())
+            # only consider selections within same line
+            if row_begin == row_end:
+                initialText = view.substr(selection)
+
+        w.show_quick_panel(arrayOfValues, callback)
+        w.run_command('insert', {'characters': initialText})
+        w.run_command("select_all")
 
     @staticmethod
     def on_query_completions(view, prefix, locations):
