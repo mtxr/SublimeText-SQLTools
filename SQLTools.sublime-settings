@@ -160,7 +160,7 @@
                     "options": ["--tuples-only", "--no-psqlrc"]
                 },
                 "functions": {
-                    "query": "select quote_ident(n.nspname) || '.' || quote_ident(f.proname) || '(' || pg_get_function_identity_arguments(f.oid) || ')' as funname from pg_catalog.pg_proc as f inner join pg_catalog.pg_namespace as n on n.oid = f.pronamespace where f.proisagg = false and n.nspname not in ('pg_catalog', 'information_schema');",
+                    "query": "select quote_ident(n.nspname) || '.' || quote_ident(f.proname) || '(' || pg_get_function_identity_arguments(f.oid) || ')' as funname from pg_catalog.pg_proc as f inner join pg_catalog.pg_namespace as n on n.oid = f.pronamespace where n.nspname not in ('pg_catalog', 'information_schema');",
                     "options": ["--tuples-only", "--no-psqlrc"]
                 }
             }
