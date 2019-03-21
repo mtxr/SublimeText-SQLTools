@@ -101,6 +101,7 @@ You might need to restart the editor for settings to be refreshed."""
                                   callback=cb,
                                   query=queryToRun,
                                   encoding=self.encoding,
+                                  timeout=60,
                                   silenceErrors=True,
                                   stream=False)
 
