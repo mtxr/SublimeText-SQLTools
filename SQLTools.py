@@ -327,42 +327,50 @@ class ST(EventListener):
         if connectionName not in ST.connectionDict:
             return
 
+        settings = settingsStore.all()
         config = ST.connectionDict.get(connectionName)
 
         promptKeys = [key for key, value in config.items() if value is None]
         promptDict = {}
+        logger.info('[setConnection] prompt keys {}'.format(promptKeys))
 
-        def createConnection(promptedKeys):
-            nonlocal config
-            nonlocal callback
-            settings = settingsStore.all()
+        def mergeConfig(config, promptedKeys=None):
             merged = config.copy()
-            merged.update(promptedKeys)
+            if promptedKeys:
+                merged.update(promptedKeys)
+            return merged
+
+        def createConnection(connectionName, config, settings, callback=None):
             # if DB cli binary could not be found in path a FileNotFoundError is thrown
             try:
-                ST.conn = Connection(connectionName, merged, settings=settings)
+                ST.conn = Connection(connectionName, config, settings=settings)
             except FileNotFoundError as e:
                 # use only first line of the Exception in status message
                 Window().status_message(__package__ + ": " + str(e).splitlines()[0])
                 raise e
             ST.loadConnectionData(callback)
 
+        if not promptKeys:
+            createConnection(connectionName, config, settings, callback)
+            return
+
 
         def setMissingKey(key, value):
             nonlocal promptDict
-            nonlocal promptKeys
             if value is None:
                 return
             promptDict[key] = value
             if promptKeys:
                 promptNext()
             else:
-                createConnection(promptDict);
+                merged = mergeConfig(config, promptDict)
+                createConnection(connectionName, merged, settings, callback)
 
         def promptNext():
             nonlocal promptKeys
             if not promptKeys:
-                return
+                merged = mergeConfig(config, promptDict)
+                createConnection(connectionName, merged, settings, callback)
             key = promptKeys.pop();
             Window().show_input_panel(
                     'Connection ' + key,
