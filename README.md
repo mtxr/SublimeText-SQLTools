@@ -7,7 +7,7 @@ Your swiss knife SQL for Sublime Text.
 
 Write your SQL with smart completions and handy table and function definitions, execute SQL and explain queries, format your queries and save them in history.
 
-Project website: [http://mtxr.github.io/SQLTools/](http://mtxr.github.io/SQLTools/)
+Project website: [https://code.mteixeira.dev/SublimeText-SQLTools/](https://code.mteixeira.dev/SublimeText-SQLTools/)
 
 > If you are looking for VSCode version go to [https://github.com/mtxr/vscode-sqltools](https://github.com/mtxr/vscode-sqltools).
 
@@ -54,7 +54,7 @@ If you are using [Sublime Package Control](https://packagecontrol.io/packages/SQ
 
 I strongly recommend you to use Package Control. It helps you to keep the package updated with the last version.
 
-1. Download the files zip file [here](http://mtxr.github.io/SQLTools/)
+1. Download the latest released zip file [here](https://github.com/mtxr/SublimeText-SQLTools/releases/latest)
 2. Unzip the files and rename the folder to `SQLTools`
 3. Find your `Packages` directory using the menu item  `Preferences -> Browse Packages...`
 4. Copy the folder into your Sublime Text `Packages` directory
@@ -65,13 +65,12 @@ Sublime Text has it's environment variable `PATH` set from launchctl, not by you
 
 ## Contributors
 
-This project exists thanks to all the people who contribute.
-<a href="https://github.com/mtxr/SQLTools/graphs/contributors"><img src="https://opencollective.com/SQLTools/contributors.svg?width=890&button=false" /></a>
+This project exists thanks to all the people who [contribute](https://github.com/mtxr/SublimeText-SQLTools/graphs/contributors).
 
 
 ## Configuration 
 
-Documentation: [http://mtxr.github.io/SQLTools/](http://mtxr.github.io/SQLTools/)
+Documentation: [https://code.mteixeira.dev/SublimeText-SQLTools/](https://code.mteixeira.dev/SublimeText-SQLTools/)
 
 
 
