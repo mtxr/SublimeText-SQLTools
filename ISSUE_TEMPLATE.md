@@ -4,7 +4,7 @@
 > 
 > Before submitting an issue, please consider these things first: 
 > * Are you running the latest version? If not, try to upgrade.
-> * Did you check the [Setup Guide](http://mtxr.github.io/SQLTools/)?
+> * Did you check the [Setup Guide](https://code.mteixeira.dev/SublimeText-SQLTools/)?
 > * Did you check the logs in console (``Ctrl+` `` or select *View → Show Console*)?
 
 ### Issue Type
