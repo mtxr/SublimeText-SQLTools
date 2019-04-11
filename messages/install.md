@@ -5,11 +5,11 @@ Your swiss knife SQL for Sublime Text.
 
 Write your SQL with smart completions and handy table and function definitions, execute SQL and explain queries, format your queries and save them in history.
 
-Project website: http://mtxr.github.io/SQLTools/
+Project website: https://code.mteixeira.dev/SublimeText-SQLTools/
 
 ## Features
 
-* Works with PostgreSQL, MySQL, Oracle, MSSQL, SQLite, Vertica, Firebird
+* Works with PostgreSQL, MySQL, Oracle, MSSQL, SQLite, Vertica, Firebird and Snowflake
 * Smart completions (except SQLite)
 * Run SQL Queries  `CTRL+e, CTRL+e`
 * View table description  `CTRL+e, CTRL+d`
@@ -25,4 +25,4 @@ Project website: http://mtxr.github.io/SQLTools/
 
 ## Configuration 
 
-Documentation: http://mtxr.github.io/SQLTools/
+Documentation: https://code.mteixeira.dev/SublimeText-SQLTools/
