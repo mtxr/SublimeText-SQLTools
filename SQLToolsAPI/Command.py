@@ -177,9 +177,14 @@ class ThreadCommand(Command, Thread):
             self.process = None
 
             logger.info("command execution exceeded timeout (%s s), process killed", self.timeout)
-            self.callback("Command execution time exceeded 'thread_timeout' ({0} s).\nProcess killed!\n\n"
-                          .format(self.timeout))
+            self.callback(("Command execution time exceeded 'thread_timeout' ({0} s).\n"
+                           "Process killed!\n\n"
+                          ).format(self.timeout))
         except Exception:
+            logger.info("command execution exceeded timeout (%s s), process could not be killed", self.timeout)
+            self.callback(("Command execution time exceeded 'thread_timeout' ({0} s).\n"
+                           "Process could not be killed!\n\n"
+                          ).format(self.timeout))
             pass
 
     @staticmethod

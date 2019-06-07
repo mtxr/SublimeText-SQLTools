@@ -49,19 +49,19 @@ You might need to restart the editor for settings to be refreshed."""
         self.Command = getattr(C, commandClass)
 
         self.name = name
-        self.options = options
+        self.options = {k: v for k, v in options.items() if v is not None}
 
         if settings is None:
             settings = {}
         self.settings = settings
 
-        self.type       = options.get('type', None)
-        self.host       = options.get('host', None)
-        self.port       = options.get('port', None)
-        self.database   = options.get('database', None)
-        self.username   = options.get('username', None)
-        self.password   = options.get('password', None)
-        self.encoding   = options.get('encoding', 'utf-8')
+        self.type       = self.options.get('type', None)
+        self.host       = self.options.get('host', None)
+        self.port       = self.options.get('port', None)
+        self.database   = self.options.get('database', None)
+        self.username   = self.options.get('username', None)
+        self.password   = self.options.get('password', None)
+        self.encoding   = self.options.get('encoding', 'utf-8')
         self.encoding   = self.encoding or 'utf-8'  # defaults to utf-8
         if not _encoding_exists(self.encoding):
             self.encoding = 'utf-8'
@@ -70,7 +70,7 @@ You might need to restart the editor for settings to be refreshed."""
         self.show_query = settings.get('show_query', False)
         self.rowsLimit  = settings.get('show_records', {}).get('limit', 50)
         self.useStreams = settings.get('use_streams', False)
-        self.cli        = settings.get('cli')[options['type']]
+        self.cli        = settings.get('cli')[self.options['type']]
 
         cli_path = shutil.which(self.cli)
         if cli_path is None:
@@ -87,6 +87,8 @@ You might need to restart the editor for settings to be refreshed."""
     def runInternalNamedQueryCommand(self, queryName, callback):
         query = self.getNamedQuery(queryName)
         if not query:
+            emptyList = []
+            callback(emptyList)
             return
 
         queryToRun = self.buildNamedQuery(queryName, query)

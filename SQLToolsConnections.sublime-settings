@@ -2,6 +2,7 @@
   "connections": {
   /*
     "Generic Template": {      // Connection name, used in menu (Display name)
+      // connection properties set to "null" will prompt for value when connecting
       "type"     : "pgsql",    // DB type: (mysql, pgsql, oracle, vertica, sqlite, firebird, sqsh)
       "host"     : "HOSTNAME", // DB host to connect to
       "port"     :  PORT,      // DB port
