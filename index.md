@@ -3,7 +3,7 @@
 
 Your swiss knife SQL for Sublime Text.
 
-Write your SQL with smart completions and hady table and function definitions, execute SQL and explain queries, format your queries and save them in history.
+Write your SQL with smart completions and handy table and function definitions, execute SQL and explain queries, format your queries and save them in history.
 
 Project website: [http://mtxr.github.io/SQLTools/](http://mtxr.github.io/SQLTools/)
 
@@ -31,11 +31,13 @@ SQLTools will save you (for sure) a lot of time and help you to increase your pr
 * Threading Support (prevent ST lockups)
 * Query timeout (Kill thread if query takes too long)
 * Unescape chars for languages (PHP \" is replace by ")
+* Prompt for connection parameters
 * Save queries (`CTRL+e, CTRL+q`)
 * List and Run saved queries (`CTRL+e, CTRL+a`)
 * Remove saved queries (`CTRL+e, CTRL+r`)
 
 ## Installing
+
 
 ### Using Sublime Package Control
 
@@ -46,9 +48,10 @@ If you are using [Sublime Package Control](http://wbond.net/sublime_packages/pac
 3. Find SQLTools
 4. Wait & Done!
 
+
 ### Download Manually
 
-I strongly recomend you to use Package Control. It helps you to keep the package updated with the last version.
+I strongly recommend you to use Package Control. It helps you to keep the package updated with the last version.
 
 1. Download the files zip file [here](http://mtxr.github.io/SQLTools/)
 2. Unzip the files and rename the folder to `SQLTools`
@@ -58,24 +61,28 @@ I strongly recomend you to use Package Control. It helps you to keep the package
 
 ## Settings
 
-| Option                  | Description                                                                                                      | Type      | Default value     |
-| ---                     | :---                                                                                                             | ---       | ---               |
-| `unescape_quotes`       | Escape chars like \\" and \\' for extension in array                                                             | `array`   | `[ "php" ]`       |
-| `cli`                   | Path to desired command. You can check more on [Path to Cli](#path-to-commands)                                  | `object`  |                   |
-| `thread_timeout`        | Query execution time in miliseconds before kill. Prevents Sublime Text from lockup while running complex queries | `int`     | 15                |
-| `use_streams`        | Stream results to output | `boolean`     | `false`                |
-| `show_result_on_window` | Show query result using a window (true) or a panel (false)                                                       | `boolean` | `false`           |
-| `show_records`          | Resultset settings. You can check more on [Show records options](#show-records-options)                          | `object`  | `{"limit": 50}`   |
-| `format`                | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting)                                 | `object`  |                   |
-| `safe_limit`            | Optionally set a default LIMIT on queries.  Parameter can be an INT or false.                                    | `int`     | `false`           |
-| `show_query`            | Optionally show the executed query alongside the results. (`"top"` or `"bottom"`)                                | `mixed`   | `false`           |
-| `expand_to_paragraph`   | Expand cursor selection to current paragraph upon running an SQL query.                                          | `boolean` | `false`           |
+| Option            | Description                                                                                                       | Type      | Default value   |
+| ---               | :---                                                                                                              | ---       | ---             |
+| `cli`             | Path to desired CLI binary executable. You can check more on [Path to CLI](#path-to-commands)                     | `object`  |                 |
+| `expand_to`       | Expand cursor selection according this setting upon running a query. Options: `"file"`, `"paragraph"`, `"line"`.  | `string`  | `file`          |
+| `autocompletion`  | Type of completion. `"smart"` - complete table columns and aliases, `"basic"` - basic DB objects, `false` - disable. | `string`  | `smart`         |
+| `thread_timeout`  | Query execution time in milliseconds before kill. Prevents from lockup while executing long running queries       | `int`     | 15              |
+| `use_streams`     | Stream results (line by line) to output                                                                           | `boolean` | `false`         |
+| `show_result_on_window` | Show query result using a window (`true`) or an output panel (`false`)                                      | `boolean` | `false`         |
+| `clear_output`    | Clear previous query results (`true`) vs. append new results to existing output (`false`)                         | `boolean` | `true`          |
+| `focus_on_result` | Move focus (cursor) to the output panel / result window after executing the query.                                | `boolean` | `false`         |
+| `show_query`      | Show the executed query alongside the results. Options: `false` (disabled), `"top"` or `"bottom"`.                | `mixed`   | `false`         |
+| `safe_limit`      | Set a default LIMIT on queries.  Parameter can be an integer or `false`.                                          | `int`     | `false`         |
+| `unescape_quotes` | Escape chars like \\" and \\' for extension in array                                                              | `array`   | `[ "php" ]`     |
+| `show_records`    | Resultset settings. You can check more on [Show records options](#show-records-options)                           | `object`  | `{"limit": 50}` |
+| `format`          | SQL formatting settings. You can check more on [SQL Formatting](#sql-formatting)                                  | `object`  |                 |
+
 
 ### <a id="show-records-options"></a>Show records options
 
 | Option  | Description                                                 | Type  | Default value |
 | ---     | :---                                                        | ---   | ---           |
-| `limit` | number of rows to show whe using Show Table Records command | `int` | 50            |
+| `limit` | number of rows to show when using Show Table Records command | `int` | 50            |
 
 
 ### <a id="sql-formatting"></a>SQL Formatting
@@ -89,23 +96,29 @@ I strongly recomend you to use Package Control. It helps you to keep the package
 | `indent_width`    | Indentation width                                                                                                                     | `int`     | 4             |
 | `reindent`        | Reindent code if `true`                                                                                                               | `boolean` | `true`        |
 
-### <a id="path-to-commands"></a>Path to Cli
 
-In case your database command is not in your `PATH` enviroment var, you can set the path here.
+### <a id="path-to-commands"></a>Path to CLI
+
+In case your database command is not in your `PATH` environment var, you can set the path here.
 
 | Option       | Default value |
 | ---          | ---           |
-| `"mysql"`    | `"mysql"`     | 
+| `"mysql"`    | `"mysql"`     |
 | `"pgsql"`    | `"psql"`      |
+| `"mssql"`    | `"sqlcmd"`    |
 | `"oracle"`   | `"sqlplus"`   |
-| `"vertica"`  | `"vsql"`      |
-| `"sqsh" `    | `"sqsh"`      |
-| `"firebird"` | `"isql"`      |
 | `"sqlite"`   | `"sqlite3"`   |
+| `"vertica"`  | `"vsql"`      |
+| `"firebird"` | `"isql"`      |
+| `"sqsh" `    | `"sqsh"`      |
+| `"snowsql" ` | `"snowsql"`   |
+
 
 ## Connections
 
-You can setup your connecitons using the `Preferences` menu or `CTRL+SHIFT+P` and searching for `ST: Setup Connections`. 
+You can setup your connections using the `Preferences` menu or `CTRL+SHIFT+P` and searching for `ST: Setup Connections`.
+
+When you set any of the connection parameter value to `null` you will be **prompted** for this value upon connecting.
 
 Below you can see an example of the `SQLToolsConnections.sublime-settings`:
 
@@ -155,6 +168,7 @@ Below you can see an example of the `SQLToolsConnections.sublime-settings`:
 
 You can also add connections to your `.sublime-project` files to use per-project connections.
 
+
 ## Auto Complete
 
 After you select one connection, SQLTools will prepare auto completions for you.
@@ -174,6 +188,7 @@ PS: For a better experience, add this line to your sublime settings file
 }
 ```
 
-## Using SQLTools with Mac OS X
 
-Sublime Text has it's evironment variable `PATH` set from launchctl, not by your shell. Binaries installed by packages such as homebrew, for instance `psql` DB CLI for `PostgreSQL`, cannot be found by Sublime Text and results in error in Sublime Text console by `SQLTools`. Installing the package `Fix Mac Path` or setting the full path to your DB CLI binary in `SQLTools.sublime-settings` resolves this issue. Package can be downloaded via [PackageControl](https://packagecontrol.io/packages/Fix%20Mac%20Path) or [github](https://github.com/int3h/SublimeFixMacPath).
+## Using SQLTools with MacOS
+
+Sublime Text has it's environment variable `PATH` set from launchctl, not by your shell. Binaries installed by packages such as homebrew, for instance `psql` DB CLI for `PostgreSQL`, cannot be found by Sublime Text and results in error in Sublime Text console by `SQLTools`. Installing the package `Fix Mac Path` or setting the full path to your DB CLI binary in `SQLTools.sublime-settings` resolves this issue. Package can be downloaded via [PackageControl](https://packagecontrol.io/packages/Fix%20Mac%20Path) or [github](https://github.com/int3h/SublimeFixMacPath).
