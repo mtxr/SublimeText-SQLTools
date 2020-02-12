@@ -192,9 +192,3 @@ PS: For a better experience, add this line to your sublime settings file
 ## Using SQLTools with MacOS
 
 Sublime Text has it's environment variable `PATH` set from launchctl, not by your shell. Binaries installed by packages such as homebrew, for instance `psql` DB CLI for `PostgreSQL`, cannot be found by Sublime Text and results in error in Sublime Text console by `SQLTools`. Installing the package `Fix Mac Path` or setting the full path to your DB CLI binary in `SQLTools.sublime-settings` resolves this issue. Package can be downloaded via [PackageControl](https://packagecontrol.io/packages/Fix%20Mac%20Path) or [github](https://github.com/int3h/SublimeFixMacPath).
-
-<div id="codefund"></div>
-<script
-src="https://app.codefund.io/properties/704/funder.js"
-async
-></script>
