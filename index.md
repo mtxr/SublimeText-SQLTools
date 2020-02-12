@@ -5,7 +5,7 @@ Your swiss knife SQL for Sublime Text.
 
 Write your SQL with smart completions and handy table and function definitions, execute SQL and explain queries, format your queries and save them in history.
 
-Project website: [http://mtxr.github.io/SQLTools/](http://mtxr.github.io/SQLTools/)
+Project website: [https://code.mteixeira.dev/SublimeText-SQLTools/](https://code.mteixeira.dev/SublimeText-SQLTools/)
 
 ## Donate
 
@@ -53,7 +53,7 @@ If you are using [Sublime Package Control](http://wbond.net/sublime_packages/pac
 
 I strongly recommend you to use Package Control. It helps you to keep the package updated with the last version.
 
-1. Download the files zip file [here](http://mtxr.github.io/SQLTools/)
+1. Download the files zip file [here](https://code.mteixeira.dev/SublimeText-SQLTools/)
 2. Unzip the files and rename the folder to `SQLTools`
 3. Find your `Packages` directory using the menu item  `Preferences -> Browse Packages...`
 4. Copy the folder into your Sublime Text `Packages` directory
@@ -192,3 +192,9 @@ PS: For a better experience, add this line to your sublime settings file
 ## Using SQLTools with MacOS
 
 Sublime Text has it's environment variable `PATH` set from launchctl, not by your shell. Binaries installed by packages such as homebrew, for instance `psql` DB CLI for `PostgreSQL`, cannot be found by Sublime Text and results in error in Sublime Text console by `SQLTools`. Installing the package `Fix Mac Path` or setting the full path to your DB CLI binary in `SQLTools.sublime-settings` resolves this issue. Package can be downloaded via [PackageControl](https://packagecontrol.io/packages/Fix%20Mac%20Path) or [github](https://github.com/int3h/SublimeFixMacPath).
+
+<div id="codefund"></div>
+<script
+src="https://app.codefund.io/properties/704/funder.js"
+async
+></script>
