@@ -1,6 +1,13 @@
 ![SQLTools](https://github.com/mtxr/SQLTools/raw/images/icon.png?raw=true) SQLTools
 ===============
 
+> Looking for maintainers! I'm currently using VSCode as my editor, so I'm not actively maintaining this project anymore.
+>
+> If you are interested in maintaining this project, contact me.
+>
+> If you are interested in checking VSCode version, see [https://github.com/mtxr/vscode-sqltools](https://github.com/mtxr/vscode-sqltools).
+
+
 [![Join the chat at https://gitter.im/SQLTools/Lobby](https://badges.gitter.im/SQLTools/Lobby.svg)](https://gitter.im/SQLTools/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Your swiss knife SQL for Sublime Text.
